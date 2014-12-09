@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<!-- ===================== This is location form layout =============================-->
+<record id="class_form" model="ir.ui.view">
+    <field name="name">class.form</field>
+    <field name="model">class.info</field>
+    <field name="arch" type="xml">
+        <form string="test" version="7.0">
+            <sheet>
+                <group>
+						<div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1 style="width:380px;">
+                                <field name = "name"/>
+                            </h1>
+						    <label for="class_code" class="oe_edit_only"/>
+                            <h2 style="width:280px;">
+                                <field name = "class_code"/>
+                            </h2>
+						</div>
+		       
+						<div>
+							<group>
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp oe_form_readonly schedule_status_box">
+										<div class="no_learners">	
+												No. of Learner
+										</div>
+										<div class="learner_box">	
+												9
+										</div>
+									</div>
+								</tree>
+								<tree string=" Program Status Order Lines" create="false" delete="false">
+								<div class="openerp oe_form_readonly schedule_status_box_1">
+									<div class="no_learners_1">	
+											Status
+									</div>
+									<div class="learner_box_1">	
+											In Progress
+									</div>
+								</div>
+								</tree>
+							</group>
+						</div>
+				</group>
+			    <group col="9">					
+					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
+					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
+					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
+				</group>
+				<group>
+					<group style="width:380px;">
+						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
+						<field name = "end_date" readonly="context.get('ctx', False)"/>
+					</group>
+					<group>
+						<field name = "start_time" readonly="context.get('ctx', False)"/>
+						<field name = "end_time" readonly="context.get('ctx', False)"/>
+					</group>
+		        </group>
+						
+			<notebook colspan="5" col="10">
+					<page string="Schedule">
+							<div>
+								<group>
+									<field name = "sessions_per_week" string="Number of Sessions Per Week"/>
+									<field name = "sessions_duration_in_hrs" string="Sessions Durations in Hours"/>
+									<field name = "total_hrs" string="Total Hours"/>
+									<field name = "total_sessions" string="Total Sessions"/>
+									<field name = "total_weeks" string="Total Weeks"/>
+								</group>
+							</div>
+							<div>
+								<group>
+									<h4>
+										<label string=""  readonly="context.get('ctx', False)"/>
+									</h4>
+								</group>
+								<group col="12">
+									<h4>
+										<label string=""  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Start Date"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Start Time"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="End Date"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="End Time"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Room"  readonly="context.get('ctx', False)"/>
+									</h4>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 1"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date2"/>
+									</div>
+									<div>
+										<field name="start_time1"/>
+									</div>
+									<div>
+										<field name="end_date1"/>
+									</div>
+									<div>
+										<field name="end_time1"/>
+									</div>
+									<div>
+										<field name="room1"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 2"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date3"/>
+									</div>
+									<div>
+										<field name="start_time2"/>
+									</div>
+									<div>
+										<field name="end_date2"/>
+									</div>
+									<div>
+										<field name="end_time2"/>
+									</div>
+									<div>
+										<field name="room2"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 3"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date4"/>
+									</div>
+									<div>
+										<field name="start_time3"/>
+									</div>
+									<div>
+										<field name="end_date3"/>
+									</div>
+									<div>
+										<field name="end_time3"/>
+									</div>
+									<div>
+										<field name="room3"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 4"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date5"/>
+									</div>
+									<div>
+										<field name="start_time4"/>
+									</div>
+									<div>
+										<field name="end_date4"/>
+									</div>
+									<div>
+										<field name="end_time4"/>
+									</div>
+									<div>
+										<field name="room4"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 5"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date6"/>
+									</div>
+									<div>
+										<field name="start_time5"/>
+									</div>
+									<div>
+										<field name="end_date5"/>
+									</div>
+									<div>
+										<field name="end_time5"/>
+									</div>
+									<div>
+										<field name="room5"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 6"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date7"/>
+									</div>
+									<div>
+										<field name="start_time6"/>
+									</div>
+									<div>
+										<field name="end_date6"/>
+									</div>
+									<div>
+										<field name="end_time6"/>
+									</div>
+									<div>
+										<field name="room6"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 7"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date"/>
+									</div>
+									<div>
+										<field name="start_time7"/>
+									</div>
+									<div>
+										<field name="end_date7"/>
+									</div>
+									<div>
+										<field name="end_time7"/>
+									</div>
+									<div>
+										<field name="room7"/>
+									</div>
+								</group>
+							</div>
+					</page>
+               		<page string="Trainer">
+						<h2>
+							<label string="Trainer"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<group>
+						   <div>
+									<label for="trainer_broadcast" string = "Broadcast"/>
+									<field name="trainer_broadcast"  nolabel="1" readonly="context.get('ctx', False)">
+										<tree string="Broadcast" editable="bottom">
+											<field name = "s_no"/>
+											<field name = "trainer"/>
+											<field name = "confirmation"/>
+											<field name = "attendance"/>
+										</tree>
+									</field>
+							</div>
+							<div>
+									<label for="trainer_history" string = "Trainer Assignment History"/>
+									<field name="trainer_history"  nolabel="1" readonly="context.get('ctx', False)">
+										<tree string="Broadcast"   create="false" delete="false">
+											<field name = "s_no"/>
+											<field name = "trainer"/>
+											<field name = "session_assigned"/>
+											<field name = "date_of_assignment"/>
+											<field name = "single_session"/>
+										</tree>
+									</field>
+								
+							</div>
+						</group>
+					</page>
+					<page string="M.O.I">
+						<h2>
+							<label string="Mode of Instruction"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<group>
+						   <div>
+							   <group>
+									<field name = "delivery_mode" string="Medium Of Instruction"  readonly="context.get('ctx', False)"/>
+									<field name = "binder_in_use"  readonly="context.get('ctx', False)"/>
+									<field name = "tablet_in_use"  readonly="context.get('ctx', False)"/>
+									<field name = "primary"  readonly="context.get('ctx', False)"  />
+								</group>
+							</div>
+							<div>
+								<group>
+								<field name = "room_arr"  readonly="context.get('ctx', False)"/>
+								<field name="pf_line" readonly="context.get('ctx', False)">
+									<tree string="PF Order Lines" editable="bottom">
+										<field name = "equip_list" required='True'/>
+									</tree>
+								</field>
+								</group>
+							</div>
+						</group>
+					</page>
+					<page string="Learner">
+						<h2>
+							<label string="Learner"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<field name="trainer_learner" readonly="context.get('ctx', False)">
+							<tree string="PF Order Lines" editable="bottom">
+								<field name = "name" required='True'/>
+								<field name = "nric_fin" required='True'/>
+								<field name = "learning_mode"/>
+								<field name = "attendance"/>
+								<field name = "move"/>
+							</tree>
+						</field>
+					</page>
+					<page string="Assets">
+						<h2>
+							<label string="Assets"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<field name="trainer_asset" readonly="context.get('ctx', False)">
+							<tree string="PF Order Lines" editable="bottom">
+								<field name = "name" required='True'/>
+								<field name = "nric_fin" required='True'/>
+								<field name = "blinder_issue_date" />
+								<field name = "tablet_type" />
+								<field name = "tablet_serial_num"/>
+								<field name = "tablet_issue_date"/>
+								<field name = "blended_type" />
+								<field name = "blended_serial_number"/>
+								<field name = "blended_issue_date"/>
+							</tree>
+						</field>
+					</page>
+					<page string="Non Standard Items">
+						<h2>
+							<label string="Non Standard Items"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<group style="width:300px;">
+							<field name = "non_std_items"/>
+						</group>
+						<field name="trainer_po_listing" readonly="context.get('ctx', False)">
+							<tree string="PF Order Lines" editable="bottom">
+								<field name = "po_no" required='True'/>
+								<field name = "item_type" required='True'/>
+								<field name = "po_create_date"/>
+								<field name = "tablet_type" />
+								<field name = "supplier" />
+								<field name = "total"/>
+								<field name = "by_whom"/>
+							</tree>
+						</field>
+					</page>
+					<page string="History">
+						<field name="history_tab" readonly="context.get('ctx', False)">
+							<tree string="PF Order Lines"  create="false" delete="false">
+								<field name = "s_no"/>
+								<field name = "action"/>
+								<field name = "date_time"/>
+								<field name = "action_by"/>
+							</tree>
+						</field>
+					</page>
+				</notebook>
+           </sheet>
+        </form>
+   </field>
+</record>
+
+		 <record id="class_tree" model="ir.ui.view">
+            <field name="name">class.tree</field>
+            <field name="model">class.info</field>
+            <field name="arch" type="xml">
+                <tree string="Location">
+					<field name = "name"/>
+					<field name = "class_code"/>
+			    </tree>
+            </field>
+        </record>
+		 <record id="view_class_filter" model="ir.ui.view">
+            <field name="name">Class</field>
+            <field name="model">class.info</field>
+            <field name="arch" type="xml">
+                <search string="Class">
+                    <field name="name" string="Class"/>
+					<field name="class_code" string="Code"/>
+	           </search>
+            </field>
+        </record>
+	
+		<!-- Event calendar view -->
+        <record model="ir.ui.view" id="event_calendar_view1">
+            <field name="name">class.calendar</field>
+            <field name="model">class.info</field>
+			<field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Calendar" date_start="start_date" color="class_code">
+                    <field name = "name" string="Class"/>
+					<field name = "class_code" string="Code"/>
+					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
+					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
+					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
+					<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
+					<field name = "end_date" readonly="context.get('ctx', False)"/>
+                </calendar>
+            </field>
+        </record> 
+
+		<record model="ir.actions.act_window" id="action_class">
+            <field name="name">Class</field>
+			<field name="type">ir.actions.act_window</field>
+            <field name="res_model">class.info</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">calendar,tree,form</field>
+			<field name="search_view_id" ref="view_class_filter"/>
+		    <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new location.
+              </p>
+            </field>
+        </record>
+
+
+<menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
+<menuitem name = "Test Calendar" id = "test_listing_page" parent = "menu_sub3" action = "action_test_listing_page" />
+
+</data> 
+</openerp>

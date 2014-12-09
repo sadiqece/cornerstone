@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<!-- ===================== This is location form layout =============================-->
+
+<!--	<record model="ir.ui.view" id="event_form_view">
+            <field name="name">Event Form</field>
+            <field name="model">calendar.event</field>
+            <field name="arch" type="xml">
+                <form string="event_form_view" version="7.0">
+                <header>
+
+                </header>
+                <sheet>
+				
+				</sheet>
+				</form>
+			</field>
+	</record> -->
+	
+	<record id="test_listing_page_form" model="ir.ui.view">
+		<field name="name">test.listing.page.form</field>
+		<field name="model">test.listing.page.info</field>
+		<field name="arch" type="xml">
+			<form string="Calendar" version="7.0">
+			<sheet>
+				<group>
+					<group class="oe_title" style="width:350px;">
+							<field name = "test_name_id" on_change="on_change_test_name_id(test_name_id)"/>
+                            <field name = "test_definitation" string="Test Definitation"/>
+					</group>
+					<div>
+							<group>
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp oe_form_readonly test_schedule_status_box">
+										<div class="test_schedule_no_learners">	
+												No. of Learner
+										</div>
+										<div class="test_schedule_learner_box">	
+												9
+										</div>
+									</div>
+								</tree>
+								<tree string=" Program Status Order Lines" create="false" delete="false">
+								<div class="openerp oe_form_readonly test_schedule_status_box_1">
+									<div class="test_schedule_no_learners_1">	
+											Status
+									</div>
+									<div class="test_schedule_learner_box_1">	
+											In Progress
+									</div>
+								</div>
+								</tree>
+							</group>
+					</div>
+					<group>
+                            <field name = "test_code" string="Test Code"/>
+                            <field name = "test_code_compliance" string="Test Code(compliance)"/>
+					</group>
+					<group>
+                            <field name = "module_id" on_change="on_change_module_id(module_id)" string="Module Name"/>
+                            <field name = "module_code" string="Module Code" />
+					</group>
+				</group>
+					<group>
+						<group style="width:380px;">
+							<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
+							<field name = "end_date" readonly="context.get('ctx', False)"/>
+						</group>
+						<group>
+							<field name = "start_time" readonly="context.get('ctx', False)"/>
+							<field name = "end_time" readonly="context.get('ctx', False)"/>
+						</group>
+					</group>
+					<group style="width:200px;">
+                            <field name = "room_id" on_change="on_change_room_id(room_id)" string="Rooms"/>
+					</group>
+				
+					<notebook colspan="5" col="10">
+						<page string="Test Modality">
+							<h2>	
+								<label for="test_modality" class="oe_edit_only"/>
+							</h2>
+							<group style="width:300px;">
+								<field name='delivery_mode' string="Delivery Mode"/>
+							</group>
+							<field name='test_modality' nolabel='1'>
+									<tree string='List' editable="bottom">
+										<field name='test_id' on_change="on_change_test_id(test_id)" />
+										<field name='active'/>
+									</tree>
+							</field>
+						</page>
+						<page string="Learner">
+							<h2>	
+								<label for="learner" class="oe_edit_only"/>
+							</h2>
+							<field name='learner' nolabel='1'>
+									<tree string='List' editable="bottom">
+										<field name='name' />
+										<field name='nric_fin'/>
+										<field name='class_code'/>
+										<field name='compliance_code'/>
+										<field name='level'/>
+										<field name='attendance'/>
+										<field name='reading'/>
+										<field name='listening'/>
+										<field name='speaking'/>
+										<field name='writing'/>
+										<field name='numeracy'/>
+									</tree>
+							</field>
+						</page>
+						<page string="Scores">
+							<h2>	
+								<label for="test_scores" class="oe_edit_only"/>
+							</h2>
+							<field name='test_scores' nolabel='1'>
+									<tree string='List' editable="bottom">
+										<field name='name' />
+										<field name='nric_fin'/>
+										<field name='compr'/>
+										<field name='conv'/>
+										<field name='r_level'/>
+										<field name='r_scores'/>
+										<field name='l_level'/>
+										<field name='l_scores'/>
+										<field name='s_level'/>
+										<field name='s_scores'/>
+										<field name='w_level'/>
+										<field name='w_scores'/>
+										<field name='w_outcome'/>
+										<field name='n_level'/>
+										<field name='n_scores'/>
+										<field name='n_outcome'/>
+									</tree>
+							</field>
+						</page>
+					</notebook>
+			</sheet>
+			</form>
+		</field>
+	</record>
+
+
+
+	<!-- ========================= Action Layout ============================= -->
+	
+	
+	<record id="test_listing_page_tree" model="ir.ui.view">
+            <field name="name">test.listing.page.tree</field>
+            <field name="model">test.listing.page.info</field>
+            <field name="arch" type="xml">
+                <tree string="Calendar">
+					<field name = "s_no"/>
+					<field name = "test_name_id" on_change="on_change_test_name_id(test_name_id)"/>
+					<field name = "test_definitation" string="Type"/>
+					<field name = "test_code" string="Code"/>
+					<field name = "start_date" string="Date"/>
+					<field name = "status" />
+					<field name = "capacity" />
+					<field name = "actual_number" />
+                </tree>
+            </field>
+        </record>
+		
+		<!-- Event calendar view -->
+        <record model="ir.ui.view" id="event_calendar_view">
+            <field name="name">test.listing.page.calendar</field>
+            <field name="model">test.listing.page.info</field>
+			<field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Calendar" date_start="start_date" color="test_definitation" date_delay="start_time">
+                    <field name= "name"/>
+                    <field name= "test_definitation"/>
+                    <field name= "test_code"/>
+					<field name = "start_date"/>
+					<field name = "status" />
+					<field name = "capacity" />
+					<field name = "actual_number" />
+                </calendar>
+            </field>
+        </record> 
+		
+		<record id="view_test_listing_filter" model="ir.ui.view">
+            <field name="name">Test Listing Page</field>
+            <field name="model">test.listing.page.info</field>
+            <field name="arch" type="xml">
+                <search string="Test Scheduling">
+
+	           </search>
+            </field>
+        </record>
+		
+		<record model="ir.actions.act_window" id="action_test_listing_page">
+            <field name="name">Test Listing</field>
+			<field name="type">ir.actions.act_window</field>
+            <field name="res_model">test.listing.page.info</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">calendar,tree,form</field>
+			<field name="search_view_id" ref="view_test_listing_filter"/>
+		    <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new test schedule.
+              </p>
+            </field>
+        </record>
+		
+
+<menuitem name = "Test Calendar" id = "test_listing_page" parent = "menu_sub3" action = "action_test_listing_page" />
+
+
+</data> 
+</openerp>

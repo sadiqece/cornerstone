@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<!-- ===================== This is tree layout =============================-->
+<record id="program_tree" model="ir.ui.view">
+    <field name="name">Program</field>
+    <field name="model">lis.program</field>
+    <field name="arch" type="xml">
+        <tree string="lab">
+            <field name = "name"/>
+            <field name = "program_code"/>
+            <field name = "program_level"/>
+	     	<field name = "program_duration"/>
+			<field name = "program_fee"/>
+        </tree>
+    </field>
+</record>
+		 <record id="view_program_filter" model="ir.ui.view">
+            <field name="name">Program</field>
+            <field name="model">lis.program</field>
+            <field name="arch" type="xml">
+                <search string="Program">
+                    <field name="name" string="Module"/>
+					<field name="program_code" string="Code"/>
+                </search>
+            </field>
+        </record>
+<!-- ========================= Action Layout ============================= -->
+<record id="action_program" model="ir.actions.act_window">
+    <field name="name">Program</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">lis.program</field>
+    <field name="view_type">form</field>
+	<field name="limit">10</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="view_program_filter"/>
+    <field name="view_id" ref="program_tree"/>
+</record>
+
+
+<!-- ========================This is program form layout===============================-->
+<record id="program_form" model="ir.ui.view">
+    <field name="name">Program</field>
+    <field name="model">lis.program</field>
+    <field name="arch" type="xml">
+        <form string="lab" version="7.0">
+            <sheet>
+                <group>
+                      <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1 style="width:380px;">
+                                <field name = "name"/>
+                            </h1>
+						    <label for="program_code" class="oe_edit_only"/>
+                            <h2>
+                                <field name = "program_code"/>
+                            </h2>
+						</div>
+				<group col="4">
+						<div attrs="{'invisible': [('prog_status_display', 'in' , ('Incomplete', 'InActive', 'False'))]}">
+							<group colspam="6" col="12">
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp oe_form_readonly prog_status_box">
+										<div class="prog_status_box_label">	
+												Status
+										</div>
+										<div class="prog_status_box_status">	
+												<field name = "prog_status_display" readline="1" />
+										</div>
+										<div class="prog_status_box_date">	
+											<field name = "date4"/>			
+										</div>
+									</div>
+								</tree>
+						</group >
+					</div>
+					<div attrs="{'invisible': [('prog_status_display_1', 'in' ,('Active','Completed', 'False'))]}">
+						<group colspan="4" col="12">
+							<tree string=" Program Status Order Lines" create="false" delete="false">
+								<div class="openerp oe_form_readonly prog_status_box_1">
+								<div class="prog_status_box_label_1">	
+										Status
+								</div>
+								<div class="prog_status_box_status_1">	
+										<field name = "prog_status_display_1" readline="1" />
+								</div>
+								<div class="prog_status_box_date_1">	
+									<field name = "date3"/>			
+								</div>
+								</div>
+							</tree>
+						</group>
+				</div>
+				</group>
+				 </group>
+				 <group col="6">	
+					<field name = "program_cert_achevied"/>
+					<field name = "program_level"  widget="selection/" />
+				 </group>
+				 <group col="10">					
+					<field name = "program_duration" readonly="1" string="Total Duration"/>
+					<field name = "program_fee" readonly="1" string="Total Fee $"/>
+					<field name = "program_tot_mod" readonly="1"/>
+				    <field name = "program_status" widget="selection/"/>
+					<field name = "program_tot_credit" readonly="1"/>
+				</group>
+				
+				<group col="8">
+					<div  colspan='4' >
+						 <label for="program_description"/>
+						 <field name="program_description" on_change="on_change_program_desc(program_description)" />
+					</div>
+					<group>
+						<field name = "program_center"  widget="selection/"/>
+					
+						<field name = "select_module"  widget="selection/"/>
+					</group>
+				</group>
+				<notebook colspan="5" col="10">
+					<page string="Modules">
+						<field name='program_mod_line' nolabel='1'>
+									<tree string='List' editable="bottom">
+										<field name='prog_mod_id' invisible="1" />
+										<field name='module_id' on_change="on_change_module_id(module_id)"/>
+										<field name = "module_code"/>
+										<field name = "no_of_hrs" on_change="on_change_module_id(module_id)"/>
+										<button name="views" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
+									</tree>
+						</field>
+					</page>
+                    <page string="Req">
+					<group col="6">
+						<div>	
+								<label for="prog_req_line" string = "Program Level Requirments"/>
+								<field name='prog_req_line' nolabel='1' style="height:150px">
+									<tree string="Req Order Lines" editable="bottom">
+										<field name = "program_master_req" on_change="on_change_program_master_req(program_master_req)"/>
+										<field name = "description"/>
+										<field name = "musthave"/>
+										<field name = "verification"/>
+									</tree>
+								</field>
+						</div>
+						<div>
+								<label for="program_mod_req_line" string = "Module Level Requirments"/>
+								<field name='program_mod_req_line' nolabel='1'  >
+											<tree string="Req Order Lines">
+												<field name = "module_name"/>
+												<field name = "module_code"/>
+												<field name = "master_req"/>
+												<field name = "description"/>
+												<field name = "musthave"/>
+												<field name = "verification"/>
+												<button name="views" string="View Module" icon="view_mod" type="object"/>
+											</tree>
+								</field>
+						</div>
+					</group>
+					</page>
+                    <page string="Desc">
+					
+							<group col="6">
+								<div>
+								<h2>
+									<label string="Program Descriptions"  readonly="context.get('ctx', False)"/>
+								</h2>
+									<label for="program_synopsis"/>
+									<field name="program_synopsis" on_change="on_change_program_synopsis(program_synopsis)"/>
+									<label for="program_outline"/>
+									<field name="program_outline"/>
+								</div>
+								<div>
+								<h2>
+									<label string="Descriptions of Attached Modules"  readonly="context.get('ctx', False)"/>
+								</h2>
+								<field name='program_module_desc_line'  create='false' delete='false'>
+								<tree string="Req Order Lines">
+									<field name = "s_no"/>
+									<field name = "name"/>
+									<field name = "module_code" string="Module Code"/>
+									<field name = "synopsis"/>
+								</tree>
+								</field>
+							</div>
+							</group>
+					</page>
+					<page string="M.O.I">
+						<field name='program_modality_line' nolabel='1'  create='false' delete='false'>
+							<tree string="Req Order Lines">
+								<field name = "s_no"/>
+								<field name = "name"/>
+								<field name = "module_code" string="Module Code"/>
+								<field name = "delivery_mode" string="Medium of Instruction"/>
+								<field name = "primary" string="Primary Mode"/>
+								<field name = "modalities_in_use" string="Modes In use"/>
+							</tree>
+						</field>
+					</page>
+					<page string="Test / Assessments">
+						<field name='program_test_line' nolabel='1'  create='false' delete='false'>
+							<tree string="Req Order Lines">
+								<field name = "s_no"/>
+								<field name = "name"/>
+								<field name = "module_code" string="Module Code"/>
+								<field name = "pre_test" string="Pre-Test"/>
+								<field name = "in_class_test" string="In Class"/>	
+								<field name = "post_test" string="Post-Test"/>	
+							</tree>
+						</field>
+					</page>
+					<page string="Show &amp; Do">
+						<group>
+							<div>
+								<field name='program_show_do_line' nolabel='1'  create='false' delete='false'>
+									<tree string="Req Order Lines" editable="bottom">
+										<field name = "master_show_do" on_change="on_change_master_show_do(master_show_do)"/>
+										<field name = "supp_doc_req"/>
+									</tree>
+								</field>
+							</div>
+							<div>
+								<field name='program_module_show_do_line' nolabel='1' >
+											<tree string="Req Order Lines" create='false' delete='false' edit="false" editable="top">
+												<field name = "module_name"/>
+												<field name = "module_code"/>
+												<field name = "master_req" string="Item"/>
+												<button name="views" string="View Module" icon="view_mod" type="object"/>
+											</tree>
+								</field>
+							</div>
+						</group>
+					</page>
+					<page string="Fees &amp; Subsidies">
+						<h2>
+					    <label string="Fees &amp; Subsidies"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<group>
+							<field name = "program_total_fee" string="Total Program Fee(Baseline Only) $"/>
+						</group>	
+						<group>		
+						<div>	
+								<label for="program_cost_line" string = "Module Cost Items"/>
+								<field name='program_cost_line' nolabel='1'  create='false' delete='false' style="height:150px">
+									<tree string="Req Order Lines">
+										<field name = "name" />
+										<field name = "module_code" string="Module Code"/>
+										<field name = "module_fee" string="Module Cost"/>
+									</tree>
+								</field>
+						</div>
+							<div>
+								<label for="subsidy_line"/>
+								<field name="subsidy_line" nolabel="1">
+									<tree string="Cost Order Lines" editable="bottom">
+										<field name = "s_no"/>
+										<field name = "master_subsidy"   on_change="on_change_master_subsidy(master_subsidy)"/>
+										<field name = "per_fee_mod" on_change="on_change_per_fee_mod(per_fee_mod)"/>
+										<field name = "ver_req"/>
+									</tree>
+								</field>
+							</div>
+						</group>
+					</page>
+					<page string="Durations">
+					<group>
+						<field name = "program_tot_duration" string="Total Duration(Hours)"/>
+					</group>
+						<field name='program_duration_line' nolabel='1'  create='false' delete='false'>
+							<tree string="Req Order Lines">
+								<field name = "s_no"/>
+								<field name = "name" />
+								<field name = "module_code" string="Module Code"/>
+								<field name = "module_duration" string="Module Duration (hrs)"/>
+							</tree>
+						</field>
+					</page>
+					<page string="Alerts">
+					  <group col="6">
+						  <div>
+								<label for="program_alert_line" string = "Alerts for Programs"/>
+								<field name="program_alert_line">
+										<tree string="Alert Order Lines" editable="bottom">
+											<field name = "s_no"/>
+											<field name = "program_alert_list" on_change="on_change_master_program_alerts(program_alert_list)"/>
+											<field name = "time" widget="float_time" on_change="on_change_alert_time(time)"/>
+											<field name = "befor_after"/>
+											<field name = "min_max"/>
+											<field name = "value_per" on_change="on_change_value_per(value_per)"/>
+											<field name = "action"/>
+										</tree>
+									</field>
+							</div>
+							<div>	
+								<label for="program_cost_line" string = "Alerts for attached Modules"/>
+								<field name='program_cost_line' nolabel='1'  create='false' delete='false' style="height:150px">
+									<tree string="Req Order Lines">
+										<field name = "name" />
+										<field name = "module_code" string="Module Code"/>
+										<field name = "alert_line"/>
+									</tree>
+								</field>
+						</div>
+						</group>
+					</page>
+					<page string="History">
+						<field name="program_history_line">
+								<tree string="History Order Lines" create="false" delete="false">
+									<field name = "s_no"/>
+									<field name = "date_created"/>
+									<field name = "created_by"/>
+									<field name = "last_update"/>
+									<field name = "last_update_by"/>
+									<field name = "date_status_change"/>
+									<field name = "status_change_by"/>
+									<field name = "changes"/>
+								</tree>
+						</field>
+					</page>
+					
+                </notebook>
+           </sheet>
+        </form>
+   </field>
+</record>
+
+<!-- ===================== This is module tree layout =============================-->
+
+
+<record id="matser_req_form" model="ir.ui.view">
+    <field name="name">Master Req</field>
+    <field name="model">master.req</field>
+    <field name="arch" type="xml">
+         <form string="Req Order Lines" version="7.0">
+		 <group>
+			<field name = "name"/>
+			<field name = "description"/>
+			<field name = "musthave"/>
+			<field name = "verification"/>
+		</group>
+		</form>
+    </field>
+</record>
+
+<record id="matser_req_form" model="ir.ui.view">
+    <field name="name">Master Equipment</field>
+    <field name="model">master.equip</field>
+    <field name="arch" type="xml">
+         <form string="Req Order Lines" version="7.0">
+		 <group>
+			<field name = "name"/>
+		</group>
+		</form>
+    </field>
+</record>
+
+<record id="matser_req_form" model="ir.ui.view">
+    <field name="name">Master Equipment</field>
+    <field name="model">master.tests</field>
+    <field name="arch" type="xml">
+         <form string="Req Order Lines" version="7.0">
+		 <group>
+			<field name = "name"/>
+		</group>
+		</form>
+    </field>
+</record>
+<record id="matser_req_form" model="ir.ui.view">
+    <field name="name">Master Show Do</field>
+    <field name="model">master.show.do</field>
+    <field name="arch" type="xml">
+         <form string="Req Order Lines" version="7.0">
+		 <group>
+			<field name = "name"/>
+			<field name = "supp_doc_req"/>
+		</group>
+		</form>
+    </field>
+</record>
+<record id="matser_req_form" model="ir.ui.view">
+    <field name="name">Master Subsidy</field>
+    <field name="model">master.subsidy</field>
+    <field name="arch" type="xml">
+         <form string="Req Order Lines" version="7.0">
+		 <group>
+			<field name = "name"/>
+			<field name = "per_fee_mod"/>
+			<field name = "ver_req"/>
+		</group>
+		</form>
+    </field>
+</record>
+<!-- ========================This is module form layout===============================-->
+<record model="ir.ui.view" id="ir_cron_view_calendar">
+            <field name="model">ir.cron</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Scheduled Actions" date_start="nextcall" color="user_id">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                </calendar>
+            </field>
+        </record>
+<record id="module_form" model="ir.ui.view">
+    <field name="name">module.form</field>
+    <field name="model">cs.module</field>
+    <field name="arch" type="xml">
+        <form string="module" version="7.0">
+            <sheet>
+				<script>
+				/*	function myfunction {
+						$(selector).pagination({
+							items: 100,
+							itemsOnPage: 10
+						});
+					
+						function myfunction {
+						$(selector).pagination('prevPage');
+					});
+						function myfunction {
+						$(selector).pagination('nextPage');
+					});
+					}); */
+				</script>
+                <group>
+						<div class="oe_title">
+                            <label for="name" class="oe_edit_only" invisible="context.get('ctx', False)"/>
+                            <h1 style="width:320px;"><field name="name" class="oe_inline"  readonly="context.get('ctx', False)"/></h1>
+							<label for="module_code" class="oe_edit_only" style="width:300px;" invisible="context.get('ctx', False)"/>
+                            <h2>
+                                <field name = "module_code"  readonly="context.get('ctx', False)"/>
+                            </h2>
+							<label for="module_crscode" class="oe_edit_only" style="width:300px;" invisible="context.get('ctx', False)"/>
+							 <h2>
+							<field name = "module_crscode"  readonly="context.get('ctx', False)"/>
+							</h2>
+                        </div>
+						<group col="4">
+						<div attrs="{'invisible': [('status_display', 'in' , ('Incomplete', 'InActive', 'False'))]}">
+							<group colspam="6" col="12">
+								<tree string="Status Order Lines" create="false" delete="false">
+									<div id="div_status2"  class="openerp oe_form_readonly status_box">
+										<div class="status_box_label">	
+												Status
+										</div>
+										<div class="status_box_status">	
+												<field name = "status_display" readline="1"/>
+										</div>
+										<div class="status_box_date">	
+											<field name = "date2"/>			
+										</div>
+									</div>
+								</tree>
+						</group >
+					</div>
+					<div attrs="{'invisible': [('status_display_1', 'in' ,('Active','Completed', 'False'))]}">
+						<group colspan="4" col="12">
+							<tree string="Status Order Lines" create="false" delete="false">
+								<div id="div_status1" class="openerp oe_form_readonly status_box_1">
+								<div class="status_box_label_1 ">	
+										Status
+								</div>
+								<div class="status_box_status_1">	
+										<field name = "status_display_1" readline="1" />
+								</div>
+								<div class="status_box_date_1 ">	
+									<field name = "date1"/>			
+								</div>
+								</div>
+							</tree>
+						</group>
+				</div>
+				</group>
+               </group>
+			   <group>
+			  <field name = "module_certification" readonly="context.get('ctx', False)"/>
+			   </group>
+				 <group col="8">
+					<field name = "module_duration" on_change="on_change_module_duration(module_duration)"  readonly="context.get('ctx', False)"/>
+					<field name = "module_fee" on_change="on_change_module_fee(module_fee)"  readonly="context.get('ctx', False)"/>
+					<field name = "module_status" widget="selection/"  readonly="context.get('ctx', False)" />
+					<field name = "module_credit_value"  readonly="context.get('ctx', False)" string="Credit Value"/>
+					<field name = "module_level"  widget="selection/"  readonly="context.get('ctx', False)"/>
+					<field name = "module_category"  widget="selection/"  readonly="context.get('ctx', False)"/>
+					<field name = "module_pathway"  widget="selection/"  readonly="context.get('ctx', False)"/>
+					<field name = "orientation"  widget="selection/"  readonly="context.get('ctx', False)"/>
+			    </group>
+			
+				<group col="8">
+					<div  colspan='4' >
+						 <label for="description"/>
+						 <field name="description"  on_change="on_change_module_desc(description)" readonly="context.get('ctx', False)" />
+					</div>
+					<group>
+						<field name = "module_center"  widget="selection/"  readonly="context.get('ctx', False)"/>
+						
+						<field name = "select_program"  widget="selection/" readonly="context.get('ctx', False)"/>
+					</group>
+				</group>
+				<notebook colspan="5" col="10">
+                    <page string="Requirements">
+						<field name="req_line"  readonly="context.get('ctx', False)" >
+						<tree string="Req Order Lines" editable="bottom">
+							<field name = "master_req" on_change="on_change_master_req(master_req)"/>
+							<field name = "description"/>
+							<field name = "musthave"/>
+							<field name = "verification"/>
+                        </tree>
+						</field>
+					</page>
+                    <page string="Description">
+							 <group>
+								<field name = "max_num_ppl_class" readonly="context.get('ctx', False)"/>
+							 </group>
+							 <group>
+								<div>
+									<label for="synopsis"/>
+									<field name="synopsis"  on_change="on_change_module_synopsis(synopsis)" readonly="context.get('ctx', False)"/>
+								</div>
+							</group>
+							<group>
+								<div>
+									<label for="outline"/>
+									<field name="outline"  readonly="context.get('ctx', False)"/>
+								</div>
+							</group>
+							
+				    </page>
+					<page string="M.O.I">
+					    <h2>
+					    <label string="Mode of Instruction"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<group>
+						   <div>
+							   <group>
+									<field name = "delivery_mode" string="Medium Of Instruction"  readonly="context.get('ctx', False)"/>
+									<field name = "binder_in_use"  readonly="context.get('ctx', False)"/>
+									<field name = "tablet_in_use"  readonly="context.get('ctx', False)"/>
+									<field name = "primary"  readonly="context.get('ctx', False)"  />
+								</group>
+							</div>
+							<div>
+								<group>
+								<field name = "room_arr"  readonly="context.get('ctx', False)"/>
+								<field name="pf_line" readonly="context.get('ctx', False)">
+									<tree string="PF Order Lines" editable="bottom">
+										<field name = "equip_list" required='True'/>
+									</tree>
+								</field>
+								</group>
+							</div>
+						</group>
+			        </page>
+					<page string="Test / Assessments">
+						<group col="3">
+						   <div>
+									<group colspan="1">
+										<field name="pre_test"  readonly="context.get('ctx', False)"/>
+									</group>
+									<div attrs="{'invisible': [('pre_test', '=' , False)]}">
+									<field name="pre_test_line"  nolabel="1" readonly="context.get('ctx', False)">
+										<tree string="Pre Order Lines" editable="bottom">
+											<field name = "order_priority"/>
+											<field name = "test_list"/>
+										</tree>
+									</field>
+									</div>
+							 </div>
+							 <div>
+								<group colspan="1">
+									<field name="in_class_test" readonly="context.get('ctx', False)"/>
+								</group>
+								<div attrs="{'invisible': [('in_class_test', '=' , False)]}">
+								<field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)">
+									<tree string="In Class Order Lines" editable="bottom">
+										<field name = "order_priority"/>
+										<field name = "test_list"/>
+									</tree>
+								</field>
+								</div>
+							</div>
+							<div>
+								<group colspan="1">
+									<field name="post_test" readonly="context.get('ctx', False)"/>
+								</group>
+								<div attrs="{'invisible': [('post_test', '=' , False)]}">
+								<field name="post_test_line"  nolabel="1" readonly="context.get('ctx', False)">
+									<tree string="Post Order Lines" editable="bottom">
+										<field name = "order_priority" />
+										<field name = "test_list"/>
+									</tree>
+								</field>
+								</div>
+							</div>
+						</group>
+					</page>
+					<page string="Alerts">
+						<field name="alert_line" readonly="context.get('ctx', False)">
+								<tree string="Alert Order Lines" editable="bottom">
+									<field name = "s_no"/>
+									<field name = "alert_list" on_change="on_change_master_module_alerts(alert_list,mod_id)"/>
+									<field name = "time" widget="float_time" on_change="on_change_alert_time(time)"/>
+									<field name = "befor_after"/>
+									<field name = "min_max"/>
+									<field name = "value_per" on_change="on_change_value_per(value_per)"/>
+									<field name = "action"/>
+									<field name = "mod_id"  invisible="1"/>
+								</tree>
+							</field>
+                    </page>
+					<page string="History">
+							<field name="history_line" readonly="context.get('ctx', False)" class="history_line">
+								<tree string="History Order Lines" create="false" delete="false">
+									<field name = "s_no"/>
+									<field name = "date_created"/>
+									<field name = "created_by"/>
+									<field name = "last_update"/>
+									<field name = "last_update_by"/>
+									<field name = "date_status_change"/>
+									<field name = "status_change_by"/>
+									<field name = "changes"/>
+								</tree>
+							</field>
+                    </page>
+					<page string="Modules">
+						<group>
+							<field name = "no_of_modules"/>
+						</group>
+						<group col="4">
+						   <div>
+								<group colspan="1">
+									<field name = "group_name1" readonly="context.get('ctx', False)"/>
+									<field name="max_modules1"  readonly="context.get('ctx', False)"/>
+								</group>
+								<field name="Module1_group"  readonly="context.get('ctx', False)">
+									<tree string="Pre Order Lines" editable="bottom">
+										<field name = "s_no"/>
+										<field name = "module_id" on_change="on_change_module_id(module_id)"/>
+									</tree>
+								</field>
+							 </div>
+							 <div>
+								<group colspan="1">
+									<field name = "group_name2" readonly="context.get('ctx', False)"/>
+									<field name="max_modules2"  readonly="context.get('ctx', False)" />
+								</group>
+								<field name="Module2_group"  readonly="context.get('ctx', False)">
+									<tree string="Pre Order Lines" editable="bottom">
+										<field name = "s_no"/>
+										<field name = "module_id" on_change="on_change_module_id(module_id)" />
+									</tree>
+								</field>
+							 </div>
+							 <div>
+								<group colspan="1">
+									<field name = "group_name3" readonly="context.get('ctx', False)"/>
+									<field name="max_modules3"  readonly="context.get('ctx', False)"/>
+								</group>
+								<field name="Module3_group"  readonly="context.get('ctx', False)">
+									<tree string="Pre Order Lines" editable="bottom">
+										<field name = "s_no"/>
+										<field name = "module_id" on_change="on_change_module_id(module_id)"/>
+									</tree>
+								</field>
+							 </div>
+							 <div>
+								<group colspan="1">
+									<field name = "group_name4" readonly="context.get('ctx', False)"/>
+									<field name="max_modules4"  readonly="context.get('ctx', False)"/>
+								</group>
+								<field name="Module4_group"  readonly="context.get('ctx', False)">
+									<tree string="Pre Order Lines" editable="bottom">
+										<field name = "s_no"/>
+										<field name = "module_id" on_change="on_change_module_id(module_id)"/>
+									</tree>
+								</field>
+							 </div>
+						</group>
+                    </page>
+                </notebook>
+           </sheet>
+        </form>
+   </field>
+</record>
+
+<!-- ========================= Action Layout ============================= -->
+
+		
+
+		 <record id="module_tree" model="ir.ui.view">
+            <field name="name">module.tree</field>
+            <field name="model">cs.module</field>
+            <field name="arch" type="xml">
+                <tree string="CSModules">
+					<field name = "name"/>
+					<field name = "module_code"/>
+					<field name = "module_level"/>
+					<field name = "module_category" />
+					<field name = "module_pathway"/>
+					<field name = "module_crscode" string='CRS Code'/>
+					<field name = "module_duration" string='Duration(Hours)'/>
+					<field name = "module_fee" string='Module Fee (SGD)'/>
+                </tree>
+            </field>
+        </record>
+		 <record id="view_module_filter" model="ir.ui.view">
+            <field name="name">Module</field>
+            <field name="model">cs.module</field>
+            <field name="arch" type="xml">
+                <search string="Modules">
+                    <field name="name" string="Module"/>
+					 <field name="module_code" string="Code"/>
+					  <field name="module_category" string="Category"/>
+                </search>
+            </field>
+        </record>
+	
+		<record model="ir.actions.act_window" id="action_module">
+            <field name="name">Module</field>
+			<field name="type">ir.actions.act_window</field>
+            <field name="res_model">cs.module</field>
+            <field name="view_type">form</field>
+			<field name="limit">10</field>
+			<field name="view_mode">tree,form,calendar</field>
+            <field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="view_module_filter"/>
+		    <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new module.
+              </p>
+            </field>
+        </record>
+
+<!-- ===========================Menu Settings=========================== -->
+<menuitem name = "Corner Stone" id = "menu_lis_lab" />
+<menuitem name = "Offerings" id = "menu_sub" parent = "menu_lis_lab"/>
+<menuitem name = "Fulfilment" id = "menu_sub1" parent = "menu_lis_lab"/>
+<menuitem name = "Definitions" id = "menu_sub2" parent = "menu_lis_lab"/>
+<menuitem name = "Scheduling and Information" id = "menu_sub3" parent = "menu_lis_lab"/>
+<menuitem name = "Test Scheduling" id = "menu_sub6" parent = "menu_lis_lab"/>
+<menuitem name = "Enrollment" id = "menu_sub5" parent = "menu_lis_lab"/>
+<menuitem name = "Program" id = "lab_program" parent = "menu_sub" action = "action_program" />
+<menuitem name = "Module" id = "lab_module" parent = "menu_sub" action = "action_module" />
+
+</data> 
+</openerp>

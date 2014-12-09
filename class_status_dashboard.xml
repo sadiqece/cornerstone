@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+	<record id="class_status_dashboard_page_form" model="ir.ui.view">
+		<field name="name">class.status.dashboard.form</field>
+		<field name="model">class.status.dashboard.info</field>
+		<field name="arch" type="xml">
+			<form string="Calendar" version="7.0">
+			<sheet>
+				<group>
+						<h2>
+							<label string="Class Status"  readonly="context.get('ctx', False)"/>
+						</h2>
+				</group>
+				<group>
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_1">
+									<div class="created_req">	
+										Created
+									</div>
+									<div class="number_10">	
+										24
+									</div>
+								</div>
+								</tree>
+					
+								<tree string=" Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_2">
+										<div class="come_alive">	
+											Come Alive
+										</div>
+										<div class="number_20">	
+											10
+										</div>
+									</div>
+								</tree>
+					
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_3">
+										<div class="postponed">	
+											Postponed
+										</div>
+										<div class="number_30">	
+											10
+										</div>
+									</div>
+								</tree>
+					
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_4">
+										<div class="cancelled">	
+											Cancelled
+										</div>
+										<div class="number_40">	
+											10
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_5">
+										<div class="go_head">	
+											Go Head
+										</div>
+										<div class="number_50">	
+											10
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_6">
+										<div class="started">	
+											Started
+										</div>
+										<div class="number_60">	
+											10
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_7">
+										<div class="in_progress">	
+											In Progress
+										</div>
+										<div class="number_70">	
+											20
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_8">
+										<div class="completed">	
+											Completed
+										</div>
+										<div class="number_80">	
+											50
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_9">
+										<div class="total">	
+											Total
+										</div>
+										<div class="number_90">	
+											150
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_10">
+										<div class="need_your_attention">	
+											Need Your Attenction
+										</div>
+										<div class="number_100">	
+											10
+										</div>
+									</div>
+								</tree>
+								
+								<tree string="Program Status Order Lines" create="false" delete="false">
+									<div class="openerp class_status_dashboard_11">
+										<div class="calls">	
+											Calls
+										</div>
+										<div class="number_110">	
+											10
+										</div>
+									</div>
+								</tree>
+				</group>
+			</sheet>
+			</form>
+		</field>
+	</record>
+
+	<!-- ========================= Action Layout ============================= -->
+
+		<record id="view_class_status_dashboard_filter" model="ir.ui.view">
+            <field name="name">Class Status Dashboard Page</field>
+            <field name="model">class.status.dashboard.info</field>
+            <field name="arch" type="xml">
+                <search string="Class Status">
+
+	           </search>
+            </field>
+        </record>
+
+		<record model="ir.actions.act_window" id="action_class_status_dashboard">
+            <field name="name">Class Status Dashboard</field>
+			<field name="type">ir.actions.act_window</field>
+            <field name="res_model">class.status.dashboard.info</field>
+            <field name="view_type">form</field>
+			<field name="search_view_id" ref="view_class_status_dashboard_filter"/>
+	    </record>
+
+
+
+<!-- ===========================Menu Settings=========================== -->
+
+<menuitem name = "Class Status Dashboard" id = "class_status_dashboard_page" parent = "menu_sub3" action = "action_class_status_dashboard" />
+
+
+</data> 
+</openerp>
