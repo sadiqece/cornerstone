@@ -162,9 +162,9 @@
 
 
 
-<!-- ===========================Menu Settings=========================== -->
+<!-- ===========================Menu Settings=========================== 
 
-<menuitem name = "Class Status Dashboard" id = "class_status_dashboard_page" parent = "menu_sub3" action = "action_class_status_dashboard" />
+<menuitem name = "Class Status Dashboard" id = "class_status_dashboard_page" parent = "menu_sub3" action = "action_class_status_dashboard" /> -->
 
 
 </data> 

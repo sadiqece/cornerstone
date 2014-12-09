@@ -147,77 +147,78 @@
 				<page string="Assignment Schedules">
 					<group>
 						<group>
-					
+							<?xml-stylesheet type="text/css" href="adminsched.css"?>
 							<AdminSched>
 								<title>
 									>>    December 2014     >>
 								</title>
 								<cols>
-									<MyColumn1/>
-									<MyColumn2/>
-									<MyColumn3/>
-									<MyColumn4/>
-									<MyColumn5/>
-									<MyColumn6/>
-									<MyColumn7/>
+									<MyColumn12/>
+									<MyColumn22/>
+									<MyColumn32/>
+									<MyColumn42/>
+									<MyColumn52/>
+									<MyColumn62/>
+									<MyColumn72/>
 								</cols>
 								<headings>
 									<record>
-										<MyColumn1>Sun</MyColumn1>
-										<MyColumn2>Mon</MyColumn2>
-										<MyColumn3>Tue</MyColumn3>
-										<MyColumn1>Wed</MyColumn1>
-										<MyColumn2>Thu</MyColumn2>
-										<MyColumn3>Fri</MyColumn3>
-										<MyColumn3>Sat</MyColumn3>
+										<MyColumn12>Sun</MyColumn12>
+										<MyColumn22>Mon</MyColumn22>
+										<MyColumn32>Tue</MyColumn32>
+										<MyColumn42>Wed</MyColumn42>
+										<MyColumn52>Thu</MyColumn52>
+										<MyColumn62>Fri</MyColumn62>
+										<MyColumn72>Sat</MyColumn72>
 									</record>
 								</headings>
 								<records>
 									<record>
-										<MyColumn1>.</MyColumn1>
-										<MyColumn2>1</MyColumn2>
-										<MyColumn3>2</MyColumn3>
-										<MyColumn4>3</MyColumn4>
-										<MyColumn5>4</MyColumn5>
-										<MyColumn6>5</MyColumn6>
-										<MyColumn7>6</MyColumn7>
-									</record>        <record>
-										<MyColumn1>7</MyColumn1>
-										<MyColumn2>8</MyColumn2>
-										<MyColumn3>9</MyColumn3>
-										<MyColumn4>10</MyColumn4>
-										<MyColumn5>11</MyColumn5>
-										<MyColumn6>12</MyColumn6>
-										<MyColumn7>13</MyColumn7>
+										<MyColumn12>.</MyColumn12>
+										<MyColumn22>1</MyColumn22>
+										<MyColumn32>2</MyColumn32>
+										<MyColumn42>3</MyColumn42>
+										<MyColumn52>4</MyColumn52>
+										<MyColumn62>5</MyColumn62>
+										<MyColumn72>6</MyColumn72>
+									</record>        
+									<record>
+										<MyColumn12>7</MyColumn12>
+										<MyColumn22>8</MyColumn22>
+										<MyColumn32>9</MyColumn32>
+										<MyColumn42>10</MyColumn42>
+										<MyColumn52>11</MyColumn52>
+										<MyColumn62>12</MyColumn62>
+										<MyColumn72>13</MyColumn72>
 									</record>
 
 									<record>
-										<MyColumn1>14</MyColumn1>
-										<MyColumn2>15</MyColumn2>
-										<MyColumn3 style="background-color:#2ECC71;">16</MyColumn3>
-										<MyColumn4>17</MyColumn4>
-										<MyColumn5>18</MyColumn5>
-										<MyColumn6>19</MyColumn6>
-										<MyColumn7>20</MyColumn7>
+										<MyColumn12>14</MyColumn12>
+										<MyColumn22>15</MyColumn22>
+										<MyColumn32 style="background-color:#2ECC71;">16</MyColumn32>
+										<MyColumn42>17</MyColumn42>
+										<MyColumn52>18</MyColumn52>
+										<MyColumn62>19</MyColumn62>
+										<MyColumn72>20</MyColumn72>
 									</record>
 									<record>
-										<MyColumn1>21</MyColumn1>
-										<MyColumn2 style="background-color:#8E44AD;">22</MyColumn2>
-										<MyColumn3>23</MyColumn3>
-										<MyColumn4>24</MyColumn4>
-										<MyColumn5>25</MyColumn5>
-										<MyColumn6>26</MyColumn6>
-										<MyColumn7>27</MyColumn7>
+										<MyColumn12>21</MyColumn12>
+										<MyColumn22 style="background-color:#8E44AD;">22</MyColumn22>
+										<MyColumn32>23</MyColumn32>
+										<MyColumn42>24</MyColumn42>
+										<MyColumn52>25</MyColumn52>
+										<MyColumn62>26</MyColumn62>
+										<MyColumn72>27</MyColumn72>
 									</record>
 
 									<record>
-										<MyColumn1>28</MyColumn1>
-										<MyColumn2>29</MyColumn2>
-										<MyColumn3>30</MyColumn3>
-										<MyColumn4>31</MyColumn4>
-										<MyColumn5>.</MyColumn5>
-										<MyColumn6>.</MyColumn6>
-										<MyColumn7>.</MyColumn7>
+										<MyColumn12>28</MyColumn12>
+										<MyColumn22>29</MyColumn22>
+										<MyColumn32>30</MyColumn32>
+										<MyColumn42>31</MyColumn42>
+										<MyColumn52>.</MyColumn52>
+										<MyColumn62>.</MyColumn62>
+										<MyColumn72>.</MyColumn72>
 									</record>
 								</records>
 							</AdminSched>
@@ -225,6 +226,7 @@
 					<group>
 						<div>
 						<group>				
+								<?xml-stylesheet type="text/css" href="base.css"?>
 								<MyTable>
 								<title>
 									>>    December 2014     >>
@@ -387,41 +389,44 @@
 				</div>	
 				
 			<notebook colspan="5" col="10">
-					<page string="Assignments">
-						<h2>
-							<label string="Assignments" readonly="context.get('ctx', False)"/>
-						</h2>
-						<group>
-							<group>
-								<field name="assignment_avaliable">
-										<tree string="Assignment Available">
-											<field name = "class"/>
-											<field name = "class_code_avaliable"/>
-											<field name = "start_date_avaliable"/>
-											<field name = "confirm"/>
-										</tree>	
-								</field>		
-							</group>
-							<group>
-								<field name="assignment_current" >
-									<tree string="Assignment Current" create="false">
-										<field name = "class"/>
-										<field name = "class_code_current"/>
-										<field name = "start_date_current"/>
-										<field name = "end_date_current"/>
-									</tree>
-								</field>
-								<field name="assignment_history">
-									<tree string="Assignment History" create="false">
-										<field name = "class"/>
-										<field name = "class_code_history"/>
-										<field name = "start_date_history"/>
-										<field name = "end_date_history"/>
-									</tree>
-								</field>
-							</group>
-						</group>
-                    </page>
+				<page string="Assignments">
+				<h2>
+				<label string="Assignments" readonly="context.get('ctx', False)"/>
+				</h2>
+				<group>
+				<div>
+				<label for="assignment_avaliable" string = "Available"/>
+				<field name="assignment_avaliable">
+				<tree string="Assignment Available">
+				<field name = "class"/>
+				<field name = "class_code_avaliable"/>
+				<field name = "start_date_avaliable"/>
+				<field name = "confirm"/>
+				</tree> 
+				</field>  
+				</div>
+				<div>
+				<label for="assignment_current" string = "Current"/>
+				<field name="assignment_current" >
+				<tree string="Assignment Current" create="false">
+				<field name = "class"/>
+				<field name = "class_code_current"/>
+				<field name = "start_date_current"/>
+				<field name = "end_date_current"/>
+				</tree>
+				</field>
+				<label for="assignment_history" string = "History"/>
+				<field name="assignment_history">
+				<tree string="Assignment History" create="false">
+				<field name = "class"/>
+				<field name = "class_code_history"/>
+				<field name = "start_date_history"/>
+				<field name = "end_date_history"/>
+				</tree>
+				</field>
+				</div>
+				</group>
+				</page>
 					<page string="Module">
 						<h2>
 					    <label string="Module"  readonly="context.get('ctx', False)"/>
@@ -587,7 +592,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">edu.info</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">form</field>
 			<field name="search_view_id" ref="view_edu_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -601,7 +606,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">panel.info</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">form</field>
 			<field name="search_view_id" ref="view_panel_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -628,9 +633,9 @@
 		
 		
 <menuitem name = "Educator Management" id = "menu_educator" parent = "menu_lis_lab"/>
-<menuitem name = "EM Admin Dashboard" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />
-<menuitem name = "EM Admin Panel" id = "educator_panel" parent = "menu_educator" action="action_panel" />
-<menuitem name = "Trainer Profile" id = "trainer_profile" parent = "menu_educator" action="action_trainers" />
+<!--<menuitem name = "EM Admin Dashboard" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />-->
+<menuitem name = "Trainer Enrollment" id = "educator_panel" parent = "menu_educator" action="action_panel" />
+<!--<menuitem name = "Trainer Profile" id = "trainer_profile" parent = "menu_educator" action="action_trainers" />-->
 
 </data> 
 </openerp>

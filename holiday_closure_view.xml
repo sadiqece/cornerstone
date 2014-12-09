@@ -16,11 +16,12 @@
 				        </div>
 						
 		       </group>
-			   <group style="width:380px;">
+			   <group style="width:300px;">
 					<field name='year'/>
 			   </group>
 			 		<field name='holiday_line'>
 						<tree string='List'  editable="bottom" >
+							<field name='s_no'/>
 							<field name='description'/>
 							<field name='date_start'/>
 							<field name='date_end'/>

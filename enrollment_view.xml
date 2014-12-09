@@ -5,27 +5,29 @@
 	<!-- ===================== This is location form layout =============================-->
 	<record id="enroll_form" model="ir.ui.view">
 		<field name="name">enroll.form</field>
-		<field name="model">enroll.info</field>
+		<field name="model">learner.info</field>
 		<field name="arch" type="xml">
 			<form string="enroll_info" version="7.0">
 			<sheet>
 				<field name="image_medium" widget='image' class="oe_left oe_avatar"/>
 				 
 						<div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
+                            <label for="learner_name" class="oe_edit_only"/>
                             <h1 style="width:380px;">
-                                <field name = "name"/>
+                                <field name = "learner_name"/>
                             </h1>
-						    <label for="full_name" class="oe_edit_only"/>
+						    <label for="learnerfull_name" class="oe_edit_only"/>
                             <h2 style="width:380px;">
-                                <field name = "full_name"/>
+                                <field name = "learnerfull_name"/>
                             </h2>
-							<label for="nric" class="oe_edit_only"/>
+							<label for="learner_nric" class="oe_edit_only"/>
                             <h2 style="width:380px;">
-                                <field name = "nric"/>
+                                <field name = "learner_nric"/>
                             </h2>
-							<label for="program_info" class="oe_edit_only"/>
-							<field name = "program_info" style="width:280px;"/>
+							<label for="program_learner" class="oe_edit_only"/>
+							<field name = "program_learner" style="width:280px;"/>
+							<field name = "id" />
+							
 						</div>
 						
 				<notebook colspan="5" col="10">
@@ -290,7 +292,7 @@
 				<div class="oe_title">
                             <label for="learner_name" class="oe_edit_only"/>
                             <h1 style="width:380px;">
-                                <field name = "learner_name"/>
+                                <field name = "learner_name" on_change="true_false(id)"/>
                             </h1>
 						    <label for="learnerfull_name" class="oe_edit_only"/>
                             <h2 style="width:380px;">
@@ -464,7 +466,7 @@
 						</group>
 				</div>
 					<notebook colspan="5" col="10">	
-						<page string="Outstanding">
+						<page string="Outstanding" >
 							<h2>
 								<label string="Outstanding"  readonly="context.get('ctx', False)"/>
 							</h2>
@@ -680,6 +682,7 @@
 					<field name = "learner_name"/>
 					<field name="learnerfull_name"/>
 					<field name="learner_status"/>
+					<button name="views_enroll" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
 			    </tree>
             </field>
         </record>
@@ -734,8 +737,8 @@
         </record>
 
 <menuitem name = "Sales" id = "menu_sales" parent = "menu_lis_lab"/>
-<menuitem name = "Enrollment Page" id = "sale_enrollment" parent = "menu_sales" action="action_enroll" />
-<menuitem name = "Learner Profile" id = "sale_learner" parent = "menu_sales" action="action_learner" />
+<!-- <menuitem name = "Enrollment Page" id = "sale_enrollment" parent = "menu_sales" action="action_enroll" /> -->
+<menuitem name = "Learner Enrollment" id = "sale_learner" parent = "menu_sales" action="action_learner" />
 
 
 </data> 

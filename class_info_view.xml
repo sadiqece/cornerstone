@@ -418,7 +418,6 @@
 
 
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
-<menuitem name = "Test Calendar" id = "test_listing_page" parent = "menu_sub3" action = "action_test_listing_page" />
 
 </data> 
 </openerp>

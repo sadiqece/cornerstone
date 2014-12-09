@@ -7,6 +7,126 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+class learner_info(osv.osv):
+
+	def _get_image(self, cr, uid, ids, name, args, context=None):
+		result = dict.fromkeys(ids, False)
+		for obj in self.browse(cr, uid, ids, context=context):
+			result[obj.id] = tools.image_get_resized_images(obj.image)
+		return result
+
+	def _set_image(self, cr, uid, id, name, value, args, context=None):
+		return self.write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
+		
+	def views_enroll(self,cr,uid,ids,context=None):
+		global globvar
+		globvar = 1
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'learner_form')
+		view_id = view_ref and view_ref[1] or False
+		prog_mod_obj = self.pool.get('program.module.line')
+		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
+		module_ids =[]
+		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+			module_ids.append(prog_module_line['module_id'].id)
+		ctx = dict(context)
+		#this will return product tree view and form view. 
+		ctx.update({
+		'ctx': True
+		})
+		return {
+		'type': 'ir.actions.act_window',
+		'name': _('Module'),
+		'res_model': 'learner.info',
+		'view_type': 'form',
+		'res_id': module_ids[0], # this will open particular product,
+		'view_id': view_id,
+		'view_mode': 'form',
+		'target': 'new',
+		'nodestroy': True,
+		'context': ctx,
+		}
+		
+	_name = "learner.info"
+	_description = "This table is for keeping location data"
+	_columns = {
+		'location_id': fields.char('Id',size=20),
+		'learner_name': fields.char('Name', size=100,required=True, select=True),
+		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20),
+		'learner_nric': fields.char('NRIC', size=10),
+		'learner_status': fields.selection((('active','Active'),('Inactive','Inactive')),'Status'),
+		'program_learner': fields.many2one('lis.program','Program',ondelete='cascade', help='Program', select=True, required=True),
+		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True),
+		'class_codel1':fields.char('Class'),
+		'start_datel1':fields.date('Start'),
+		'end_datel1':fields.date('End'),
+		'select_learner_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
+		'outstanding_line': fields.one2many('outstanding.module','outstanding_id','outstanding'),
+		'personal_details_line': fields.one2many('personal.module','personal_id','personal details'),
+		'nationality':fields.selection((('Indian','Indian'),('American','American')),'Nationality'),
+		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
+		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
+		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
+		'birth_date':fields.date('Birth Date'),
+		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
+		('O Level or equivalent','O Level or equivalent')),'Highest Qualification'),
+		'language_proficiency':fields.boolean('Language Proficiency'),
+		'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
+		'company_name':fields.selection((('ASZ','ASZ'),('HCL','HCL'),('CGI','CGI')),'Company'),
+		'desig_detail':fields.selection((('Developer','Developer'),('Tester','Tester'),('HR','HR')),'Designation'),
+		'sal_range':fields.selection((('10-15','10-15'),('15-25','15-25'),('25-50','25-50')),'Salary Range'),
+		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
+		'email_id': fields.char('Email', size=30),
+		'addr_1': fields.text('Address', size=40),	
+		'mobile_no': fields.char('Mobile', size=10),
+		'landline_no': fields.char('Landline', size=10),
+		'office_no': fields.char('Office', size=10),
+		'action_learn_line': fields.one2many('action.learn.module','action_id','action'),
+		'action_learner': fields.selection((('Withdrawal','Withdrawal'),('Reassignment','Reassignment'),('Call','Call'),),'Action'),
+		'remarks_learner': fields.char('Remarks'),
+		'support_docs_learner': fields.char('Supports Documents'),
+		'upload_learner': fields.char('Uploads'),
+		'date_action':fields.date('Date of Action'),
+		'action_taken_learner': fields.char('Action Taken By'),
+		'payment_history_line': fields.one2many('payment.history.module','payment_id','Payment History'),
+		'class_history_line': fields.one2many('class.history.module','class_id','Class History'),
+		'test_history_line': fields.one2many('test.history.module','test_id','Test History'),
+		'test_score_line': fields.one2many('test.score.module','test_score_id','Test Scores'),
+		'qualification_line': fields.one2many('qualification.module','qualify_id','Qualification & Awards'),
+		'assets_line': fields.one2many('assets.learner.module','asset_id','Assets'),
+		'feedback_line': fields.one2many('feedback.module','feedback_id','Feedback'),
+		'remarks_line': fields.one2many('remarks.module','remarks_id','Remarks'),
+		'image': fields.binary("Photo",
+            help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
+        'image_medium': fields.function(_get_image, fnct_inv=_set_image,
+            string="Medium-sized photo", type="binary", multi="_get_image",
+            store = {
+                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+            },
+            help="Medium-sized photo of the employee. It is automatically "\
+                 "resized as a 128x128px image, with aspect ratio preserved. "\
+                 "Use this field in form views or some kanban views."),
+        'image_small': fields.function(_get_image, fnct_inv=_set_image,
+            string="Smal-sized photo", type="binary", multi="_get_image",
+            store = {
+                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+            },
+            help="Small-sized photo of the employee. It is automatically "\
+                 "resized as a 64x64px image, with aspect ratio preserved. "\
+                 "Use this field anywhere a small image is required."),
+		'history_line': fields.one2many('history.enroll.module','history_id','history'),
+		'schedule_line': fields.one2many('schedule.module','session_no','schedule'),
+		'class_code':fields.char('Class Code', readonly=1),
+		'start_date':fields.date('Start Date', readonly='True'),
+		'end_date':fields.date('End Date', readonly='True'),
+		'select_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
+		'select_module':fields.selection((('Module 1','Module 1'),('Module 2','Module 2'),('Module 3','Module 3'),),'Select Module'),
+		'date_1':fields.date('Date', readonly='True'),
+		'module_line': fields.one2many('enroll.module.line','enroll_id','enroll_module_line'),
+		'module_line': fields.one2many('enroll.module.line','enroll_id','enroll_module_line'),
+		'check_line': fields.one2many('checklist.module','checklist_id','checklist'),
+	}
+learner_info ()
+
 class enroll_info(osv.osv):
 
 	def _get_image(self, cr, uid, ids, name, args, context=None):
@@ -17,6 +137,10 @@ class enroll_info(osv.osv):
 
 	def _set_image(self, cr, uid, id, name, value, args, context=None):
 		return self.write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
+		
+	def true_false_control(self, cr, uid, ids, context=None):
+		if val:
+			raise osv.except_osv(_('Warning', _('Test')))
 		
 	_name = "enroll.info"
 	_description = "This table is for keeping location data"
@@ -206,88 +330,7 @@ history()
 
 
 
-class learner_info(osv.osv):
 
-	def _get_image(self, cr, uid, ids, name, args, context=None):
-		result = dict.fromkeys(ids, False)
-		for obj in self.browse(cr, uid, ids, context=context):
-			result[obj.id] = tools.image_get_resized_images(obj.image)
-		return result
-
-	def _set_image(self, cr, uid, id, name, value, args, context=None):
-		return self.write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
-		
-		
-	_name = "learner.info"
-	_description = "This table is for keeping location data"
-	_columns = {
-		'location_id': fields.char('Id',size=20),
-		'learner_name': fields.char('Name', size=100,required=True, select=True),
-		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20),
-		'learner_nric': fields.char('NRIC', size=10),
-		'learner_status': fields.selection((('active','Active'),('Inactive','Inactive')),'Status'),
-		'program_learner': fields.many2one('lis.program','Program',ondelete='cascade', help='Program', select=True, required=True),
-		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, required=True),
-		'class_codel1':fields.char('Class'),
-		'start_datel1':fields.date('Start'),
-		'end_datel1':fields.date('End'),
-		'select_learner_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
-		'outstanding_line': fields.one2many('outstanding.module','outstanding_id','outstanding'),
-		'personal_details_line': fields.one2many('personal.module','personal_id','personal details'),
-		'nationality':fields.selection((('Indian','Indian'),('American','American')),'Nationality'),
-		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
-		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
-		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
-		'birth_date':fields.date('Birth Date'),
-		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
-		('O Level or equivalent','O Level or equivalent')),'Highest Qualification'),
-		'language_proficiency':fields.boolean('Language Proficiency'),
-		'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
-		'company_name':fields.selection((('ASZ','ASZ'),('HCL','HCL'),('CGI','CGI')),'Company'),
-		'desig_detail':fields.selection((('Developer','Developer'),('Tester','Tester'),('HR','HR')),'Designation'),
-		'sal_range':fields.selection((('10-15','10-15'),('15-25','15-25'),('25-50','25-50')),'Salary Range'),
-		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
-		'email_id': fields.char('Email', size=30),
-		'addr_1': fields.text('Address', size=40),	
-		'mobile_no': fields.char('Mobile', size=10),
-		'landline_no': fields.char('Landline', size=10),
-		'office_no': fields.char('Office', size=10),
-		'action_learn_line': fields.one2many('action.learn.module','action_id','action'),
-		'action_learner': fields.selection((('Withdrawal','Withdrawal'),('Reassignment','Reassignment'),('Call','Call'),),'Action'),
-		'remarks_learner': fields.char('Remarks'),
-		'support_docs_learner': fields.char('Supports Documents'),
-		'upload_learner': fields.char('Uploads'),
-		'date_action':fields.date('Date of Action'),
-		'action_taken_learner': fields.char('Action Taken By'),
-		'payment_history_line': fields.one2many('payment.history.module','payment_id','Payment History'),
-		'class_history_line': fields.one2many('class.history.module','class_id','Class History'),
-		'test_history_line': fields.one2many('test.history.module','test_id','Test History'),
-		'test_score_line': fields.one2many('test.score.module','test_score_id','Test Scores'),
-		'qualification_line': fields.one2many('qualification.module','qualify_id','Qualification & Awards'),
-		'assets_line': fields.one2many('assets.learner.module','asset_id','Assets'),
-		'feedback_line': fields.one2many('feedback.module','feedback_id','Feedback'),
-		'remarks_line': fields.one2many('remarks.module','remarks_id','Remarks'),
-		'image': fields.binary("Photo",
-            help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
-        'image_medium': fields.function(_get_image, fnct_inv=_set_image,
-            string="Medium-sized photo", type="binary", multi="_get_image",
-            store = {
-                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Medium-sized photo of the employee. It is automatically "\
-                 "resized as a 128x128px image, with aspect ratio preserved. "\
-                 "Use this field in form views or some kanban views."),
-        'image_small': fields.function(_get_image, fnct_inv=_set_image,
-            string="Smal-sized photo", type="binary", multi="_get_image",
-            store = {
-                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Small-sized photo of the employee. It is automatically "\
-                 "resized as a 64x64px image, with aspect ratio preserved. "\
-                 "Use this field anywhere a small image is required."),
-	
-	}
-learner_info ()
 
 class outstanding(osv.osv):
 

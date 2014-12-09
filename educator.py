@@ -92,7 +92,7 @@ class trainer(osv.osv):
 	_description = "This table is for keeping location data"
 	_columns = {	
 	'trainer_id' : fields.integer('Id',size=20),
-	'trainer_name': fields.char('Name'),
+	'trainer_name': fields.many2one('trainer.profile.info', 'Name'),
 	'trainer_status': fields.char('Status', size=100),
 	'date_join': fields.date('Date Joined', size=100),
 	

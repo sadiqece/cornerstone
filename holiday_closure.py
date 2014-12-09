@@ -19,10 +19,19 @@ holidays
 
 
 class holiday_line(osv.osv):
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+  
+	  res = super(holiday_line, self).read(cr, uid,ids, fields, context, load)
+	  seq_number =0 
+	  for r in res:
+	   seq_number = seq_number+1
+	   r['s_no'] = seq_number
+	   
+	  return res
 	_name = "holiday.line"
 	_description = "This table is for keeping location data"
 	_columns = {
-		'line_id': fields.char('Id',size=20),
+		's_no': fields.char('S.No',size=20, readonly=1),
 		'description': fields.char('Description', size=100,required=True, select=True),
 		'date_start': fields.date('Date Start'),
 		'date_end': fields.date('Date End'),

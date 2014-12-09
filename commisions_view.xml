@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-<!-- ===================== This is location form layout =============================-->
+
+<!-- ===================== This is location form layout of By Program =============================-->
 <record id="commision_form" model="ir.ui.view">
     <field name="name">commision.form</field>
     <field name="model">commisions</field>
@@ -16,12 +17,11 @@
                             <h2 style="width:280px;">
                                 <field name = "commision_code"  readonly="context.get('ctx', False)"/>
                             </h2>
-							<label for="applied_to" class="oe_edit_only" style="width:280px;"/>
-							
-								<field name = "applied_to"/>
-							
+							<label for="bussiness_id" class="oe_edit_only" style="width:200px;"/>
+							<h4 style="width:280px;">
+								<field name = "bussiness_id" on_change="on_change_bussiness_id(bussiness_id)"/>
+							</h4>
 							<label for="date_added" class="oe_edit_only" style="width:280px;"/>
-							
 								<field name = "date_added"/>
 							
 				        </div>
@@ -42,6 +42,8 @@
    </field>
 </record>
 
+<!-- ===================== This is location form layout of By Project Value =============================-->
+
 <record id="commision1_form" model="ir.ui.view">
     <field name="name">commision1.form</field>
     <field name="model">commisions_1</field>
@@ -58,10 +60,10 @@
                             <h2 style="width:280px;">
                                 <field name = "commision_code"  readonly="context.get('ctx', False)"/>
                             </h2>
-							<label for="applied_to1" class="oe_edit_only" style="width:280px;"/>
-							
-								<field name = "applied_to1"/>
-							
+							<label for="bussiness_id" class="oe_edit_only" style="width:200px;"/>
+							<h4 style="width:280px;">
+								<field name = "bussiness_id" on_change="on_change_bussiness_id(bussiness_id)" />
+							</h4>
 							<label for="date_added1" class="oe_edit_only" style="width:280px;"/>
 							
 								<field name = "date_added1"/>
@@ -72,7 +74,7 @@
 			   <field name='pay_value'/>
 			   </group>
 			 		<field name='project_value_line' nolabel='1'>
-						<tree string='List' >
+						<tree string='List' editable="bottom" >
 							<field name = 'sr_no'/>
 							<field name='s_range'/>
 							<field name='e_range'/>
@@ -84,6 +86,7 @@
    </field>
 </record>
 
+<!-- ===================== This is location tree layout =============================-->
 		 <record id="commision_tree" model="ir.ui.view">
             <field name="name">commision.tree</field>
             <field name="model">commisions</field>
@@ -92,7 +95,7 @@
 					<field name = "s_no"/>
 					<field name = "name"/>
 					<field name = "commision_code"/>
-					<field name = "applied_to"/>
+					<field name = "bussiness_id"/>
 					<field name = "date_added"/>
 			    </tree>
             </field>
@@ -106,14 +109,16 @@
 					<field name = "sr_no"/>
 					<field name = "name"/>
 					<field name = "commision_code"/>
-					<field name = "applied_to1"/>
+					<field name = "bussiness_id"/>
 					<field name = "date_added1"/>
 			    </tree>
             </field>
         </record>
-				
+		
+
+		
 		<record model="ir.actions.act_window" id="action_commision">
-            <field name="name">Commisions</field>
+            <field name="name">By Program</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">commisions</field>
             <field name="view_type">form</field>
@@ -126,7 +131,7 @@
         </record>
 
 		<record model="ir.actions.act_window" id="action_commision_1">
-            <field name="name">Commisions_1</field>
+            <field name="name">By Project Value</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">commisions_1</field>
             <field name="view_type">form</field>
@@ -140,7 +145,7 @@
 
 		
 <menuitem name = "Commisions" id = "commision" parent = "menu_sub2"/>
-<menuitem name = "By Module" id = "commision_1" parent = "commision" action = "action_commision" />
+<menuitem name = "By Program" id = "commision_1" parent = "commision" action = "action_commision" />
 <menuitem name = "By Project Value" id = "commision_2" parent = "commision" action = "action_commision_1" />
 
 </data> 

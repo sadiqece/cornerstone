@@ -21,14 +21,15 @@
       </div>
          </group>
       <field name='asset_line'  nolabel='1'>
-      <tree string='List' >
-	   <field name ="sr_no"/>
-       <field name='brand'/>
-       <field name='model'/>
-       <field name='specs'/>
-       <field name='date_issue'/>
-       <field name='date_stopped'/>
-      </tree>
+	  <field name="priority">6</field>
+		 <tree string='List' editable="bottom">
+		   <field name ="sr_no"/>
+		   <field name='brand'/>
+		   <field name='model'/>
+		   <field name='specs'/>
+		   <field name='date_issue'/>
+		   <field name='date_stopped'/>
+		</tree>
     </field>
    </sheet>
         </form>
