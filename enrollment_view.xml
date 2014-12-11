@@ -49,7 +49,7 @@
 					    <label string="Checklist"  readonly="context.get('ctx', False)"/>
 						</h2>
 						<field name='check_line' nolabel='1'>
-									<tree string='List' >
+									<tree string='List' editable="bottom" >
 										<field name='checklist_id' invisible="1" />
 										<field name = "s_no"/>
 										<field name = "item"/>
@@ -212,7 +212,7 @@
 						<field name = "marital_status" style="width:280px;" />
 						<field name = "race" style="width:280px;" />
 						<field name = "gender" style="width:280px;" />
-						<field name = "birth_date" />									
+						<field name = "birth_date" on_change="onchange_dob(birth_date)"/>									
 					</group>					
 					<h2>
 					    <label string="Educational Details"  readonly="context.get('ctx', False)"/>
@@ -229,7 +229,7 @@
 					<field name = "company_name" style="width:280px;" />
 					<field name = "desig_detail" style="width:280px;" />
 					<field name = "sal_range" style="width:280px;" />
-					<field name = "sponsor_ship" style="width:280px;" />
+					<field name = "sponsor_ship" style="width:280px;"/>
 					</group>
 				</div>	
 				
@@ -239,7 +239,7 @@
 						<label string="Contact Details"  readonly="context.get('ctx', False)"/>
 					</h2>
 					<group>	
-					<field name = "email_id" style="width:280px;"/>
+					<field name = "email_id" style="width:280px;" on_change="ValidateEmail(email_id)"/>
 					<field name = "addr_1" style="width:280px;"/>
 					<field name = "mobile_no" style="width:280px;"/>
 					<field name = "landline_no" style="width:280px;"/>
@@ -257,8 +257,8 @@
 						<h2>
 					    <label string="History"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<field name='history_line' nolabel='1'>
-									<tree string='List' >
+						<field name='history_learner_line' nolabel='1'>
+									<tree string='List' create="false" delete="false" >
 										<field name='history_id' invisible="1" />
 										<field name = "s_no"/>
 										<field name = "date_created"/>
@@ -606,9 +606,9 @@
 							</field>
 						</page>
 						
-						<page string="Qualification  Awards">
+						<page string="Qualification &amp; Awards">
 							<h2>
-								<label string="Qualification Awards"  readonly="context.get('ctx', False)"/>
+								<label string="Qualification &amp; Awards"  readonly="context.get('ctx', False)"/>
 							</h2>
 							<field name='qualification_line' nolabel='1'>
 							<tree string='List' create='false' >
@@ -662,17 +662,6 @@
 	
 	
 	<!-- ========================= Action Layout ============================= -->
-		<record id="enroll_tree" model="ir.ui.view">
-          <field name="name">enroll.tree</field>
-            <field name="model">enroll.info</field>
-            <field name="arch" type="xml">
-                <tree string="Enrollment">
-					<field name = "name"/>
-					<field name="full_name"/>
-					<field name="program_info"/>
-			    </tree>
-            </field>
-        </record>
 		
 		<record id="learner_tree" model="ir.ui.view">
           <field name="name">learner.tree</field>
@@ -682,18 +671,8 @@
 					<field name = "learner_name"/>
 					<field name="learnerfull_name"/>
 					<field name="learner_status"/>
-					<button name="views_enroll" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
+					<button name="views_enroll" string="View Learner" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
 			    </tree>
-            </field>
-        </record>
-		
-		<record id="view_enroll_filter" model="ir.ui.view">
-            <field name="name">Enrollment</field>
-            <field name="model">enroll.info</field>
-            <field name="arch" type="xml">
-                <search string="Enroll">
-
-	           </search>
             </field>
         </record>
 		
@@ -707,28 +686,15 @@
             </field>
         </record>
 	
-
-	<record model="ir.actions.act_window" id="action_enroll">
-            <field name="name">Enrollment</field>
-			<field name="type">ir.actions.act_window</field>
-            <field name="res_model">enroll.info</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-			<field name="search_view_id" ref="view_enroll_filter"/>
-		    <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to define a new location.
-              </p>
-            </field>
-        </record>
-		
 		<record model="ir.actions.act_window" id="action_learner">
             <field name="name">Learner</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">learner.info</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-			<field name="search_view_id" ref="view_learner_filter"/>
+			<!--<field name="search_view_id" ref="view_learner_filter"/>-->
+			<field name="view_id" ref="enroll_form"/>
+			
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to define a new location.

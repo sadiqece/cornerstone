@@ -1,9 +1,14 @@
+import datetime
+from dateutil import relativedelta
 from openerp import addons
 import logging
 from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
+import re
+
+
 
 _logger = logging.getLogger(__name__)
 
@@ -23,36 +28,88 @@ class learner_info(osv.osv):
 		globvar = 1
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'learner_form')
 		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-		'ctx': True
-		})
 		return {
 		'type': 'ir.actions.act_window',
-		'name': _('Module'),
+		'name': _('Learner'),
 		'res_model': 'learner.info',
 		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
+		'res_id': ids[0], # this will open particular product,
 		'view_id': view_id,
 		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
 		}
+
+	def months_between(self, date1, date2):
+		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d')
+		date12 = datetime.datetime.strptime(date2, '%Y-%m-%d')
+		r = relativedelta.relativedelta(date12, date11)
+		return r.days
+	
+	def onchange_dob(self, cr, uid, ids, dob, context=None):
+		if dob:
+			d = self.months_between(dob, str(datetime.datetime.now().date()))
+			res = {'value':{}}
+			if d < 0:
+				res['value']['birth_date'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, future date not allowed.                   ')}})
+				return res
+			return dob
+			
+	def  ValidateEmail(self, cr, uid, ids, email_id):
+		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email_id) != None:
+			return True
+		else:
+			raise osv.except_osv('Invalid Email', 'Please enter a valid email address')	
+				
+	def _nationality_get(self, cr, uid, ids, context=None):
+		ids = self.pool.get('res.country').search(cr, uid, [('name', '=', 'Singapore')], context=context)
+		#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(ids[0]))
+		if ids:
+			return ids[0]
+		return False			
+						
 		
+	def _check_unique_id(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.email_id.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.email_id and x.id not in ids
+			]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.email_id and self_obj.email_id.lower() in  lst:
+				return False
+		return True		
+		
+
+	def _check_unique_number(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.mobile_no.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.mobile_no and x.id not in ids
+			]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.mobile_no and self_obj.mobile_no.lower() in  lst:
+				return False
+		return True		
+		
+
+	def create(self,cr, uid, values, context=None):
+		sub_lines = []
+		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+		sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+			'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
+		values.update({'history_learner_line': sub_lines})
+		name = super(learner_info, self).create(cr, uid, values, context=context)
+		return name
+	
+	
+	
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
 	_columns = {
 		'location_id': fields.char('Id',size=20),
 		'learner_name': fields.char('Name', size=100,required=True, select=True),
 		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20),
-		'learner_nric': fields.char('NRIC', size=10),
+		'learner_nric': fields.char('NRIC', size=20),
 		'learner_status': fields.selection((('active','Active'),('Inactive','Inactive')),'Status'),
 		'program_learner': fields.many2one('lis.program','Program',ondelete='cascade', help='Program', select=True, required=True),
 		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True),
@@ -62,13 +119,16 @@ class learner_info(osv.osv):
 		'select_learner_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
 		'outstanding_line': fields.one2many('outstanding.module','outstanding_id','outstanding'),
 		'personal_details_line': fields.one2many('personal.module','personal_id','personal details'),
-		'nationality':fields.selection((('Indian','Indian'),('American','American')),'Nationality'),
-		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
+		'nationality':fields.many2one('res.country', 'Nationality'),
+		'marital_status':fields.selection((('Single','Single'),('Married','Married'),('Widow','Widow')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
 		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
 		'birth_date':fields.date('Birth Date'),
 		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
-		('O Level or equivalent','O Level or equivalent')),'Highest Qualification'),
+		('O Level or equivalent','O Level or equivalent'),('A Level or equivalent','A Level or equivalent'),('ITE Skills Certification (ISC)','ITE Skills Certification (ISC)'),('Higher NITEC','Higher NITEC'),('NITEC/Post Nitec','NITEC/Post Nitec'),
+		('Polytechnic Diploma','Polytechnic Diploma'),('WSQ Diploma','WSQ Diploma'),('Professional Qualification & Other Diploma','Professional Qualification & Other Diploma'),('University First Degree','University First Degree'),
+		('University Post-graduate Diploma & Degree/Master/Doctorate','University Post-graduate Diploma & Degree/Master/Doctorate'),('WSQ Certificate','WSQ Certificate'),('WSQ Higher Certificate','WSQ Higher Certificate'),('WSQ Advance Certificate','WSQ Advance Certificate'),
+		('WSQ Diploma','WSQ Diploma'),('WSQ Specialist Diploma','WSQ Specialist Diploma'),('WSQ Graduate Diploma','WSQ Graduate Diploma'),('Others','Others'),('Not Reported','Not Reported')),'Highest Qualification'),
 		'language_proficiency':fields.boolean('Language Proficiency'),
 		'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
 		'company_name':fields.selection((('ASZ','ASZ'),('HCL','HCL'),('CGI','CGI')),'Company'),
@@ -77,13 +137,13 @@ class learner_info(osv.osv):
 		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
 		'email_id': fields.char('Email', size=30),
 		'addr_1': fields.text('Address', size=40),	
-		'mobile_no': fields.char('Mobile', size=10),
-		'landline_no': fields.char('Landline', size=10),
-		'office_no': fields.char('Office', size=10),
-		'action_learn_line': fields.one2many('action.learn.module','action_id','action'),
+		'mobile_no': fields.char('Mobile', size=9),
+		'landline_no': fields.char('Landline', size=9),
+		'office_no': fields.char('Office', size=9),
+		'action_learn_line': fields.one2many('action.learn.module','action_id','Action'),
 		'action_learner': fields.selection((('Withdrawal','Withdrawal'),('Reassignment','Reassignment'),('Call','Call'),),'Action'),
 		'remarks_learner': fields.char('Remarks'),
-		'support_docs_learner': fields.char('Supports Documents'),
+		'support_docs_learner': fields.char('Supported Documents'),
 		'upload_learner': fields.char('Uploads'),
 		'date_action':fields.date('Date of Action'),
 		'action_taken_learner': fields.char('Action Taken By'),
@@ -113,7 +173,7 @@ class learner_info(osv.osv):
             help="Small-sized photo of the employee. It is automatically "\
                  "resized as a 64x64px image, with aspect ratio preserved. "\
                  "Use this field anywhere a small image is required."),
-		'history_line': fields.one2many('history.enroll.module','history_id','history'),
+		'history_learner_line': fields.one2many('history.learner.module','history_id','History',limit=None),
 		'schedule_line': fields.one2many('schedule.module','session_no','schedule'),
 		'class_code':fields.char('Class Code', readonly=1),
 		'start_date':fields.date('Start Date', readonly='True'),
@@ -121,10 +181,11 @@ class learner_info(osv.osv):
 		'select_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
 		'select_module':fields.selection((('Module 1','Module 1'),('Module 2','Module 2'),('Module 3','Module 3'),),'Select Module'),
 		'date_1':fields.date('Date', readonly='True'),
-		'module_line': fields.one2many('enroll.module.line','enroll_id','enroll_module_line'),
-		'module_line': fields.one2many('enroll.module.line','enroll_id','enroll_module_line'),
+		'module_line': fields.one2many('enroll.module.line','enroll_id','Module'),
 		'check_line': fields.one2many('checklist.module','checklist_id','checklist'),
 	}
+	_constraints = [(_check_unique_id, 'Error: Email ID Already Exists', ['email_id']),(_check_unique_number, 'Error: Mobile Number Already Exists', ['mobile_no'])]
+	
 learner_info ()
 
 class enroll_info(osv.osv):
@@ -141,14 +202,58 @@ class enroll_info(osv.osv):
 	def true_false_control(self, cr, uid, ids, context=None):
 		if val:
 			raise osv.except_osv(_('Warning', _('Test')))
+			
+	
+			
+	def  ValidateEmail(self, cr, uid, ids, email_id):
+		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email_id) != None:
+			return True
+		else:
+			raise osv.except_osv('Invalid Email', 'Please enter a valid email address')	
+				
+	def _nationality_get(self, cr, uid, ids, context=None):
+		ids = self.pool.get('res.country').search(cr, uid, [('name', '=', 'Singapore')], context=context)
+		#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(ids[0]))
+		if ids:
+			return ids[0]
+		return False			
+						
+		
+	def _check_unique_id(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.email_id.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.email_id and x.id not in ids
+			]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.email_id and self_obj.email_id.lower() in  lst:
+				return False
+		return True		
+		
+
+	def _check_unique_number(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.mobile_no.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.mobile_no and x.id not in ids
+			]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.mobile_no and self_obj.mobile_no.lower() in  lst:
+				return False
+		return True		
+		
+	
+	
+			
+			
 		
 	_name = "enroll.info"
 	_description = "This table is for keeping location data"
 	_columns = {
 	    'location_id': fields.char('Id',size=20),
-		'name': fields.char('Name', size=100,required=True, select=True),
-		'full_name': fields.char('Name as in NRIC/FIN', size=20),
-		'nric': fields.char('NRIC', size=10),
+		'name': fields.char('Name', size=30,required=True, select=True),
+		'full_name': fields.char('Name as in NRIC/FIN', size=30),
+		'nric': fields.char('NRIC', size=30),
 		'program_info': fields.selection((('prog A','Prog A'),('prog B','prog B')),'Program'),
 		'module_line': fields.one2many('enroll.module.line','enroll_id','enroll_module_line'),
 		'check_line': fields.one2many('checklist.module','checklist_id','checklist'),
@@ -160,13 +265,16 @@ class enroll_info(osv.osv):
 		'start_date':fields.date('Start Date', readonly='True'),
 		'end_date':fields.date('End Date', readonly='True'),
 		'personal_line': fields.one2many('personal.module','personal_id','Personal Details'),
-		'nationality':fields.selection((('Indian','Indian'),('American','American')),'Nationality'),
+		'nationality':fields.many2one('res.country', 'Nationality'),
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
 		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
 		'birth_date':fields.date('Birth Date'),
 		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
-		('O Level or equivalent','O Level or equivalent')),'Highest Qualification'),
+		('O Level or equivalent','O Level or equivalent'),('A Level or equivalent','A Level or equivalent'),('ITE Skills Certification (ISC)','ITE Skills Certification (ISC)'),('Higher NITEC','Higher NITEC'),('NITEC/Post Nitec','NITEC/Post Nitec'),
+		('Polytechnic Diploma','Polytechnic Diploma'),('WSQ Diploma','WSQ Diploma'),('Professional Qualification & Other Diploma','Professional Qualification & Other Diploma'),('University First Degree','University First Degree'),
+		('University Post-graduate Diploma & Degree/Master/Doctorate','University Post-graduate Diploma & Degree/Master/Doctorate'),('WSQ Certificate','WSQ Certificate'),('WSQ Higher Certificate','WSQ Higher Certificate'),('WSQ Advance Certificate','WSQ Advance Certificate'),
+		('WSQ Diploma','WSQ Diploma'),('WSQ Specialist Diploma','WSQ Specialist Diploma'),('WSQ Graduate Diploma','WSQ Graduate Diploma'),('Others','Others'),('Not Reported','Not Reported')),'Highest Qualification'),
 		'language_proficiency':fields.boolean('Language Proficiency'),
 		'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
 		'company_name':fields.selection((('ASZ','ASZ'),('HCL','HCL'),('CGI','CGI')),'Company'),
@@ -175,30 +283,31 @@ class enroll_info(osv.osv):
 		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
 		'email_id': fields.char('Email', size=30),
 		'addr_1': fields.text('Address', size=40),	
-		'mobile_no': fields.char('Mobile No', size=10),
-		'landline_no': fields.char('Home Number', size=10),
-		'office_no': fields.char('Office', size=10),
+		'mobile_no': fields.char('Mobile No', size=9),
+		'landline_no': fields.char('Home Number', size=9),
+		'office_no': fields.char('Office', size=9),
 		'payment_line': fields.one2many('payment.module','payment_id','payment'),
-		'history_line': fields.one2many('history.enroll.module','history_id','history'),
-        'image': fields.binary("Photo",
-            help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
-        'image_medium': fields.function(_get_image, fnct_inv=_set_image,
-            string="Medium-sized photo", type="binary", multi="_get_image",
-            store = {
-                'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Medium-sized photo of the employee. It is automatically "\
-                 "resized as a 128x128px image, with aspect ratio preserved. "\
-                 "Use this field in form views or some kanban views."),
-        'image_small': fields.function(_get_image, fnct_inv=_set_image,
-            string="Smal-sized photo", type="binary", multi="_get_image",
-            store = {
-                'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Small-sized photo of the employee. It is automatically "\
-                 "resized as a 64x64px image, with aspect ratio preserved. "\
-                 "Use this field anywhere a small image is required."),
+		'history_line': fields.one2many('history.learner.module','history_id','history'),
+		'image': fields.binary("Photo",
+			help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
+		'image_medium': fields.function(_get_image, fnct_inv=_set_image,
+			string="Medium-sized photo", type="binary", multi="_get_image",
+			store = {
+				'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+			},
+			help="Medium-sized photo of the employee. It is automatically "\
+				"resized as a 128x128px image, with aspect ratio preserved. "\
+					"Use this field in form views or some kanban views."),
+		'image_small': fields.function(_get_image, fnct_inv=_set_image,
+			string="Smal-sized photo", type="binary", multi="_get_image",
+			store = {
+				'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+			},
+			help="Small-sized photo of the employee. It is automatically "\
+				"resized as a 64x64px image, with aspect ratio preserved. "\
+				"Use this field anywhere a small image is required."),
 	}
+		
 enroll_info ()
 	
 	
@@ -227,6 +336,7 @@ class checklist(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
+				
 		
 	def import_Upload_Documents(self, cr, uid, ids, context=None):
 		fileobj = TemporaryFile('w+')
@@ -238,12 +348,51 @@ class checklist(osv.osv):
 	_name ='checklist.module'
 	_description ="checklist Tab"
 	_columns = {
-	'checklist_id' : fields.integer('Id',size=20), 
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'item':fields.char('Item',size=20),
-	'confirmation':fields.boolean('Confirmation'),
+	'checklist_id' : fields.integer('Id',size=20, readonly=1), 
+	's_no' : fields.integer('S.No',size=20, readonly=1),
+	'item':fields.char('Item', readonly=1),
+	'confirmation':fields.boolean('Confirmation', readonly=1),
 	'upload_docs':fields.binary('Upload Documents'),
+	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True, readonly=1),
+	'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+	'program_learner': fields.many2one('lis.program','Program',ondelete='cascade', help='Program', select=True, readonly=1),
 	}
+
+	def on_change_module_id(self, cr, uid, ids, module_id):
+		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
+		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
+		
+	def views(self,cr,uid,ids,context=None):
+		global globvar
+		globvar = 1
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
+		view_id = view_ref and view_ref[1] or False
+		prog_mod_obj = self.pool.get('program.module.line')
+		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
+		module_ids =[]
+		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+			module_ids.append(prog_module_line['module_id'].id)
+		ctx = dict(context)
+		#this will return product tree view and form view. 
+		ctx.update({
+			'ctx': True
+		})
+		return {
+		'type': 'ir.actions.act_window',
+		'name': _('Module'),
+		'res_model': 'cs.module',
+		'view_type': 'form',
+		'res_id': module_ids[0], # this will open particular product,
+		'view_id': view_id,
+		'view_mode': 'form',
+		'target': 'new',
+		'nodestroy': True,
+		'context': ctx,
+		}
+	
+	
+	
+	
 checklist ()
 
 
@@ -279,7 +428,18 @@ class payment(osv.osv):
 payment()
 
 class history(osv.osv):
-	_name = "history.enroll.module"
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(history, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+
+	_name = "history.learner.module"
 	_description = "History Tab"
 	_columns = { 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
