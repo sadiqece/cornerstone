@@ -7,6 +7,15 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+
+class class_dash(osv.osv):
+	_name = "class.dash"
+	_description = "This table is for keeping location data"
+	_columns = {
+		'name': fields.char('Class Name', size=100,required=True, select=True),
+	}
+class_dash()
+
 class class_info(osv.osv):
 	_name = "class.info"
 	_description = "This table is for keeping location data"
@@ -36,7 +45,7 @@ class class_info(osv.osv):
 		'day_5':fields.char('Day 5',readonly=1),
 		'day_6':fields.char('Day 6',readonly=1),
 		'day_7':fields.char('Day 7',readonly=1),
-		'start_date': fields.date(),
+		'start_date1': fields.date(),
 		'start_date2': fields.date(),
 		'start_date3': fields.date(),
 		'start_date4': fields.date(),

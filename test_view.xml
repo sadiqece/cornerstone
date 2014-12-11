@@ -32,13 +32,12 @@
                    <page string="Modules">
 						<field name='test_mod_line' nolabel='1'>
 									<tree string='List' editable="bottom">
-										<field name='test_mod_id' invisible="1" />
-										<field name='module_id' on_change="on_change_module_id(module_id)" required='True' />
-										<field name = "module_code"/>
-										<field name = "pre_test"/>
-										<field name = "inclass_test"/>
-										<field name = "post_test"/>
-										<button name="views" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
+										<field name='module_id' on_change="on_change_module_id(module_id)" />
+										<field name = "module_code" on_change="on_change_module_id(module_id)"/>
+										<field name = "pre_test" on_change="on_change_module_id(module_id)"/>
+										<field name = "inclass_test" on_change="on_change_module_id(module_id)"/>
+										<field name = "post_test" on_change="on_change_module_id(module_id)"/>
+										<button name="views" string="View Module" icon="view_mod" type="object"/>
 									</tree>
 						</field>
 					</page>
@@ -83,6 +82,7 @@
             <field name="model">test</field>
             <field name="arch" type="xml">
                 <tree string="Location">
+					<field name = "s_no"/>
 					<field name = "name"/>
 					<field name = "test_code"/>
 					<field name = "test_fee" />

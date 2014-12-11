@@ -4118,7 +4118,6 @@ div.ui-widget-overlay {
 	width:100px;
 	height:80px;
 	padding:10px;
-	float:right;
 }
 
 .created_req {
@@ -4146,7 +4145,8 @@ div.ui-widget-overlay {
 	height:80px;
 	padding:10px;
 	float:right;
-	margin-right: 618px;
+	margin-right: 866px;
+	margin-top: -99px;
 }
 
 .come_alive {
@@ -4172,8 +4172,8 @@ div.ui-widget-overlay {
     background-color: #f39c12;
     float: right;
     height: 80px;
-    margin-right: -256px;
-    margin-top: -102px;
+    margin-right: -249px;
+    margin-top: -99px;
     padding: 10px;
     width: 100px;
 }
@@ -4201,8 +4201,8 @@ div.ui-widget-overlay {
     background-color: #c0392b;
     float: right;
     height: 80px;
-    margin-right: 361px;
-    margin-top: -101px;
+    margin-right: 609px;
+    margin-top: -99px;
     padding: 10px;
     width: 100px;
 }
@@ -4230,8 +4230,8 @@ div.ui-widget-overlay {
     background-color: #e67e22;
     float: right;
     height: 80px;
-    margin-right: -512px;
-    margin-top: -103px;
+    margin-right: -248px;
+    margin-top: -99px;
     padding: 10px;
     width: 100px;
 }
@@ -4259,8 +4259,8 @@ div.ui-widget-overlay {
     background-color: #16A085;
     float: right;
     height: 80px;
-    margin-right: 106px;
-    margin-top: -103px;
+    margin-right: -375px;
+    margin-top: -99px;
     padding: 10px;
     width: 100px;
 }
@@ -4290,6 +4290,8 @@ div.ui-widget-overlay {
 	height:80px;
 	padding:10px;
 	float:right;
+	margin-right: -503px;
+    margin-top: -99px;
 }
 
 .in_progress {
@@ -4311,13 +4313,15 @@ div.ui-widget-overlay {
 }
 
 /*  SUPREETH 06 12 2014 */
+
 .openerp  .class_status_dashboard_8 {
-    background-color: #2C3E50;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
-	margin-right: 618px;
+    background-color: #7F8C8D;
+    float: right;
+    height: 80px;
+    margin-right: -250px;
+    margin-top: -99px;
+    padding: 10px;
+    width: 100px;
 }
 
 .completed {
@@ -4344,8 +4348,8 @@ div.ui-widget-overlay {
     background-color: #7F8C8D;
     float: right;
     height: 80px;
-    margin-right: -256px;
-    margin-top: -102px;
+    margin-right: -631px;
+    margin-top: -99px;
     padding: 10px;
     width: 100px;
 }
@@ -4375,8 +4379,8 @@ div.ui-widget-overlay {
 	height:80px;
 	padding:10px;
 	float:right;
-	margin-right: 362px;
-	margin-top: -102px;
+    margin-right: 994px;
+    margin-top: 5px;
 }
 
 .need_your_attention {
@@ -4397,15 +4401,17 @@ div.ui-widget-overlay {
 	display:block;
 }
 
+
+
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_11 {
-    background-color: #27AE60;
+    background-color: #E67E22;
 	width:100px;
 	height:80px;
 	padding:10px;
 	float:right;
-	margin-right: -514px;
-	margin-top: -102px;
+	   margin-right: 866px;
+    margin-top: -99px;
 }
 
 .calls {
@@ -4425,3 +4431,4 @@ div.ui-widget-overlay {
 	line-height:2.4;
 	display:block;
 }
+
