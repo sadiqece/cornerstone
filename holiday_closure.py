@@ -29,16 +29,27 @@ class holidays(osv.osv):
 		   ('choice14', '2023'))
 		
 	def populate_year(self, cursor, user_id, context=None):
-		year_dropdown = ''
-		for y in range(2010, (datetime.datetime.now().year + 10)):
-			year_dropdown = year_dropdown + '(' + y, y + '),'
-		return year_dropdown
-		
+		a = ''
+		res = {}
+		for year_dropdown in (2010, (datetime.datetime.now().year + 10)):
+			a = a + '(\'' + str(year_dropdown) + '\'' + ' ,' + '\'' + str(year_dropdown) + '\')'
+			#a = a + '(\'' + str(year_dropdown) + '\'' + ' ,' + '\'' + str(year_dropdown) + '\')'
+			#if not datetime.datetime.now().year + 10:
+			#	a = a + ','
+			#a = a + '(' + a + ')'
+			#res [year]= '((\'' + str(2010) + '\''  , + '\'' + str(2010) + '\'))'
+			#raise osv.except_osv(_('warning'),_('Year %s')%(a))
+			#r['year'] = a
+			#res [year]=a
+		res.append({'year':a})
+		#res = [a]
+		return res
+
 	_name = "holiday"
 	_description = "This table is for keeping location data"
 	_columns = {
 		'holiday_id': fields.char('Id',size=20),
-		'year': fields.selection(_populate_year,'Year',select=True, required=True),
+		'year': fields.selection(_populate_year,'Year', required=True),
 		'holiday_line': fields.one2many('holiday.line', 'holiday_line_id', 'Holiday Lines', select=True, required=True),
 	}
 holidays
@@ -98,7 +109,7 @@ class holiday_line(osv.osv):
 		if dob:
 			d = self.months_between(dob, str(datetime.datetime.now().date()))
 			res = {'value':{}}
-			if d < 0:
+			if d > 0:
 				res['value']['date_end'] = ''
 				#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})

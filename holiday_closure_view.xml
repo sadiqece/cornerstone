@@ -24,7 +24,7 @@
 							<field name='s_no'/>
 							<field name='description'/>
 							<field name='date_start' on_change="onchange_date(date_start)"/>
-							<field name='date_end' on_change="onchange_date(date_start)"/>
+							<field name='date_end' on_change="onchange_dateend(date_end)"/>
 						</tree>
 				</field>
 			</sheet>

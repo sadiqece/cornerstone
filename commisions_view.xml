@@ -26,13 +26,27 @@
 							
 				        </div>
 		       </group>
-			   <group style="width:280px;">
-			   <field name='pay_value'/>
-			   </group>
+				<group style="width:280px;">
+					<field name='pay_value' on_change="on_change_pay_value(pay_value)"/> 
+				</group>
 			 	<group>
 			 		<div>	
-						<label for="program_line" string = "By Program"/>
-						<field name='program_line' nolabel='1'>
+						<group attrs="{'invisible': [('pay_value_2', '=' , True)]}">
+							<field name='pay_value_1' invisible="1"/>
+						</group>
+					
+						<group attrs="{'invisible': [('pay_value_1', '=' , True)]}">
+							<field name='pay_value_2' invisible="1"/>
+						</group>
+					</div>
+				</group> 
+						<div attrs="{'invisible': [('pay_value_1', '=' , False)]}">
+						<group colspan="1">
+							<h3>
+								<label for="program_line" string = "By Program"/>
+							</h3>
+						</group>
+						<field name='program_line' nolabel='1' readonly="context.get('ctx', False)">
 							<tree string="Req Order Lines" editable="bottom">
 								<field name = "s_no"/>
 								<field name="program_id"/>
@@ -40,19 +54,24 @@
 								<field name="value"/>
 							</tree>
 						</field>
-					</div>
-					<div>
-						<label for="project_value_line" string = "By Project Value"/>
-						<field name='project_value_line' nolabel='1'>
-							<tree string="Req Order Lines" editable="bottom">
-								<field name = "sr_no"/>
-								<field name="s_range1"/>
-								<field name="e_range1"/>
-								<field name="value1"/>
-							</tree>
-						</field>
-					</div> 
-				</group>
+						</div>
+						<div>
+							<div attrs="{'invisible': [('pay_value_2', '=' , False)]}">
+							<group colspan="1">
+								<h3>
+									<label for="project_value_line" string = "By Project Value"/>
+								</h3>
+							</group>
+							<field name='project_value_line' nolabel='1'>
+								<tree string="Req Order Lines" editable="bottom">
+									<field name = "sr_no"/>
+									<field name="s_range1"/>
+									<field name="e_range1"/>
+									<field name="value1"/>
+								</tree>
+							</field>
+							</div>
+						</div> 
 			</sheet>
         </form>
    </field>
@@ -84,7 +103,7 @@
             <field name="view_mode">tree,form</field>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new location.
+                Click to define a new Commisions.
               </p>
             </field>
         </record>
