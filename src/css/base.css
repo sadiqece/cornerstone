@@ -3642,12 +3642,15 @@ div.ui-widget-overlay {
 
 /*  ZEYA 03 12 2014 */
 .openerp .oe_form_readonly .schedule_status_box_2 {
-    background-color: #2ECC71;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
+	background-color: #e74c3c;
+    float: right;
+    height: 80px;
+	margin-right: -2px;
+    margin-top: 1px;
+    padding: 10px;
+    width: 100px;
 }
+
 
 .no_learners_2 {
     color: #ffffff;
@@ -3742,6 +3745,485 @@ div.ui-widget-overlay {
 }
 
 .test_schedule_learner_box_1 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 05 12 2014 */
+.openerp  .edu_dashboard_1 {
+    background-color: #2C3E50;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.assigment_req {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_24 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 05 12 2014 */
+.openerp  .edu_dashboard_2 {
+    background-color: #3498DB;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.confirmation_req {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_25 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 05 12 2014 */
+.openerp  .edu_dashboard_3 {
+    background-color: #E74C3C;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.class_outstanding {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_10 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 05 12 2014 */
+.openerp  .edu_dashboard_4 {
+    background-color: #27AE60;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.class_assigned {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_100 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_1 {
+    background-color: #2C3E50;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.created_req {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_10 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_2 {
+    background-color: #E74C3C;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+	margin-right: 618px;
+}
+
+.come_alive {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_20 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_3 {
+    background-color: #f39c12;
+    float: right;
+    height: 80px;
+    margin-right: -256px;
+    margin-top: -102px;
+    padding: 10px;
+    width: 100px;
+}
+
+.postponed {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_30 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_4 {
+    background-color: #c0392b;
+    float: right;
+    height: 80px;
+    margin-right: 361px;
+    margin-top: -101px;
+    padding: 10px;
+    width: 100px;
+}
+
+.cancelled {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_40 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_5 {
+    background-color: #e67e22;
+    float: right;
+    height: 80px;
+    margin-right: -512px;
+    margin-top: -103px;
+    padding: 10px;
+    width: 100px;
+}
+
+.go_head {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_50 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_6 {
+    background-color: #16A085;
+    float: right;
+    height: 80px;
+    margin-right: 106px;
+    margin-top: -103px;
+    padding: 10px;
+    width: 100px;
+}
+
+.started {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_60 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_7 {
+    background-color: #27AE60;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.in_progress {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_70 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_8 {
+    background-color: #2C3E50;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+	margin-right: 618px;
+}
+
+.completed {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_80 {
+    color: #ffffff;
+    font-size: 21px;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_9 {
+    background-color: #7F8C8D;
+    float: right;
+    height: 80px;
+    margin-right: -256px;
+    margin-top: -102px;
+    padding: 10px;
+    width: 100px;
+}
+
+.total {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_90 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_10 {
+    background-color: #8E44AD;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+	margin-right: 362px;
+	margin-top: -102px;
+}
+
+.need_your_attention {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_100 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  SUPREETH 06 12 2014 */
+.openerp  .class_status_dashboard_11 {
+    background-color: #27AE60;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+	margin-right: -514px;
+	margin-top: -102px;
+}
+
+.calls {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.number_110 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+	line-height:2.4;
+	display:block;
+}
+
+
+/*  ZEYA 03 12 2014 */
+.openerp .oe_form_readonly .schedule_status_box_2 {
+	background-color: #e74c3c;
+    float: right;
+    height: 80px;
+	margin-right: -2px;
+    margin-top: 1px;
+    padding: 10px;
+    width: 100px;
+}
+
+.no_learners_2 {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.learner_box_2 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/*  ZEYA 03 12 2014 */
+.openerp .oe_form_readonly .schedule_status_box_3 {
+    background-color: #2ECC71;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.no_learners_3 {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.learner_box_3 {
     color: #ffffff;
     font-size: 21px;
     font-weight: 100;
@@ -3892,111 +4374,7 @@ div.ui-widget-overlay {
     text-align: center;
 	line-height:1.4;
 	display:block;
-}
-
-/* ZEYA   6/12/2014     */
-
-
-/* ZEYA 6/12/2014  */
-
-	AdminSched {
-    display: table;
-    width: 70%;
-	height:500px;
-  #  border: thin solid black;
-    border-spacing: 200px;
-}
-	title {
-#	border: 1px solid black;
-    display: table-caption;
-    font-size: 100%;
-	font-weight: bold;
-    text-align: center;
-    padding: 5px;
-	background-color:#E6E6E6;
-}
-	cols {
-    display: table-column-group;
-}
-	cols MyColumn12, cols MyColumn22, cols MyColumn32 , cols MyColumn42, cols MyColumn52, cols MyColumn62, cols MyColumn72  {
-    display: table-column;
-}
-	headings {
-    display: table-header-group;
-	background-color:#E6E6E6;
-}
-	records {
-    display: table-row-group;
-}
-	record {
-    display: table-row;   
-}
-	record > * {
-    display: table-cell;
-    padding: 5px;
-}
-	footers {
-    display: table-footer-group;
-}
-	footers > record > *, headings > record > * {
-    text-align: center;
-    font-weight: bold;
-}
-	records > record > * {
-    font-size: 120%;
-}
-
-
-	MyTable {
-    display: table;
-    width: 2%;
-    border: thin solid black;
-    border-spacing: 2px;
-}
-	title {
-	border: 1px solid black;
-    display: table-caption;
-    font-size: 100%;
-	font-weight: bold;
-    text-align: center;
-    padding: 5px;
-	background-color:#E6E6E6;
-}
-	cols {
-    display: table-column-group;
-}
-	cols MyColumn1, cols MyColumn2, cols MyColumn3 , cols MyColumn4, cols MyColumn5, cols MyColumn6, cols MyColumn7  {
-    display: table-column;
-}
-	headings {
-    display: table-header-group;
-	background-color:#E6E6E6;
-}
-	records {
-    display: table-row-group;
-}
-	record {
-    display: table-row;   
-}
-	record > * {
-    display: table-cell;
-    padding: 5px;
-}
-	footers {
-    display: table-footer-group;
-}
-	footers > record > *, headings > record > * {
-  #  border: thin solid black;
-    text-align: center;
-    font-weight: bold;
-}
-	records > record > * {
-    font-size: 120%;
-}
-
-/* ZEYA 6/12/2014  */
-
-
+}	
 /*  SUPREETH 05 12 2014 */
 
 .openerp .edu_dashboard_1 {
@@ -4050,7 +4428,7 @@ div.ui-widget-overlay {
     font-size: 21px;
     font-weight: 100;
     text-align: center;
-	line-height: 1.4;
+	line-height: 2.9;
 	display:block;
 }
 
@@ -4108,327 +4486,144 @@ div.ui-widget-overlay {
     font-size: 21px;
     font-weight: 100;
     text-align: center;
-	line-height: 1.9;
+	line-height: 2.9;
 	display:block;
-}
+}	
 
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_1 {
-    background-color: #2C3E50;
-	width:100px;
-	height:80px;
-	padding:10px;
-}
 
-.created_req {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
 
-.number_10 {
-    color: #ffffff;
-    display: block;
-    font-size: 29px;
-    font-weight: 100;
-    line-height: 2.4;
+/* ZEYA   6/12/2014     */
+
+
+	MyTable {
+    display: table;
+    width: 2%;
+    border: thin solid black;
+    border-spacing: 2px;
+}
+	title {
+	border: 1px solid black;
+    display: table-caption;
+    font-size: 100%;
+	font-weight: bold;
     text-align: center;
+    padding: 5px;
+	background-color:#E6E6E6;
 }
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_2 {
-    background-color: #E74C3C;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
-	margin-right: 866px;
-	margin-top: -99px;
+	cols {
+    display: table-column-group;
 }
-
-.come_alive {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
+	cols MyColumn1, cols MyColumn2, cols MyColumn3 , cols MyColumn4, cols MyColumn35, cols MyColumn6, cols MyColumn7  {
+    display: table-column;
 }
-
-.number_20 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
+	headings {
+    display: table-header-group;
+	background-color:#E6E6E6;
+}
+	records {
+    display: table-row-group;
+}
+	record {
+    display: table-row;   
+}
+	record > * {
+    display: table-cell;
+    padding: 5px;
+}
+	footers {
+    display: table-footer-group;
+}
+	footers > record > *, headings > record > * {
+    border: thin solid black;
     text-align: center;
-	line-height:2.4;
-	display:block;
+    font-weight: bold;
+}
+	records > record > * {
+    font-size: 120%;
 }
 
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_3 {
-    background-color: #f39c12;
-    float: right;
-    height: 80px;
-    margin-right: -249px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
-}
+/* ZEYA 6/12/2014  */
 
-.postponed {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
+	AdminSched {
+    display: table;
+    width: 50%;
+	height:200%;
+    border: thin solid black;
+    border-spacing: 2px;
 }
-
-.number_30 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
+	title {
+	border: 1px solid black;
+    display: table-caption;
+    font-size: 100%;
+	font-weight: bold;
     text-align: center;
-	line-height:2.4;
-	display:block;
+    padding: 5px;
+	background-color:#E6E6E6;
 }
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_4 {
-    background-color: #c0392b;
-    float: right;
-    height: 80px;
-    margin-right: 609px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
+	cols {
+    display: table-column-group;
 }
-
-.cancelled {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
+	cols MyColumn1, cols MyColumn2, cols MyColumn3 , cols MyColumn4, cols MyColumn35, cols MyColumn6, cols MyColumn7  {
+    display: table-column;
 }
-
-.number_40 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
+	headings {
+    display: table-header-group;
+	background-color:#E6E6E6;
+}
+	records {
+    display: table-row-group;
+}
+	record {
+    display: table-row;   
+}
+	record > * {
+    display: table-cell;
+    padding: 5px;
+}
+	footers {
+    display: table-footer-group;
+}
+	footers > record > *, headings > record > * {
+    border: thin solid black;
     text-align: center;
-	line-height:2.4;
+    font-weight: bold;
+}
+	records > record > * {
+    font-size: 120%;
+}
+/*Aasim 20 12 2014*/
+
+.col-3{
+  width: 30%;
+  margin: 10px 1%;
+  border: 1px solid #afafb6;
+  display: block;
+  float: left;
+}
+.col-3 .box{
+  clear: both;
+  margin: 3px 0px;
+  display: block;
+  padding: 5px 1%;
+  width: 98%;
+  border-bottom: 1px solid #dddddd;
+}
+.col-3 h4, .col-3 .box h4{
+  font-size: 14px;
+  margin: 3px 0px;
+  padding: 0px 0px 0px 4px;
+}
+.col-3 h5, .col-3 .box h5{
+  font-size: 12px;
+  margin: 3px 0px;
+  padding: 0px 0px 0px 4px;
+}
+.border_box{
+	bolder:1px solid #dddddd;
+	margin:3px auto ;
+	width:95%;
 	display:block;
 }
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_5 {
-    background-color: #e67e22;
-    float: right;
-    height: 80px;
-    margin-right: -248px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
+.clear{
+  clear: both;
 }
-
-.go_head {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_50 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_6 {
-    background-color: #16A085;
-    float: right;
-    height: 80px;
-    margin-right: -375px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
-}
-
-.started {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_60 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_7 {
-    background-color: #27AE60;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
-	margin-right: -503px;
-    margin-top: -99px;
-}
-
-.in_progress {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_70 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
-/*  SUPREETH 06 12 2014 */
-
-.openerp  .class_status_dashboard_8 {
-    background-color: #7F8C8D;
-    float: right;
-    height: 80px;
-    margin-right: -250px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
-}
-
-.completed {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_80 {
-    color: #ffffff;
-    font-size: 21px;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_9 {
-    background-color: #7F8C8D;
-    float: right;
-    height: 80px;
-    margin-right: -631px;
-    margin-top: -99px;
-    padding: 10px;
-    width: 100px;
-}
-
-.total {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_90 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_10 {
-    background-color: #8E44AD;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
-    margin-right: 994px;
-    margin-top: 5px;
-}
-
-.need_your_attention {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_100 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:1.4;
-	display:block;
-}
-
-
-
-/*  SUPREETH 06 12 2014 */
-.openerp  .class_status_dashboard_11 {
-    background-color: #E67E22;
-	width:100px;
-	height:80px;
-	padding:10px;
-	float:right;
-	   margin-right: 866px;
-    margin-top: -99px;
-}
-
-.calls {
-    color: #ffffff;
-    font-size: 12px;
-	text-align: center;
-	line-height:1.4;
-	display:block;
-	margin-bottom:5px;
-}
-
-.number_110 {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 100;
-    text-align: center;
-	line-height:2.4;
-	display:block;
-}
-
