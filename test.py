@@ -95,6 +95,9 @@ class test(osv.osv):
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 	}
+	_defaults = {
+		'test_status': 'Active'
+	}
 	_constraints = [(_check_unique_name, 'Error: Test Name Already Exists', ['name']),(_check_unique_code, 'Error: Test Code Already Exists', ['test_code'])]
 test()
 

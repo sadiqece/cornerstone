@@ -79,7 +79,7 @@ class asset_line(osv.osv):
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+1
-			r['s_no'] = seq_number
+			r['sr_no'] = seq_number
 		
 		return res
 
@@ -89,7 +89,7 @@ class asset_line(osv.osv):
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 	   
-	def onchange_date(self, cr, uid, ids, dob, context=None):
+	def onchange_issuedate(self, cr, uid, ids, dob, context=None):
 		if dob:
 			d = self.months_between(dob, str(datetime.datetime.now().date()))
 			res = {'value':{}}
@@ -100,7 +100,7 @@ class asset_line(osv.osv):
 				return res
 			return dob
 			
-	def onchange_dateend(self, cr, uid, ids, dob, context=None):
+	def onchange_stopeddate(self, cr, uid, ids, dob, context=None):
 		if dob:
 			d = self.months_between(dob, str(datetime.datetime.now().date()))
 			res = {'value':{}}
@@ -110,6 +110,28 @@ class asset_line(osv.osv):
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
 				return res
 			return dob
+			
+	def _check_unique_issuedate(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.date_issue for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.date_issue and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.date_issue and self_obj.date_issue in  lst:
+				return False
+		return True
+		
+	def _check_unique_stopeddate(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.date_stopped for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.date_stopped and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.date_stopped and self_obj.date_stopped in  lst:
+				return False
+		return True
 
 	_name = "asset.line"
 	_description = "This table is for keeping location data"
@@ -119,8 +141,9 @@ class asset_line(osv.osv):
 		'brand':fields.many2one('master.brand', 'Brand', ondelete='cascade', help='Description', select=True,required=True),
 		'model': fields.char('Model', size=20),
 		'specs': fields.char('Specs & Description', size=20),
-		'date_issue': fields.date('Date of First Issue', size=20),
-		'date_stopped': fields.date('Date Stopped Issuing', size=20),
-		#'asset_line_id': fields.many2one('asset', 'Asset', ondelete='cascade', help='Test', select=True),
+		'date_issue': fields.date('Date of First Issue'),
+		'date_stopped': fields.date('Date Stopped Issuing'),
+		'asset_line_id': fields.many2one('asset', 'Asset', ondelete='cascade', help='Test', select=True),
 	}
+	_constraints = [(_check_unique_issuedate, 'Error: Date Already Exists', ['date_issue']),(_check_unique_stopeddate, 'Error: Date Already Exists', ['date_stopped'])]
 asset_line ()

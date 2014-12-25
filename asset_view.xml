@@ -14,7 +14,7 @@
                             <h1 style="width:380px;">
                                 <field name = "name"/>
                             </h1>
-          <label for="asset_code" class="oe_edit_only"/>
+							<label for="asset_code" class="oe_edit_only"/>
                             <h2 style="width:280px;">
                                 <field name = "asset_code"/>
                             </h2>
@@ -27,8 +27,8 @@
 		   <field name='brand'/>
 		   <field name='model'/>
 		   <field name='specs'/>
-		   <field name='date_issue' on_change="onchange_date(date_issue)"/>
-		   <field name='date_stopped' on_change="onchange_dateend(date_stopped)"/>
+		   <field name='date_issue' on_change="onchange_issuedate(date_issue)"/>
+		   <field name='date_stopped' on_change="onchange_stopeddate(date_stopped)"/>
 		</tree>
     </field>
    </sheet>

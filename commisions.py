@@ -121,34 +121,17 @@ class program_line(osv.osv):
 		
 		return res
 		
-	def unlink(self, cr, uid, ids, context=None):
-		program_line_id = self.browse(cr, uid, ids[0], context=context).program_line_id
-		test_checked =  self.pool.get('commisions').browse(cr, uid, program_line_id.id, context=context).pay_value
-		if test_checked:
-			sr_ids = super(pay_value, self).search(cr, uid, [('program_line_id', '=', program_line_id.id)],context=context)
-			final_val = len(sr_ids) - len(ids)
-			if final_val == 0: 
-				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
-		_logger.info('Installing chart of values %s', final_val)
-		return super(pay_value, self).unlink(cr, uid, ids, context=context)
-		
-	def _check_unique_program_line(self, cr, uid, ids, context=None):
+	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.program_id == self_obj.program_id:
-						return False
+		lst = [
+				x.program_code.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.program_code and x.id not in ids
+			]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.program_code and self_obj.program_code.lower() in  lst:
+				return False
 		return True
 		
-	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.program_id == self_obj.program_id:
-						return False
-		return True
 
 	_name = "program.line"
 	_description = "Module Line"
@@ -157,10 +140,9 @@ class program_line(osv.osv):
 		'program_line_id': fields.many2one('commisions', 'Commisions', ondelete='cascade', help='Commisions', select=True),
 		'program_id':fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True, required=True),
 		'program_code': fields.related('program_id','program_code',type="char",relation="lis.program",string="Program Code", readonly=1),
-		'value': fields.char('Value',size=20),
+		'value': fields.char('Value',size=6),
 	}
-	_constraints = [(_check_unique_program_line, 'Error: Pre Test Already Exists', ['program_id']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['program_id'])]
+	_constraints = [(_check_unique_name, 'Error: Program Label Already Exists', ['program_code'])]
 program_line
 
 class project_value_line(osv.osv):
@@ -175,33 +157,15 @@ class project_value_line(osv.osv):
 		
 		return res
 		
-	def unlink(self, cr, uid, ids, context=None):
-		project_value_line_id = self.browse(cr, uid, ids[0], context=context).project_value_line_id
-		test_checked =  self.pool.get('commisions').browse(cr, uid, project_value_line_id.id, context=context).pay_value
-		if test_checked:
-			sr_ids = super(pay_value, self).search(cr, uid, [('project_value_line_id', '=', project_value_line_id.id)],context=context)
-			final_val = len(sr_ids) - len(ids)
-			if final_val == 0: 
-				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
-		_logger.info('Installing chart of values %s', final_val)
-		return super(pay_value, self).unlink(cr, uid, ids, context=context)
-		
-	def _check_unique_project_value_line(self, cr, uid, ids, context=None):
+	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.project_value_line_id == self_obj.project_value_line_id:
-						return False
-		return True
-		
-	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.project_value_line_id == self_obj.project_value_line_id:
-						return False
+		lst = [
+				x.s_range1.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.s_range1 and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.s_range1 and self_obj.s_range1.lower() in  lst:
+				return False
 		return True
 		
 	_name = "project.value.line"
@@ -209,11 +173,10 @@ class project_value_line(osv.osv):
 	_columns = {
 		'sr_no': fields.integer('S.No', size=100, readonly=1),
 		'project_value_line_id': fields.many2one('commisions', 'Commisions', ondelete='cascade', help='Commisions', select=True),
-		's_range1':fields.char('Start of Range',size=20),
-		'e_range1': fields.char('End of Range',size=20),
-		'value1': fields.char('Value',size=20),
+		's_range1':fields.char('Start of Range',size=6),
+		'e_range1': fields.char('End of Range',size=6),
+		'value1': fields.char('Value',size=3),
 	}
-	_constraints = [(_check_unique_project_value_line, 'Error: Pre Test Already Exists', ['project_value_line_id']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['project_value_line_id'])]
+	_constraints = [(_check_unique_name, 'Error: Project Value Already Exists', ['s_range1'])]
 project_value_line
 

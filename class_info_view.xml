@@ -1,155 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-
-<!-- ===================== This is Class Dashboard kanban layout =============================-->
-	<record id="class_dashboard" model="ir.ui.view">
-		<field name="name">class.kanban</field>
-		<field name="model">class.dash</field>
-		<field name="priority">10</field>
-		<field name="arch" type="xml">
-			<kanban quick_create="false" create="true" delete="true">
-			<templates>
-				<t t-name="kanban-box">
-					<group>
-						
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_1">
-									<div class="created_req">	
-										Created
-									</div>
-									<div class="number_10">	
-										24
-									</div>
-								</div>
-								</tree>
-					
-								<tree string=" Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_2">
-										<div class="come_alive">	
-											Come Alive
-										</div>
-										<div class="number_20">	
-											10
-										</div>
-									</div>
-								</tree>
-					
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_3">
-										<div class="postponed">	
-											Postponed
-										</div>
-										<div class="number_30">	
-											10
-										</div>
-									</div>
-								</tree>
-					
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_4">
-										<div class="cancelled">	
-											Cancelled
-										</div>
-										<div class="number_40">	
-											10
-										</div>
-									</div>
-								</tree>
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_5">
-										<div class="go_head">	
-											Go Head
-										</div>
-										<div class="number_50">	
-											10
-										</div>
-									</div>
-								</tree>
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_6">
-										<div class="started">	
-											Started
-										</div>
-										<div class="number_60">	
-											10
-										</div>
-									</div>
-								</tree>
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_7">
-										<div class="in_progress">	
-											In Progress
-										</div>
-										<div class="number_70">	
-											20
-										</div>
-									</div>
-								</tree>
-								
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_9">
-										<div class="total">	
-											Total
-										</div>
-										<div class="number_90">	
-											150
-										</div>
-									</div>
-								</tree>
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_10">
-										<div class="need_your_attention">	
-											Need Your Attenction
-										</div>
-										<div class="number_100">	
-											10
-										</div>
-									</div>
-								</tree>
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_11">
-										<div class="calls">	
-											Calls
-										</div>
-										<div class="number_110">	
-											10
-										</div>
-									</div>
-								</tree>			 
-								
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp class_status_dashboard_8">
-										<div class="completed">	
-											Completed
-										</div>
-										<div class="number_80">	
-											50
-										</div>
-									</div>
-								</tree>
-					</group>
-					<div class="oe_clear"></div>
-				</t>
-			</templates>
-			</kanban>
-		</field>
-	</record>
-
-
-<!-- ===================== This is Class form layout =============================-->
+<!-- ===================== This is location form layout =============================-->
 <record id="class_form" model="ir.ui.view">
     <field name="name">class.form</field>
     <field name="model">class.info</field>
     <field name="arch" type="xml">
         <form string="test" version="7.0">
-            <sheet>
+	        <sheet>
                 <group>
 						<div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
@@ -189,196 +47,185 @@
 				</group>
 			    <group col="9">					
 					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
-					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
-					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
+					<field name = "location_id"/>
+					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)"/>
 				</group>
 				<group>
-					<group style="width:380px;">
-						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
-						<field name = "end_date" readonly="context.get('ctx', False)"/>
-					</group>
-					<group>
-						<field name = "start_time" readonly="context.get('ctx', False)"/>
-						<field name = "end_time" readonly="context.get('ctx', False)"/>
+					<group col="6">
+						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date" on_change="onchange_dates(start_date,duration,False,total_hrs)"/>
+						 <field name="duration" widget="float_time"  on_change="onchange_dates(start_date,duration,False,total_hrs)" />
+						<field name = "end_date" readonly="1" />
+						<field name = "apply_all" class="oe_edit_only"/>
 					</group>
 		        </group>
 						
 			<notebook colspan="5" col="10">
 					<page string="Schedule">
 							<div>
+							   <group col="2" >
 								<group>
-									<field name = "sessions_per_week" string="Number of Sessions Per Week"/>
-									<field name = "sessions_duration_in_hrs" string="Sessions Durations in Hours"/>
-									<field name = "total_hrs" string="Total Hours"/>
-									<field name = "total_sessions" string="Total Sessions"/>
+									<field name = "sessions_per_week" string="Number of Sessions Per Week" on_change='on_change_tot_week(total_sessions,sessions_per_week)' readonly="1" />
+									<field name = "total_hrs" string="Total Hours" on_change='on_change_tot_sess(duration,total_hrs)'/>
+									<field name = "total_sessions" string="Total Sessions" on_change='on_change_tot_week(total_sessions,sessions_per_week)'/>
 									<field name = "total_weeks" string="Total Weeks"/>
 								</group>
-							</div>
-							<div>
 								<group>
-									<h4>
-										<label string=""  readonly="context.get('ctx', False)"/>
-									</h4>
-								</group>
-								<group col="12">
-									<h4>
-										<label string=""  readonly="context.get('ctx', False)"/>
-									</h4>
-									<h4>
-										<label string="Start Date"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<h4>
-										<label string="Start Time"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<h4>
-										<label string="End Date"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<h4>
-										<label string="End Time"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<h4>
-										<label string="Room"  readonly="context.get('ctx', False)"/>
-									</h4>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 1"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date2"/>
+								<notebook>
+								<page string="Setting">
+								<div>
+									<group>
+										<h4>
+											<label string=""  readonly="context.get('ctx', False)"/>
+										</h4>
+									</group>
+									<group col="16">
+										<h4>
+											<label string=""  readonly="context.get('ctx', False)"/>
+										</h4>
+										<h4>
+											<label string="Start Date"  readonly="context.get('ctx', False)"/>
+										</h4>
+										<h4>
+											<label string="End Date"  readonly="context.get('ctx', False)"/>
+										</h4>
+										<h4>
+											<label string="Room"  readonly="context.get('ctx', False)"/>
+										</h4>
+									</group>
+									<group col="16">
+										<field name="include_1"  nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_1"  nolabel='1'  attrs="{'invisible': [('include_1','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date1" readonly="1"  attrs="{'invisible': [('include_1','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date1" readonly="1"  attrs="{'invisible': [('include_1','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room1"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_1','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_2"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_2"  nolabel='1' attrs="{'invisible': [('include_2','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date2" readonly="1" attrs="{'invisible': [('include_2','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date2" readonly="1" attrs="{'invisible': [('include_2','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room2"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_2','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_3"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_3"  nolabel='1' attrs="{'invisible': [('include_3','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date3" readonly="1" attrs="{'invisible': [('include_3','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date3" readonly="1" attrs="{'invisible': [('include_3','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room3"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_3','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_4"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_4"  nolabel='1' attrs="{'invisible': [('include_4','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date4" readonly="1" attrs="{'invisible': [('include_4','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date4" readonly="1" attrs="{'invisible': [('include_4','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room4" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_4','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_5"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_5"  nolabel='1'  attrs="{'invisible': [('include_5','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date5" readonly="1"  attrs="{'invisible': [('include_5','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date5" readonly="1"  attrs="{'invisible': [('include_5','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room5"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_5','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_6"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_6"  nolabel='1'  attrs="{'invisible': [('include_6','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date6" readonly="1"  attrs="{'invisible': [('include_6','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date6" readonly="1"  attrs="{'invisible': [('include_6','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room6" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_6','=', False)]}"/>
+										</div>
+									</group>
+									<group col="16">
+										<field name="include_7"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<h4>
+											<field name="day_7"  nolabel='1' attrs="{'invisible': [('include_7','=', False)]}"/>
+										</h4>
+										<div>
+											<field name="start_date7" readonly="1" attrs="{'invisible': [('include_7','=', False)]}"/>
+										</div>
+										<div>
+											<field name="end_date7" readonly="1" attrs="{'invisible': [('include_7','=', False)]}"/>
+										</div>
+										<div>
+											<field name="room7" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_7','=', False)]}"/>
+										</div>
+									</group>
 									</div>
-									<div>
-										<field name="start_time1"/>
-									</div>
-									<div>
-										<field name="end_date1"/>
-									</div>
-									<div>
-										<field name="end_time1"/>
-									</div>
-									<div>
-										<field name="room1"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 2"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date3"/>
-									</div>
-									<div>
-										<field name="start_time2"/>
-									</div>
-									<div>
-										<field name="end_date2"/>
-									</div>
-									<div>
-										<field name="end_time2"/>
-									</div>
-									<div>
-										<field name="room2"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 3"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date4"/>
-									</div>
-									<div>
-										<field name="start_time3"/>
-									</div>
-									<div>
-										<field name="end_date3"/>
-									</div>
-									<div>
-										<field name="end_time3"/>
-									</div>
-									<div>
-										<field name="room3"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 4"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date5"/>
-									</div>
-									<div>
-										<field name="start_time4"/>
-									</div>
-									<div>
-										<field name="end_date4"/>
-									</div>
-									<div>
-										<field name="end_time4"/>
-									</div>
-									<div>
-										<field name="room4"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 5"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date6"/>
-									</div>
-									<div>
-										<field name="start_time5"/>
-									</div>
-									<div>
-										<field name="end_date5"/>
-									</div>
-									<div>
-										<field name="end_time5"/>
-									</div>
-									<div>
-										<field name="room5"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 6"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date7"/>
-									</div>
-									<div>
-										<field name="start_time6"/>
-									</div>
-									<div>
-										<field name="end_date6"/>
-									</div>
-									<div>
-										<field name="end_time6"/>
-									</div>
-									<div>
-										<field name="room6"/>
-									</div>
-								</group>
-								<group col="12">
-									<h4>
-										<label string="Day 7"  readonly="context.get('ctx', False)"/>
-									</h4>
-									<div>
-										<field name="start_date"/>
-									</div>
-									<div>
-										<field name="start_time7"/>
-									</div>
-									<div>
-										<field name="end_date7"/>
-									</div>
-									<div>
-										<field name="end_time7"/>
-									</div>
-									<div>
-										<field name="room7"/>
-									</div>
+									</page>
+									<page string='Info'>
+									  <group col="1">
+										<h4>
+											Session with conflicts
+										</h4>
+										<field name="sess_info_line"  nolabel="1" >
+											<tree string="Session"  create="false" delete="false">
+												<field name = "sess_no"/>
+												<field name = "week_no"/>
+												<field name = "start_date"/>
+												<field name = "sess_issues"   />
+											</tree>
+										</field>
+										<h4>
+											Session Info
+										</h4>
+										<field name="sess_info_line1"  nolabel="1">
+											<tree string="Session"  create="false" delete="false">
+												<field name = "sess_no"/>
+												<field name = "week_no"/>
+												<field name = "start_date"/>
+											</tree>
+										</field>
+									 </group>
+									</page>
+									</notebook>
+									</group>
 								</group>
 							</div>
 					</page>
@@ -442,14 +289,13 @@
 						<h2>
 							<label string="Learner"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<field name="trainer_learner" readonly="context.get('ctx', False)">
-							<tree string="PF Order Lines" editable="bottom">
-								<field name = "name" required='True'/>
-								<field name = "nric_fin" required='True'/>
-								<field name = "learning_mode"/>
-								<field name = "attendance"/>
-								<field name = "move"/>
-							</tree>
+						<field name='learner_line' nolabel='1'>
+									<tree string='List' editable="bottom">
+										<field name='learner_mod_id' invisible="1" />
+										<field name='learner_id' on_change="on_change_learner_id(learner_id)"/>
+										<field name = "learner_nric"/>
+										<button name="views" string="View Learner" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
+									</tree>
 						</field>
 					</page>
 					<page string="Assets">
@@ -510,8 +356,10 @@
             <field name="model">class.info</field>
             <field name="arch" type="xml">
                 <tree string="Location">
+					<field name = "start_date"/>
 					<field name = "name"/>
 					<field name = "class_code"/>
+					<field name = "sess_no"/>
 			    </tree>
             </field>
         </record>
@@ -526,37 +374,39 @@
             </field>
         </record>
 	
-		<!-- Class calendar view -->
+	          	<!-- Event calendar view -->
         <record model="ir.ui.view" id="event_calendar_view1">
             <field name="name">class.calendar</field>
             <field name="model">class.info</field>
 			<field name="priority" eval="2"/>
+			<field name="auto_refresh">1</field>
             <field name="arch" type="xml">
-                <calendar string="Calendar" date_start="start_date" color="class_code">
+                <calendar string="Calendar" date_start="start_date" date_stop="end_date" color="class_code">
                     <field name = "name" string="Class"/>
 					<field name = "class_code" string="Code"/>
 					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
 					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
 					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
-					<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
+					<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"  />
 					<field name = "end_date" readonly="context.get('ctx', False)"/>
                 </calendar>
             </field>
-        </record>
-
-	
+        </record> 
 
 		<record model="ir.actions.act_window" id="action_class">
             <field name="name">Class</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">class.info</field>
             <field name="view_type">form</field>
-            <field name="view_mode">kanban,calendar,tree,form</field>
-			<field name="view_id" ref="class_dashboard"/>
-
+            <field name="view_mode">calendar,tree,form</field>
+			<field name="search_view_id" ref="view_class_filter"/>
+		    <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new location.
+              </p>
+            </field>
         </record>
-
-
+		
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
 
 </data> 

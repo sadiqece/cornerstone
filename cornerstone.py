@@ -7,7 +7,129 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+
 class program(osv.osv):
+
+#Aasim 20 12 2014
+
+    def onchange_no_of_mod_gp(self, cr, uid, ids, no_of_mod_gp):
+        val = {}
+        val['no_module_box1'] = False
+        val['no_module_box2'] = False
+        val['no_module_box3'] = False
+        val['no_module_box4'] = False
+        val['no_module_box5'] = False
+        val['no_module_box6'] = False
+        if no_of_mod_gp == '1':
+            val['no_module_box1'] = True
+        elif no_of_mod_gp == '2':
+            val['no_module_box1'] = True
+            val['no_module_box2'] = True
+        elif no_of_mod_gp == '3':
+            val['no_module_box1'] = True
+            val['no_module_box2'] = True
+            val['no_module_box3'] = True
+        elif no_of_mod_gp == '4':
+            val['no_module_box1'] = True
+            val['no_module_box2'] = True
+            val['no_module_box3'] = True
+            val['no_module_box4'] = True
+        elif no_of_mod_gp == '5':
+            val['no_module_box1'] = True
+            val['no_module_box2'] = True
+            val['no_module_box3'] = True
+            val['no_module_box4'] = True
+            val['no_module_box5'] = True
+        elif no_of_mod_gp == '6':
+            val['no_module_box1'] = True
+            val['no_module_box2'] = True
+            val['no_module_box3'] = True
+            val['no_module_box4'] = True
+            val['no_module_box5'] = True
+            val['no_module_box6'] = True
+
+        return {'value': val} 
+
+    def onchange_set_module_as_1(self, cr, uid, ids, set_module_as_1):
+        val = {}
+        val['set_module_block_1'] = False
+        val['set_module_select_1'] = False
+        if set_module_as_1 == 'Block':
+            val['set_module_block_1'] = True
+        elif set_module_as_1 == 'Selectable':
+            val['set_module_select_1'] = True
+
+        return {'value': val}
+
+    def onchange_set_module_as_2(self, cr, uid, ids, set_module_as_2):
+        val = {}
+        val['set_module_block_2'] = False
+        val['set_module_select_2'] = False
+        if set_module_as_2 == 'Block':
+            val['set_module_block_2'] = True
+        elif set_module_as_2 == 'Selectable':
+            val['set_module_select_2'] = True
+
+        return {'value': val}
+
+    def onchange_set_module_as_3(self, cr, uid, ids, set_module_as_3):
+        val = {}
+        val['set_module_block_3'] = False
+        val['set_module_select_3'] = False
+        if set_module_as_3 == 'Block':
+            val['set_module_block_3'] = True
+        elif set_module_as_3 == 'Selectable':
+            val['set_module_select_3'] = True
+
+        return {'value': val}
+
+    def onchange_set_module_as_4(self, cr, uid, ids, set_module_as_4):
+        val = {}
+        val['set_module_block_4'] = False
+        val['set_module_select_4'] = False
+        if set_module_as_4 == 'Block':
+            val['set_module_block_4'] = True
+        elif set_module_as_4 == 'Selectable':
+            val['set_module_select_4'] = True
+
+        return {'value': val}
+
+    def onchange_set_module_as_5(self, cr, uid, ids, set_module_as_5):
+        val = {}
+        val['set_module_block_5'] = False
+        val['set_module_select_5'] = False
+        if set_module_as_5 == 'Block':
+            val['set_module_block_5'] = True
+        elif set_module_as_5 == 'Selectable':
+            val['set_module_select_5'] = True
+
+        return {'value': val}
+
+    def onchange_set_module_as_6(self, cr, uid, ids, set_module_as_6):
+        val = {}
+        val['set_module_block_6'] = False
+        val['set_module_select_6'] = False
+        if set_module_as_6 == 'Block':
+            val['set_module_block_6'] = True
+        elif set_module_as_6 == 'Selectable':
+            val['set_module_select_6'] = True
+
+        return {'value': val}
+	
+	def _check_unique_module_in_group_6(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+		
+	_constraints = [(_check_unique_module_in_group_6, 'Error: Module Cannot Be Repeated', ['module_id_6'])]
+#EOF
+
     def _load_prog_mod_line(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
@@ -38,8 +160,7 @@ class program(osv.osv):
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids),('verification', '=', True)])
        return dict([(id, value_ids) for id in ids])
 
-
-    
+	   
     def _load_module_info(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
@@ -209,7 +330,9 @@ class program(osv.osv):
             if self_obj.program_code and self_obj.program_code.lower() in  lst:
                return False
         return True   
-  
+	
+
+		
     _name = "lis.program"
     _description = "This table is for keeping lab data of cord blood"
     _columns = {
@@ -253,6 +376,70 @@ class program(osv.osv):
 		'date3': fields.date('Date Created', readonly='True'),
 		'date4': fields.date('Date Created', readonly='True'),
 		'prog_req_line': fields.one2many('program.req.module','mod_id','Requirments'),
+    # Aasim 20 12 2014
+		#For Multiple Boxes in Module Tab
+		'no_of_mod_gp': fields.selection((('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6')),'Number of Module Groups'),
+		'no_module_box1': fields.boolean('1'),
+		'no_module_box2': fields.boolean('2'),
+		'no_module_box3': fields.boolean('3'),
+		'no_module_box4': fields.boolean('4'),
+		'no_module_box5': fields.boolean('5'),
+		'no_module_box6': fields.boolean('6'),
+		#1
+		'mod_gp_name_1': fields.char('Module Group Name'),
+		'set_group_as_sel_1': fields.boolean('Set Group As Selectable'),
+		'set_module_as_1': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_1': fields.boolean('Block'),
+		'set_module_select_1': fields.boolean('Selectable'),
+		'allow_as_block_1': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_1': fields.integer('Minimum Modules'),
+		'max_no_modules_1': fields.integer('Maximum Modules'),
+		#2
+		'mod_gp_name_2': fields.char('Module Group Name'),
+		'set_group_as_sel_2': fields.boolean('Set Group As Selectable'),
+		'set_module_as_2': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_2': fields.boolean('Block'),
+		'set_module_select_2': fields.boolean('Selectable'),
+		'allow_as_block_2': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_2': fields.integer('Minimum Modules'),
+		'max_no_modules_2': fields.integer('Maximum Modules'),
+		#3
+		'mod_gp_name_3': fields.char('Module Group Name'),
+		'set_group_as_sel_3': fields.boolean('Set Group As Selectable'),
+		'set_module_as_3': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_3': fields.boolean('Block'),
+		'set_module_select_3': fields.boolean('Selectable'),
+		'allow_as_block_3': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_3': fields.integer('Minimum Modules'),
+		'max_no_modules_3': fields.integer('Maximum Modules'),
+		#4
+		'mod_gp_name_4': fields.char('Module Group Name'),
+		'set_group_as_sel_4': fields.boolean('Set Group As Selectable'),
+		'set_module_as_4': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_4': fields.boolean('Block'),
+		'set_module_select_4': fields.boolean('Selectable'),
+		'allow_as_block_4': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_4': fields.integer('Minimum Modules'),
+		'max_no_modules_4': fields.integer('Maximum Modules'),
+		#5
+		'mod_gp_name_5': fields.char('Module Group Name'),
+		'set_group_as_sel_5': fields.boolean('Set Group As Selectable'),
+		'set_module_as_5': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_5': fields.boolean('Block'),
+		'set_module_select_5': fields.boolean('Selectable'),
+		'allow_as_block_5': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_5': fields.integer('Minimum Modules'),
+		'max_no_modules_5': fields.integer('Maximum Modules'),
+		#6
+		'mod_gp_name_6': fields.char('Module Group Name'),
+		'set_group_as_sel_6': fields.boolean('Set Group As Selectable'),
+		'set_module_as_6': fields.selection((('Block','Block'),('Selectable','Selectable')),'Set Module As'),
+		'set_module_block_6': fields.boolean('Block'),
+		'set_module_select_6': fields.boolean('Selectable'),
+		'allow_as_block_6': fields.boolean('Allow scheduling as a block'),
+		'min_no_modules_6': fields.integer('Minimum Modules'),
+		'max_no_modules_6': fields.integer('Maximum Modules'),
+	# EOF
     }
 	
     _defaults = { 
@@ -261,7 +448,7 @@ class program(osv.osv):
     }
     _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['name']),(_check_unique_code, 'Error: Program Code Already Exists', ['module_code'])]
 program()
-
+# MODULE
 globvar = 0
 class program_mod_line(osv.osv):
 	def _check_unique_module(self, cr, uid, ids, context=None):
@@ -272,22 +459,59 @@ class program_mod_line(osv.osv):
 					if x.prog_mod_id == self_obj.prog_mod_id and x.module_id == self_obj.module_id:
 						return False
 		return True
-	
+		
+	# Aasim 19 12 2014 
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(program_mod_line, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no_6'] = seq_number
+		
+		return res
+		
 	_name = "program.module.line"
 	_description = "Module Line"
 	_columns = {
+		's_no' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-		'no_of_hrs': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True),
-	}
+		'no_of_hrs': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True),  
+		#2
+		's_no_2' : fields.integer('S.No',size=20,readonly=1),
+		'prog_mod_id_2': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
+		'module_id_2':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		#3
+		's_no_3' : fields.integer('S.No',size=20,readonly=1),
+		'prog_mod_id_3': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
+		'module_id_3':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		#4
+		's_no_4' : fields.integer('S.No',size=20,readonly=1),
+		'prog_mod_id_4': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
+		'module_id_4':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		#5
+		's_no_5' : fields.integer('S.No',size=20,readonly=1),
+		'prog_mod_id_5': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
+		'module_id_5':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		#6
+		's_no_6' : fields.integer('S.No',size=20,readonly=1),
+		'prog_mod_id_6': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
+		'module_id_6':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+    }
+  # EOF
+  
 	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
 	
-	
+	#Aasim 22 12 2014
 		
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
+	#def on_change_module_id(self, cr, uid, ids, module_id):
+	#	module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
+	#	return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
+	
+	#EOF
 		
 	def views(self,cr,uid,ids,context=None):
 		global globvar
@@ -966,7 +1190,6 @@ class requirments(osv.osv):
 		'musthave':values['musthave'],'verification':values['verification']}, context=context)
 		return module_id
 		
-
 	_name ='req.module'
 	_description ="Requirement Tab"
 	_rec_name='mod_id'
