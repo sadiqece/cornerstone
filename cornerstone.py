@@ -7,10 +7,9 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
-
 class program(osv.osv):
 
-#Aasim 20 12 2014
+#Dropdown to Show no. of module groups
 
     def onchange_no_of_mod_gp(self, cr, uid, ids, no_of_mod_gp):
         val = {}
@@ -50,6 +49,7 @@ class program(osv.osv):
 
         return {'value': val} 
 
+#Set Module as
     def onchange_set_module_as_1(self, cr, uid, ids, set_module_as_1):
         val = {}
         val['set_module_block_1'] = False
@@ -115,39 +115,125 @@ class program(osv.osv):
             val['set_module_select_6'] = True
 
         return {'value': val}
-	
-	def _check_unique_module_in_group_6(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-		
-	_constraints = [(_check_unique_module_in_group_6, 'Error: Module Cannot Be Repeated', ['module_id_6'])]
+#Validate Min/Max
+    #1
+    def check_min_max_1(self, cr, uid, ids, max_no_modules_1):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids):
+           if 'module_id' in prog_module_line:
+               module_ids.append(prog_module_line['module_id'].id)
+               value_ids_1 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_1)
+       _logger.info('No Of Module 1 %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_1'] or lis_program['max_no_modules_1'] < lis_program['min_no_modules_1']:
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
+    #2
+    def check_min_max_2(self, cr, uid, ids, max_no_modules_2):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids):
+           if 'module_id_2' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_2'].id)
+               value_ids_2 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_2)
+       _logger.info('No Of Module 2 = %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_2'] or lis_program['max_no_modules_2'] < lis_program['min_no_modules_2']:
+           _logger.info('MAX 2 = %s',max_no_modules_2)
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
+    #3
+    def check_min_max_3(self, cr, uid, ids, max_no_modules_3):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids):
+           if 'module_id_3' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_3'].id)
+               value_ids_3 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_3)
+       _logger.info('No Of Module 3 %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_3'] or lis_program['max_no_modules_3'] < lis_program['min_no_modules_3']:
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
+    #4
+    def check_min_max_4(self, cr, uid, ids, context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id_4' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_4'].id)
+               value_ids_4 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_4)
+       _logger.info('No Of Module 4 %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_4'] or lis_program['max_no_modules_4'] < lis_program['min_no_modules_4']:
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
+    #5
+    def check_min_max_5(self, cr, uid, ids, context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id_5' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_5'].id)
+               value_ids_5 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_5)
+       _logger.info('No Of Module 5 %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_5'] or lis_program['max_no_modules_5'] < lis_program['min_no_modules_5']:
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
+    #6
+    def check_min_max_6(self, cr, uid, ids, context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id_5' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_6'].id)
+               value_ids_6 = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       no_of_mod = len(value_ids_6)
+       _logger.info('No Of Module 6 %s',no_of_mod )
+       if no_of_mod < lis_program['max_no_modules_6'] or lis_program['max_no_modules_6'] < lis_program['min_no_modules_6']:
+           raise osv.except_osv(_('Error!'),_('Min/Max Values invalid'))
+       return True
 #EOF
-
+#Requirement Tab
     def _load_prog_mod_line(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
-       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
        module_ids =[]
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-           module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id' in prog_module_line:
+               module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id_2' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           if 'module_id_3' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           if 'module_id_4' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           if 'module_id_5' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           if 'module_id_6' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_6'].id)
        
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids)])
-       return dict([(id, value_ids) for id in ids])
-    
-    def _load_prog_show_do_line(self, cr, uid, ids, field_names, args,  context=None):
-       prog_mod_obj = self.pool.get('program.module.line')
-       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
-       module_ids =[]
-       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-           module_ids.append(prog_module_line['module_id'].id)
-       
-       value_ids = self.pool.get('show.do.module').search(cr, uid, [('mod_id', 'in', module_ids)])
        return dict([(id, value_ids) for id in ids])
 
     def _load_prog_mod_show_do_line(self, cr, uid, ids, field_names, args,  context=None):
@@ -160,62 +246,249 @@ class program(osv.osv):
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids),('verification', '=', True)])
        return dict([(id, value_ids) for id in ids])
 
-	   
-    def _load_module_info(self, cr, uid, ids, field_names, args,  context=None):
+#Show Do Tab
+    def _load_prog_show_do_line(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
-       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
        module_ids =[]
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-           module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id' in prog_module_line:
+               module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id_2' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           if 'module_id_3' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           if 'module_id_4' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           if 'module_id_5' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           if 'module_id_6' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_6'].id)
        
-       value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       value_ids = self.pool.get('show.do.module').search(cr, uid, [('mod_id', 'in', module_ids)])
        return dict([(id, value_ids) for id in ids])
 
-    def _calculate_total_fee(self, cr, uid, ids, field_names, args,  context=None):
+#Load data For Multiple Tabs
+    def _load_module_info(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line:
+               module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id_2' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           if 'module_id_3' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           if 'module_id_4' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           if 'module_id_5' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           if 'module_id_6' in prog_module_line:
+               module_ids.append(prog_module_line['module_id_6'].id)  
+       value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       return dict([(id, value_ids ) for id in ids])
+       
+#Max Fee
+
+    def _calculate_total_fee_max(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
        res = {}
-       for line in self.browse(cr, uid, ids, context=context):
-          total_dur =0.00
-          prog_mod_obj = self.pool.get('program.module.line')
-          prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', line.id)])
-          if len(prog_mod_ids) > 0:
-            module_ids =[]
-            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-              if type(prog_module_line['module_id'].id) == int:
-                 module_ids.append(prog_module_line['module_id'].id)
-                 
-            if len(module_ids) > 0:
-              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
-                  total_dur += module_obj['module_fee']
-          res[line.id] = total_dur
+       max_fee = 0.00
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+       mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
+           max_fee += value_ids['module_fee']
+       res[ids[0]] = max_fee
+       return res
+#Min Fee   
+    def _calculate_total_fee_min(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       res = {}
+       min_fee = 0.00
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+       mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
+           min_fee += value_ids['module_fee']
+       res[ids[0]] = min_fee
        return res
 
-    def _calculate_total_mod(self, cr, uid, ids, field_names, args,  context=None):
-       if not ids: return {}
+#Min Modules
+
+    def _calculate_total_mod_min(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
        res = {}
-       for line in self.browse(cr, uid, ids, context=context):
-          mod_line_ids = self.browse(cr, uid, ids[0], context=context).program_mod_line or []
-          total_mod = len(mod_line_ids)
-          res[line.id] = total_mod
-       return res  
-   
-    def _calculate_total_duration(self, cr, uid, ids, field_names, args,  context=None):
-       res = {}
-       for line in self.browse(cr, uid, ids, context=context):
-          total_dur =0.00
-          prog_mod_obj = self.pool.get('program.module.line')
-          prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', line.id)])
-          if len(prog_mod_ids) > 0:
-            module_ids =[]
-            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-              if type(prog_module_line['module_id'].id) == int:
-                 module_ids.append(prog_module_line['module_id'].id)
-                 
-            if len(module_ids) > 0:
-              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
-                  total_dur += module_obj['module_duration']
-          res[line.id] = total_dur
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+
+       value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       min_mod = len(value_ids)
+       res[ids[0]] = min_mod
        return res
-   
+#Max Modules  
+    def _calculate_total_mod_max(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       res = {}
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+
+       value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       max_mod = len(value_ids)
+       res[ids[0]] = max_mod
+       return res
+
+#Max Duration
+ 
+    def _calculate_total_duration_max(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       res = {}
+       max_dur = 0.00
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+       mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
+           max_dur += value_ids['module_duration']
+       res[ids[0]] = max_dur
+       return res
+
+#Min Duration
+
+    def _calculate_total_duration_min(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_obj2 = self.pool.get('lis.program')
+       lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
+       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       module_ids =[]
+       res = {}
+       min_dur = 0.00
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
+               module_ids.append(prog_module_line['module_id'].id)
+           #2
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
+               module_ids.append(prog_module_line['module_id_2'].id)
+           #3
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
+               module_ids.append(prog_module_line['module_id_3'].id)
+           #4
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
+               module_ids.append(prog_module_line['module_id_4'].id)
+           #5
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
+               module_ids.append(prog_module_line['module_id_5'].id)
+           #6
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
+               module_ids.append(prog_module_line['module_id_6'].id)
+       mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
+       for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
+           min_dur += value_ids['module_duration']
+       res[ids[0]] = min_dur
+       return res
+
+#Total Credit
+	   
     def _calculate_total_credit(self, cr, uid, ids, field_names, args,  context=None):
        res = {}
        for line in self.browse(cr, uid, ids, context=context):
@@ -233,7 +506,9 @@ class program(osv.osv):
                   total_credit += module_obj['module_credit_value']
           res[line.id] = total_credit
        return res
-    
+
+#Program Status
+
     def _prog_status_display(self, cr, uid, ids, field_names, args,  context=None):
        if not ids: return {}
        res = {}
@@ -331,8 +606,6 @@ class program(osv.osv):
                return False
         return True   
 	
-
-		
     _name = "lis.program"
     _description = "This table is for keeping lab data of cord blood"
     _columns = {
@@ -343,21 +616,29 @@ class program(osv.osv):
 		'program_level': fields.selection((('Beginner','Beginner'),('Intermediate','Intermediate'),('Advanced','Advanced')),'Level'),
 	    'program_category':fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
 	    'program_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
-		'program_duration': fields.function(_calculate_total_duration, relation="lis.program",readonly=1,string='Total Duration',type='float', required=True),
-		'program_tot_duration': fields.function(_calculate_total_duration, relation="lis.program",readonly=1,string='Total Duration',type='float', required=True),
-		'program_tot_mod': fields.function(_calculate_total_mod, relation="lis.program",readonly=1,string='Number of Modules',type='integer'),
+		#Max Min
+		'max_program_duration': fields.function(_calculate_total_duration_max, relation="lis.program",readonly=1,string='Max Program Duration',type='float', required=True),
+		'min_program_duration': fields.function(_calculate_total_duration_min, relation="lis.program",readonly=1,string='Min Program Duration',type='float', required=True),
+		'max_program_mod': fields.function(_calculate_total_mod_max, relation="lis.program",readonly=1,string='Max Modules',type='integer'),
+		'min_program_mod': fields.function(_calculate_total_mod_min, relation="lis.program",readonly=1,string='Min Modules',type='integer'),
+		'max_program_fee': fields.function(_calculate_total_fee_max, relation="lis.program",readonly=1,string='Max Program Fee',type='float'),
+		'min_program_fee': fields.function(_calculate_total_fee_min, relation="lis.program",readonly=1,string='Min Program Fee',type='float'),
 		'program_tot_credit': fields.function(_calculate_total_credit, relation="lis.program",readonly=1,string='Total Credit',type='integer'),
 		'program_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status',required=True, select=True),
 		'program_center': fields.selection((('Hougang','Hougang'),('Jurong','Jurong'),('Tampines','Tampines'),('Woodlands','Woodlands')),'Select Center'),
 		'select_module': fields.selection((('Module 1','Module 1'),('Module 2','Module 2'),('Module 3','Module 3'),('Module 4','Module 4')),'Select Module'),
 		'program_audience': fields.selection((('LWW','LWW'),('LWW','LWW')),'Target Audience'),
-		'program_fee': fields.function(_calculate_total_fee, relation="lis.program",readonly=1,string='Total Program Fee',type='float'),
 		'program_description': fields.text('Description', size=500),
 		'program_synopsis':fields.text('Synopsis'),
 		'program_outline':fields.text('Outline'),
 		'program_cert_achevied': fields.char('Certifications Acheived', size=100),
-		'program_total_fee' : fields.function(_calculate_total_fee, relation="lis.program",readonly=1,string='Total Program Fee',type='float'),
+		#Table in Module Group
 		'program_mod_line': fields.one2many('program.module.line', 'prog_mod_id', 'Order Lines', select=True, required=True),
+		'program_mod_line_2': fields.one2many('program.module.line', 'prog_mod_id_2', 'Order Lines', select=True, required=True),
+		'program_mod_line_3': fields.one2many('program.module.line', 'prog_mod_id_3', 'Order Lines', select=True, required=True),
+		'program_mod_line_4': fields.one2many('program.module.line', 'prog_mod_id_4', 'Order Lines', select=True, required=True),
+		'program_mod_line_5': fields.one2many('program.module.line', 'prog_mod_id_5', 'Order Lines', select=True, required=True),
+		'program_mod_line_6': fields.one2many('program.module.line', 'prog_mod_id_6', 'Order Lines', select=True, required=True),
 		'program_module_desc_line': fields.function(_load_module_info, relation="cs.module",readonly=1,string='Module',type='one2many'),
 		'program_mod_req_line': fields.function(_load_prog_mod_line, relation="req.module",readonly=1,type='one2many', string='Module'),
 		'program_modality_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many', string='Module'),
@@ -367,16 +648,16 @@ class program(osv.osv):
 		'program_test_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many', string='Module'),
 		'subsidy_line': fields.one2many('subsidy.module','program_id','Subsidy Items'),
 		'program_cost_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many', string='Module'),
+		'program_alert_line_2': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many', string='Module'),
 		'program_duration_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many',string='Module'),
 		'program_alert_line': fields.one2many('program.alert.module','program_id','Alerts for Program'),
-		'program_module_alerts_line': fields.function(_load_module_info, relation="cs.module",readonly=1, string='Module',type='one2many'),
+		'program_module_alerts_line': fields.function(_load_module_info, relation="cs.module", readonly=1, string='Module', type='one2many'),
 		'program_history_line': fields.one2many('program.history.module','history_id','History'),
 		'prog_status_display': fields.function(_prog_status_display, readonly=1, type='char'),
 		'prog_status_display_1': fields.function(_prog_status_display_1, readonly=1, type='char'),
 		'date3': fields.date('Date Created', readonly='True'),
 		'date4': fields.date('Date Created', readonly='True'),
 		'prog_req_line': fields.one2many('program.req.module','mod_id','Requirments'),
-    # Aasim 20 12 2014
 		#For Multiple Boxes in Module Tab
 		'no_of_mod_gp': fields.selection((('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6')),'Number of Module Groups'),
 		'no_module_box1': fields.boolean('1'),
@@ -439,109 +720,75 @@ class program(osv.osv):
 		'allow_as_block_6': fields.boolean('Allow scheduling as a block'),
 		'min_no_modules_6': fields.integer('Minimum Modules'),
 		'max_no_modules_6': fields.integer('Maximum Modules'),
-	# EOF
     }
 	
     _defaults = { 
 	   'date3': fields.date.context_today,
 	   'date4': fields.date.context_today,
+	   'set_group_as_sel_1': True,
+	   'set_group_as_sel_2': True,
+	   'set_group_as_sel_3': True,
+	   'set_group_as_sel_4': True,
+	   'set_group_as_sel_5': True,
+	   'set_group_as_sel_6': True,
     }
     _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['name']),(_check_unique_code, 'Error: Program Code Already Exists', ['module_code'])]
 program()
-# MODULE
+
+# Table in Module Group
+
 globvar = 0
 class program_mod_line(osv.osv):
+	#Unique Check 
 	def _check_unique_module(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
+				for self_obj in self.browse(cr, uid, ids, context=context):	
 					if x.prog_mod_id == self_obj.prog_mod_id and x.module_id == self_obj.module_id:
+						_logger.info('Unique Modules = %s', module_id)
 						return False
 		return True
-		
-	# Aasim 19 12 2014 
 
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(program_mod_line, self).read(cr, uid,ids, fields, context, load)
-		seq_number =0 
-		for r in res:
-			seq_number = seq_number+1
-			r['s_no_6'] = seq_number
-		
-		return res
-		
 	_name = "program.module.line"
 	_description = "Module Line"
 	_columns = {
-		's_no' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
 		'no_of_hrs': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True),  
 		#2
-		's_no_2' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id_2': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id_2':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id_2':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
+		'module_code_2': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+		'no_of_hrs_2': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
 		#3
-		's_no_3' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id_3': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id_3':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id_3':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
+		'module_code_3': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+		'no_of_hrs_3': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
 		#4
-		's_no_4' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id_4': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id_4':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id_4':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
+		'module_code_4': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+		'no_of_hrs_4': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
 		#5
-		's_no_5' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id_5': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id_5':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id_5':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
+		'module_code_5': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+		'no_of_hrs_5': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
 		#6
-		's_no_6' : fields.integer('S.No',size=20,readonly=1),
 		'prog_mod_id_6': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id_6':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id_6':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
+		'module_code_6': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
+		'no_of_hrs_6': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
     }
-  # EOF
-  
+
 	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
-	
-	#Aasim 22 12 2014
-		
-	#def on_change_module_id(self, cr, uid, ids, module_id):
-	#	module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-	#	return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
-	
-	#EOF
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
 
 program_mod_line()
+
+#EOF Table in Module Group
 
 class program_requirments(osv.osv):
 	def views(self,cr,uid,ids,context=None):
@@ -872,9 +1119,8 @@ class cs_module(osv.osv):
            staus_changed_by  = current_user['name']
            values['date1'] = fields.date.today()
            values['date2'] = fields.date.today()
-        _logger.info('Installing chart of values %s', values)
-        
 
+        
         if 'pre_test' in values and values['pre_test']:
             if 'pre_test_line' in values: 
                 if len(values['pre_test_line']) == 0:
@@ -1086,7 +1332,7 @@ class cs_module(osv.osv):
 	   'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 	   'binder_in_use':fields.boolean('Binder'),
 	   'tablet_in_use':fields.boolean('Tablet'),
-	   'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet')),'Primary'),
+	   'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet'),('Blended','Blended')),'Primary'),
 	   'modalities_in_use' : fields.function(_calculate_modalities_in_use, relation="cs.module",string='Modalities In Use',readonly=1,type='char',store=True),
 	   'max_num_ppl_class': fields.integer('Max Number of People in a Class', size=3),
 	   'room_arr': fields.selection((('Default','Default'),('Active','Active')),'Room Arrangment'),
@@ -1134,7 +1380,8 @@ class cs_module(osv.osv):
 	   'date1': fields.date.context_today,
 	   'date2': fields.date.context_today,
 	   'limit': 5,
-	   'module_duration': 0.00
+	   'module_duration': 0.00,
+	   'orientation': 'No',
     }
     _order='name'
     _constraints = [(_check_unique_name, 'Error: Module Name Already Exists', ['name']),(_check_unique_code, 'Error: Module Code Already Exists', ['module_code'])]

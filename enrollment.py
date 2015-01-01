@@ -251,7 +251,7 @@ class learner_info(osv.osv):
 		view_id = view_ref and view_ref[1] or False
 		return {
 		'type': 'ir.actions.act_window',
-		'learner_name': _('Learner'),
+		'name': _('Learner'),
 		'res_model': 'learner.info',
 		'view_type': 'form',
 		'res_id': ids[0], # this will open particular product,
@@ -332,8 +332,8 @@ class learner_info(osv.osv):
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
 	_columns = {
-		'location_id': fields.char('Id',size=20),
-		'learner_name': fields.char('Name', size=100,required=True, select=True),
+		'learner_id': fields.char('Id',size=20),
+		'name': fields.char('Name', size=100,required=True, select=True),
 		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20),
 		'learner_nric': fields.char('NRIC', size=20),
 		'learner_status': fields.selection((('active','Active'),('Inactive','Inactive')),'Status'),

@@ -4593,12 +4593,27 @@ div.ui-widget-overlay {
 }
 /*Aasim 20 12 2014*/
 
+/*Aasim 20 12 2014*/
+.col-2{
+  width: 48%;
+  margin: 10px 1%;  
+  display: block;
+  float: left; 
+}
 .col-3{
-  width: 30%;
-  margin: 10px 1%;
-  border: 1px solid #afafb6;
+  width: 31%;
+  margin: 10px 1%;  
   display: block;
   float: left;
+}
+.col-4{
+  width: 24%;
+  margin: 10px 0.5%;  
+  display: block;
+  float: left;
+}
+.grey_border{
+  border: 1px solid #afafb6;
 }
 .col-3 .box{
   clear: both;
@@ -4619,11 +4634,12 @@ div.ui-widget-overlay {
   padding: 0px 0px 0px 4px;
 }
 .border_box{
-	bolder:1px solid #dddddd;
-	margin:3px auto ;
-	width:95%;
-	display:block;
+ border:0px solid #dddddd;
+ margin:3px auto ;
+ width:95%;
+ display:block;
 }
 .clear{
   clear: both;
 }
+
