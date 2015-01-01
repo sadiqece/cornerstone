@@ -112,27 +112,7 @@ class class_info(osv.osv):
 		if len(learner_move_array) > 0 :
 			raise osv.except_osv(_('Error!'),_("Please move the learners before closing the class"))
 			 
-	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-   
-	def _check_unique_code(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.class_code.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.class_code and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.class_code and self_obj.class_code.lower() in  lst:
-				return False
-		return True 
+
 
 
 	_name = "class.info"
@@ -145,7 +125,7 @@ class class_info(osv.osv):
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
 		'room_id':fields.many2one('room', 'Rooms', ondelete='cascade', help='Room', select=True, required=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-		'start_date': fields.datetime('Start Date'),
+		'start_date': fields.datetime('Start Date', required=True),
 		'end_date': fields.datetime('End Date'),
 		'duration': fields.float('Duration(Hrs)'),
 		'sessions_per_week': fields.integer('Number of Sessions Per Week', size=7),
@@ -212,8 +192,6 @@ class class_info(osv.osv):
 		'status':fields.boolean('Status')
 	}
 	_order = "start_date"
-	
-	_constraints = [(_check_unique_name, 'Error: Class Name Already Exists', ['name']),(_check_unique_code, 'Error: Class Code Already Exists', ['class_code'])]
 	 
 	def create(self,cr, uid, values, context=None):
 		global class_create
