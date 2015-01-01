@@ -629,8 +629,9 @@ instance.web.ViewManager =  instance.web.Widget.extend({
         var options = _.clone(view.options);
         if (view_type === "form" && this.action && (this.action.target == 'new' || this.action.target == 'inline')) {
             options.initial_mode = 'edit';
+			
         }
-        var controller = new viewclass(this, this.dataset, view.view_id, options);
+	    var controller = new viewclass(this, this.dataset, view.view_id, options);
 
         controller.on('history_back', this, function() {
             var am = self.getParent();
@@ -1006,7 +1007,7 @@ instance.web.ViewManagerAction = instance.web.ViewManager.extend({
         evt.currentTarget.selectedIndex = 0;
     },
     do_edit_resource: function(model, id, action) {
-        var action = _.extend({
+	    var action = _.extend({
             res_model : model,
             res_id : id,
             type : 'ir.actions.act_window',
