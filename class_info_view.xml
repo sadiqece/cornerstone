@@ -7,7 +7,7 @@
     <field name="model">class.info</field>
     <field name="arch" type="xml">
         <form string="test" version="7.0">
-	        <sheet>
+            <sheet>
                 <group>
 						<div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
@@ -28,7 +28,7 @@
 												No. of Learner
 										</div>
 										<div class="learner_box">	
-												<field name = "no_of_learners"/>
+												9
 										</div>
 									</div>
 								</tree>
@@ -47,202 +47,210 @@
 				</group>
 			    <group col="9">					
 					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
-					<field name = "location_id"/>
-					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)"/>
+					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
+					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
 				</group>
 				<group>
-					<group col="6">
-						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date" on_change="onchange_dates(start_date,duration,False,total_hrs)"/>
-						 <field name="duration" widget="float_time"  on_change="onchange_dates(start_date,duration,False,total_hrs)" />
-						<field name = "end_date" readonly="1" />
-						<field name = "apply_all" class="oe_edit_only" on_change="onchange_apply_to_all(apply_all)"/>
-						<field name = "apply_to_future" class="oe_edit_only" on_change="onchange_apply_to_future(apply_to_future)"/>
+					<group style="width:380px;">
+						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
+						<field name = "end_date" readonly="context.get('ctx', False)"/>
+					</group>
+					<group>
+						<field name = "start_time" readonly="context.get('ctx', False)"/>
+						<field name = "end_time" readonly="context.get('ctx', False)"/>
 					</group>
 		        </group>
 						
 			<notebook colspan="5" col="10">
 					<page string="Schedule">
 							<div>
-							   <group col="2" >
 								<group>
-									<field name = "sessions_per_week" string="Number of Sessions Per Week" on_change='on_change_tot_week(total_sessions,sessions_per_week)' readonly="1" />
-									<field name = "total_hrs" string="Total Hours" on_change='on_change_tot_sess(duration,total_hrs)'/>
-									<field name = "total_sessions" string="Total Sessions" on_change='on_change_tot_week(total_sessions,sessions_per_week)'/>
+									<field name = "sessions_per_week" string="Number of Sessions Per Week"/>
+									<field name = "sessions_duration_in_hrs" string="Sessions Durations in Hours"/>
+									<field name = "total_hrs" string="Total Hours"/>
+									<field name = "total_sessions" string="Total Sessions"/>
 									<field name = "total_weeks" string="Total Weeks"/>
 								</group>
+							</div>
+							<div>
 								<group>
-								<notebook>
-								<page string="Setting">
-								<div>
-									<group>
-										<h4>
-											<label string=""  readonly="context.get('ctx', False)"/>
-										</h4>
-									</group>
-									<group col="16">
-										<h4>
-											<label string=""  readonly="context.get('ctx', False)"/>
-										</h4>
-										<h4>
-											<label string="Start Date"  readonly="context.get('ctx', False)"/>
-										</h4>
-										<h4>
-											<label string="End Date"  readonly="context.get('ctx', False)"/>
-										</h4>
-										<h4>
-											<label string="Room"  readonly="context.get('ctx', False)"/>
-										</h4>
-									</group>
-									<group col="16">
-										<field name="include_1"  nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_1"  nolabel='1'  attrs="{'invisible': [('include_1','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date1" readonly="1"  attrs="{'invisible': [('include_1','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date1" readonly="1"  attrs="{'invisible': [('include_1','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room1"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_1','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_2"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_2"  nolabel='1' attrs="{'invisible': [('include_2','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date2" readonly="1" attrs="{'invisible': [('include_2','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date2" readonly="1" attrs="{'invisible': [('include_2','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room2"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_2','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_3"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_3"  nolabel='1' attrs="{'invisible': [('include_3','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date3" readonly="1" attrs="{'invisible': [('include_3','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date3" readonly="1" attrs="{'invisible': [('include_3','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room3"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_3','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_4"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_4"  nolabel='1' attrs="{'invisible': [('include_4','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date4" readonly="1" attrs="{'invisible': [('include_4','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date4" readonly="1" attrs="{'invisible': [('include_4','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room4" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_4','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_5"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_5"  nolabel='1'  attrs="{'invisible': [('include_5','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date5" readonly="1"  attrs="{'invisible': [('include_5','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date5" readonly="1"  attrs="{'invisible': [('include_5','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room5"  domain="[('location_id','=',location_id)]" attrs="{'invisible': [('include_5','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_6"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_6"  nolabel='1'  attrs="{'invisible': [('include_6','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date6" readonly="1"  attrs="{'invisible': [('include_6','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date6" readonly="1"  attrs="{'invisible': [('include_6','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room6" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_6','=', False)]}"/>
-										</div>
-									</group>
-									<group col="16">
-										<field name="include_7"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
-										<h4>
-											<field name="day_7"  nolabel='1' attrs="{'invisible': [('include_7','=', False)]}"/>
-										</h4>
-										<div>
-											<field name="start_date7" readonly="1" attrs="{'invisible': [('include_7','=', False)]}"/>
-										</div>
-										<div>
-											<field name="end_date7" readonly="1" attrs="{'invisible': [('include_7','=', False)]}"/>
-										</div>
-										<div>
-											<field name="room7" domain="[('location_id','=',location_id)]"  attrs="{'invisible': [('include_7','=', False)]}"/>
-										</div>
-									</group>
+									<h4>
+										<label string=""  readonly="context.get('ctx', False)"/>
+									</h4>
+								</group>
+								<group col="12">
+									<h4>
+										<label string=""  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Start Date"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Start Time"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="End Date"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="End Time"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<h4>
+										<label string="Room"  readonly="context.get('ctx', False)"/>
+									</h4>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 1"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date2"/>
 									</div>
-									</page>
-									<page string='Info'>
-									  <group col="1">
-										<h4>
-											Session with conflicts
-										</h4>
-										<field name="sess_info_line"  nolabel="1" >
-											<tree string="Session"  create="false" delete="false">
-												<field name = "sess_no"/>
-												<field name = "week_no"/>
-												<field name = "start_date"/>
-												<field name = "sess_issues"   />
-											</tree>
-										</field>
-										<h4>
-											Session Info
-										</h4>
-										<field name="sess_info_line1"  nolabel="1">
-											<tree string="Session"  create="false" delete="false">
-												<field name = "sess_no"/>
-												<field name = "week_no"/>
-												<field name = "start_date"/>
-											</tree>
-										</field>
-									 </group>
-									</page>
-									</notebook>
-									</group>
+									<div>
+										<field name="start_time1"/>
+									</div>
+									<div>
+										<field name="end_date1"/>
+									</div>
+									<div>
+										<field name="end_time1"/>
+									</div>
+									<div>
+										<field name="room1"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 2"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date3"/>
+									</div>
+									<div>
+										<field name="start_time2"/>
+									</div>
+									<div>
+										<field name="end_date2"/>
+									</div>
+									<div>
+										<field name="end_time2"/>
+									</div>
+									<div>
+										<field name="room2"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 3"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date4"/>
+									</div>
+									<div>
+										<field name="start_time3"/>
+									</div>
+									<div>
+										<field name="end_date3"/>
+									</div>
+									<div>
+										<field name="end_time3"/>
+									</div>
+									<div>
+										<field name="room3"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 4"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date5"/>
+									</div>
+									<div>
+										<field name="start_time4"/>
+									</div>
+									<div>
+										<field name="end_date4"/>
+									</div>
+									<div>
+										<field name="end_time4"/>
+									</div>
+									<div>
+										<field name="room4"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 5"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date6"/>
+									</div>
+									<div>
+										<field name="start_time5"/>
+									</div>
+									<div>
+										<field name="end_date5"/>
+									</div>
+									<div>
+										<field name="end_time5"/>
+									</div>
+									<div>
+										<field name="room5"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 6"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date7"/>
+									</div>
+									<div>
+										<field name="start_time6"/>
+									</div>
+									<div>
+										<field name="end_date6"/>
+									</div>
+									<div>
+										<field name="end_time6"/>
+									</div>
+									<div>
+										<field name="room6"/>
+									</div>
+								</group>
+								<group col="12">
+									<h4>
+										<label string="Day 7"  readonly="context.get('ctx', False)"/>
+									</h4>
+									<div>
+										<field name="start_date"/>
+									</div>
+									<div>
+										<field name="start_time7"/>
+									</div>
+									<div>
+										<field name="end_date7"/>
+									</div>
+									<div>
+										<field name="end_time7"/>
+									</div>
+									<div>
+										<field name="room7"/>
+									</div>
 								</group>
 							</div>
 					</page>
                		<page string="Trainer">
-					<group col="2">
 						<h2>
 							<label string="Trainer"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<button id="broadcast_bt" string="Broadcast" type="action" />
-					</group>
 						<group>
 						   <div>
-									<field name="trainer_line"  nolabel="1" readonly="context.get('ctx', False)">
+									<label for="trainer_broadcast" string = "Broadcast"/>
+									<field name="trainer_broadcast"  nolabel="1" readonly="context.get('ctx', False)">
 										<tree string="Broadcast" editable="bottom">
 											<field name = "s_no"/>
-											<field name = "trainer_id"/>
+											<field name = "trainer"/>
 											<field name = "confirmation"/>
 											<field name = "attendance"/>
 										</tree>
@@ -279,7 +287,7 @@
 							<div>
 								<group>
 								<field name = "room_arr"  readonly="context.get('ctx', False)"/>
-								<field name="moi_eq_line" readonly="context.get('ctx', False)">
+								<field name="pf_line" readonly="context.get('ctx', False)">
 									<tree string="PF Order Lines" editable="bottom">
 										<field name = "equip_list" required='True'/>
 									</tree>
@@ -289,37 +297,28 @@
 						</group>
 					</page>
 					<page string="Learner">
-						<group col ="4">
-									<h2>
-										<label string="Learner"  readonly="context.get('ctx', False)"/>
-									</h2>
-									<button  name="move_learner"  string="Move" type="object" class="oe_edit_only"/>
-									<button name="close_class"  string="Close Class" type="object" class="oe_edit_only" />
-								</group>
-						<field name='learner_line' nolabel='1'>
-								
-									<tree string='List' editable="bottom">
-										<field name='learner_mod_id' invisible="1" />
-										<field name='learner_id' on_change="on_change_learner_id(learner_id)"/>
-										<field name = "learner_nric"/>
-										<field name = "binder"/>
-										<field name = "tablet"/>
-										<field name = "blended"/>
-										<field name = "primary_mode"/>
-										<field name = "attendance"/>
-										<field name = "move"/>
-									</tree>
+						<h2>
+							<label string="Learner"  readonly="context.get('ctx', False)"/>
+						</h2>
+						<field name="trainer_learner" readonly="context.get('ctx', False)">
+							<tree string="PF Order Lines" editable="bottom">
+								<field name = "name" required='True'/>
+								<field name = "nric_fin" required='True'/>
+								<field name = "learning_mode"/>
+								<field name = "attendance"/>
+								<field name = "move"/>
+							</tree>
 						</field>
 					</page>
 					<page string="Assets">
 						<h2>
 							<label string="Assets"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<field name="learner_asset" readonly="context.get('ctx', False)">
+						<field name="trainer_asset" readonly="context.get('ctx', False)">
 							<tree string="PF Order Lines" editable="bottom">
-								<field name = "learner_id" required='True' on_change="on_change_learner_id(learner_id)"/>
-								<field name = "learner_nric" required='True'/>
-								<field name = "binder_issue_date" />
+								<field name = "name" required='True'/>
+								<field name = "nric_fin" required='True'/>
+								<field name = "blinder_issue_date" />
 								<field name = "tablet_type" />
 								<field name = "tablet_serial_num"/>
 								<field name = "tablet_issue_date"/>
@@ -349,16 +348,12 @@
 						</field>
 					</page>
 					<page string="History">
-						<field name="history_line" readonly="context.get('ctx', False)">
+						<field name="history_tab" readonly="context.get('ctx', False)">
 							<tree string="PF Order Lines"  create="false" delete="false">
-									<field name = "s_no"/>
-									<field name = "date_created"/>
-									<field name = "created_by"/>
-									<field name = "last_update"/>
-									<field name = "last_update_by"/>
-									<field name = "date_status_change"/>
-									<field name = "status_change_by"/>
-									<field name = "changes"/>
+								<field name = "s_no"/>
+								<field name = "action"/>
+								<field name = "date_time"/>
+								<field name = "action_by"/>
 							</tree>
 						</field>
 					</page>
@@ -373,10 +368,8 @@
             <field name="model">class.info</field>
             <field name="arch" type="xml">
                 <tree string="Location">
-					<field name = "start_date"/>
 					<field name = "name"/>
 					<field name = "class_code"/>
-					<field name = "sess_no"/>
 			    </tree>
             </field>
         </record>
@@ -391,20 +384,19 @@
             </field>
         </record>
 	
-	          	<!-- Event calendar view -->
+		<!-- Event calendar view -->
         <record model="ir.ui.view" id="event_calendar_view1">
             <field name="name">class.calendar</field>
             <field name="model">class.info</field>
-			<field name="priority" eval="1"/>
-			<field name="auto_refresh">1</field>
+			<field name="priority" eval="2"/>
             <field name="arch" type="xml">
-                <calendar string="Calendar" date_start="start_date" date_stop="end_date" color="class_code">
+                <calendar string="Calendar" date_start="start_date" color="class_code">
                     <field name = "name" string="Class"/>
 					<field name = "class_code" string="Code"/>
 					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
 					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
 					<field name = "room_id" on_change="on_change_room_id(room_id)"/>
-					<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"  />
+					<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date"/>
 					<field name = "end_date" readonly="context.get('ctx', False)"/>
                 </calendar>
             </field>
@@ -415,7 +407,6 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">class.info</field>
             <field name="view_type">form</field>
-			<field name="view_id" ref="class_form"/>
             <field name="view_mode">calendar,tree,form</field>
 			<field name="search_view_id" ref="view_class_filter"/>
 		    <field name="help" type="html">
@@ -424,34 +415,8 @@
               </p>
             </field>
         </record>
-		
-		<record id="move_form" model="ir.ui.view">
-			<field name="name">Move Learner</field>
-			<field name="model">learner.move</field>
-			<field name="arch" type="xml">
-				<form string="test" version="7.0" >
-					<sheet>
-						<group>
-						<field name = "module_id" readonly="1" on_change="onchange_module(module_id,class_id)"/>
-						<field name = "parent_id" invisible='1'/>
-						<field name = "class_id" domain="[('module_id','=',module_id),('parent_id','=',0),('id','not in',[context.get('active_parent_id')])]" on_change="onchange_class(class_id,module_id)"/>
-						</group>
-						<group col="6">
-							<field name = "class_code"/>
-							<field name = "start_date"/>
-							<field name = "end_date"/>
-							<field name = "available_seats"/>
-						 </group>
-						 <group col="2">
-						 <button  name="move_learner_save"  string="Confirm" type="object"/>
-						 <button  name="move_learner_cancel"  string="Cancel" type="object"/>
-						</group>
-						 
-				   </sheet>
-				</form>
-		   </field>
-		</record>
-		
+
+
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
 
 </data> 

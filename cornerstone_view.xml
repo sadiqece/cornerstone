@@ -10,8 +10,8 @@
             <field name = "name"/>
             <field name = "program_code"/>
             <field name = "program_level"/>
-	     	<!-- <field name = "program_duration"/> -->
-			<!-- <field name = "program_fee"/>  -->
+	     	<field name = "program_duration"/>
+			<field name = "program_fee"/>
         </tree>
     </field>
 </record>
@@ -93,345 +93,70 @@
 				</div>
 				</group>
 				 </group>
-				 <!-- Min/Max -->
-				 <div class="col-3">
-					<label for="max_program_duration"/>				 
-					<field name = "max_program_duration" readonly="1" string="Max. Duration"/>
-					<label for="min_program_duration"/>
-					<field name = "min_program_duration" readonly="1" string="Min. Duration"/>
-				 </div>
-				 <div class="col-3">
-					<label for="max_program_fee"/>	
-					<field name = "max_program_fee" readonly="1" string="Max. Fee $"/>
-					<label for="min_program_fee"/>	
-					<field name = "min_program_fee" readonly="1" string="Min. Fee $"/>
-				</div>
-				<div class="col-3">
-					<label for="max_program_mod"/>	
-					<field name = "max_program_mod" readonly="1"/>
-					<label for="min_program_mod"/>	
-					<field name = "min_program_mod" readonly="1"/>
-				</div>
-				<div class="clear"></div>
-				<div class="col-4">
-				    <label for="program_cert_achevied"/>	
+				 <group col="6">	
 					<field name = "program_cert_achevied"/>
-				</div>
-				<div class="col-4">
-					<label for="program_level"/>
 					<field name = "program_level"  widget="selection/" />
-				 </div>				 
-				<div class="col-4">
-					<label for="program_status"/>
+				 </group>
+				 <group col="10">					
+					<field name = "program_duration" readonly="1" string="Total Duration"/>
+					<field name = "program_fee" readonly="1" string="Total Fee $"/>
+					<field name = "program_tot_mod" readonly="1"/>
 				    <field name = "program_status" widget="selection/"/>
-				</div>	
-				<div class="col-4">
-					<label for="program_tot_credit"/>
 					<field name = "program_tot_credit" readonly="1"/>
-				</div>
-				<div class="clear"></div>
-				<group>
+				</group>
+				
+				<group col="8">
 					<div  colspan='4' >
 						 <label for="program_description"/>
 						 <field name="program_description" on_change="on_change_program_desc(program_description)" />
 					</div>
+					<group>
+						<field name = "program_center"  widget="selection/"/>
+					
+						<field name = "select_module"  widget="selection/"/>
+					</group>
 				</group>
-				
-				<!-- Start Of TABS -->
-				
 				<notebook colspan="5" col="10">
-				
-					<!-- START OF MODULE TAB -->
-					<page string="Modules">						
-						<!-- Dropdown to select no. of boxes -->
-						<group class="oe_edit_only">
-							<field name='no_of_mod_gp' style="width:50px;" on_change="onchange_no_of_mod_gp(no_of_mod_gp)"/>
-							<field name='no_module_box1' invisible="1"/>
-							<field name='no_module_box2' invisible="1"/>
-							<field name='no_module_box3' invisible="1"/>
-							<field name='no_module_box4' invisible="1"/>
-							<field name='no_module_box5' invisible="1"/>
-							<field name='no_module_box6' invisible="1"/>
-						</group>
-							<!-- Module group block 1 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box1', '=' , False)]}">	
-							<div class="box">	
-								<label for="mod_gp_name_1" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_1'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_1'/></span>
-								<label for="set_group_as_sel_1"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_1' invisible="1"/>
-								<field name='set_module_select_1' invisible="1"/>
-								<label for="set_module_as_1" class="oe_edit_only"/>
-								<field name= "set_module_as_1" on_change="onchange_set_module_as_1(set_module_as_1)" class="oe_edit_only"/>
-
-								<div attrs="{'invisible': [('set_module_block_1', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_1'/></span>
-								    <label for="allow_as_block_1"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_1', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_1"/>
-									<span><field name='min_no_modules_1'/></span>								
-									<label for="max_no_modules_1"/>
-									<span><field name='max_no_modules_1' on_change="check_min_max_1(max_no_modules_1)"/></span>	
-								</div>
-							</div>							
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line' nolabel='1'>							
-									<tree string='List' editable="bottom">						
+					<page string="Modules">
+						<field name='program_mod_line' nolabel='1'>
+									<tree string='List' editable="bottom">
 										<field name='prog_mod_id' invisible="1" />
-										<!-- <field name= "s_no"/> -->
-										<field name='module_id' widget="selection"/>
-										<!--<field name='module_id' on_change="module_populate_onthefly(module_id)"/>
 										<field name='module_id' on_change="on_change_module_id(module_id)"/>
-										 <field name = "module_code"/>
-										<field name = "no_of_hrs" on_change="on_change_module_id(module_id)"/> 
-										<button name="views" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>-->
-
+										<field name = "module_code"/>
+										<field name = "no_of_hrs" on_change="on_change_module_id(module_id)"/>
+										<button name="views" string="View Module" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
 									</tree>
-								</field>
-							</div>
-					    </div>
-							<!-- Module group block 2 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box2', '=' , False)]}">
-							<div class="box">	
-								<label for="mod_gp_name_2" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_2'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_2'/></span>
-								<label for="set_group_as_sel_2"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_2' invisible="1"/>
-								<field name='set_module_select_2' invisible="1"/>
-								<label for="set_module_as_2" class="oe_edit_only"/>
-								<field name= "set_module_as_2" on_change="onchange_set_module_as_2(set_module_as_2)" class="oe_edit_only"/>
-
-								<div attrs="{'invisible': [('set_module_block_2', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_2'/></span>
-								    <label for="allow_as_block_2"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_2', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_2"/>
-									<span><field name='min_no_modules_2'/></span>								
-									<label for="max_no_modules_2"/>
-									<span><field name='max_no_modules_2' on_change="check_min_max_2(max_no_modules_2)"/></span>	
-								</div>
-							</div>
-							<!---->
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line_2' nolabel='1' >							
-									<tree string='List' editable="bottom">						
-										<field name='prog_mod_id_2' invisible="1" />
-										<field name='module_id_2' widget="selection"/>
-									</tree>
-								</field>
-							</div>
-						</div>
-							<!-- Module group block 3 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box3', '=' , False)]}">	
-							<div class="box">	
-								<label for="mod_gp_name_3" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_3'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_3'/></span>
-								<label for="set_group_as_sel_3"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_3' invisible="1"/>
-								<field name='set_module_select_3' invisible="1"/>
-								<label for="set_module_as_3"/>
-								<field name= "set_module_as_3" on_change="onchange_set_module_as_3(set_module_as_3)"/>
-
-								<div attrs="{'invisible': [('set_module_block_3', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_3'/></span>
-								    <label for="allow_as_block_3"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_3', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_3"/>
-									<span><field name='min_no_modules_3'/></span>								
-									<label for="max_no_modules_3"/>
-									<span><field name='max_no_modules_3' on_change="check_min_max_3(max_no_modules_3)"/></span>	
-								</div>
-							</div>
-							<!---->
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line_3' nolabel='1'>							
-									<tree string='List' editable="bottom">						
-										<field name='prog_mod_id_3' invisible="1" />
-										<field name='module_id_3' widget="selection"/>
-									</tree>
-								</field>
-							</div>
-					    </div>
-						<div class="clear"></div>
-							<!-- Module group block 4 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box4', '=' , False)]}">	
-							<div class="box">	
-								<label for="mod_gp_name_4" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_4'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_4'/></span>
-								<label for="set_group_as_sel_4"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_4' invisible="1"/>
-								<field name='set_module_select_4' invisible="1"/>
-								<label for="set_module_as_4" class="oe_edit_only"/>
-								<field name= "set_module_as_4" on_change="onchange_set_module_as_4(set_module_as_4)" class="oe_edit_only"/>
-
-								<div attrs="{'invisible': [('set_module_block_4', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_4'/></span>
-								    <label for="allow_as_block_4"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_4', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_4"/>
-									<span><field name='min_no_modules_4'/></span>								
-									<label for="max_no_modules_4"/>
-									<span><field name='max_no_modules_4' on_change="check_min_max_4(max_no_modules_4)"/></span>	
-								</div>
-							</div>
-							<!---->
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line_4' nolabel='1'>							
-									<tree string='List' editable="bottom">						
-										<field name='prog_mod_id_4' invisible="1" />
-										<field name='module_id_4' widget="selection"/>
-									</tree>
-								</field>
-							</div>
-						</div>
-							<!-- Module group block 5 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box5', '=' , False)]}">	
-							<div class="box">	
-								<label for="mod_gp_name_5" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_5'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_5'/></span>
-								<label for="set_group_as_sel_5"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_5' invisible="1"/>
-								<field name='set_module_select_5' invisible="1"/>
-								<label for="set_module_as_5" class="oe_edit_only"/>
-								<field name= "set_module_as_5" on_change="onchange_set_module_as_5(set_module_as_5)" class="oe_edit_only"/>
-
-								<div attrs="{'invisible': [('set_module_block_5', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_5'/></span>
-								    <label for="allow_as_block_5"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_5', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_5"/>
-									<span><field name='min_no_modules_5'/></span>								
-									<label for="max_no_modules_5"/>
-									<span><field name='max_no_modules_5' on_change="check_min_max_5(max_no_modules_5)"/></span>	
-								</div>
-							</div>
-							<!---->
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line_5' nolabel='1'>							
-									<tree string='List' editable="bottom">						
-										<field name='prog_mod_id_5' invisible="1" />
-										<field name='module_id_5' widget="selection"/>
-									</tree>
-								</field>
-							</div>
-						</div>
-							<!-- Module group block 6 -->
-						<div class="col-3 grey_border" attrs="{'invisible': [('no_module_box6', '=' , False)]}">
-							<div class="box">	
-								<label for="mod_gp_name_6" class="oe_edit_only"/>
-								<h3><field name='mod_gp_name_6'/></h3>
-							</div>
-							<div class="box">	
-								<span><field name='set_group_as_sel_6'/></span>
-								<label for="set_group_as_sel_6"/>
-							</div>
-							<div class="box">	
-								<field name='set_module_block_6' invisible="1"/>
-								<field name='set_module_select_6' invisible="1"/>
-								<label for="set_module_as_6" class="oe_edit_only"/>
-								<field name= "set_module_as_6" on_change="onchange_set_module_as_6(set_module_as_6)" class="oe_edit_only"/>
-
-								<div attrs="{'invisible': [('set_module_block_6', '=' , False)]}" class="border_box">
-									<span><field name='allow_as_block_6'/></span>
-								    <label for="allow_as_block_6"/>
-								</div>
-
-								<div attrs="{'invisible': [('set_module_select_6', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_6"/>
-									<span><field name='min_no_modules_6'/></span>								
-									<label for="max_no_modules_6"/>
-									<span><field name='max_no_modules_6' on_change="check_min_max_6(max_no_modules_6)"/></span>	
-								</div>
-							</div>
-								<!---->
-							<div class="box">	
-								<h4>Modules in Group</h4>						
-								<field name='program_mod_line_6' nolabel='1'>							
-									<tree string='List' editable="bottom">						
-										<field name='prog_mod_id_6' invisible="1" />
-										<field name='module_id_6' widget="selection"/>
-									</tree>
-								</field>
-							</div>
-					</div>
-					<!-- EOF Module group blocks -->
-					<div class="clear"></div>
+						</field>
 					</page>
-					
-					<!-- Requirement -->
-					
                     <page string="Req">
 					<group col="6">
 						<div>	
-							<label for="prog_req_line" string = "Program Level Requirments"/>
-							<field name='prog_req_line' nolabel='1' style="height:150px">
-								<tree string="Req Order Lines" editable="bottom" class="grey_border">
-									<field name = "program_master_req" on_change="on_change_program_master_req(program_master_req)"/>
-									<field name = "description"/>
-									<field name = "musthave"/>
-									<field name = "verification"/>
-								</tree>
-							</field>
-						</div>
-						<div>
-							<label for="program_mod_req_line" string = "Module Level Requirments"/>
-							<field name='program_mod_req_line' nolabel='1'  >
-									<tree string="Req Order Lines" class="grey_border">
-										<field name = "module_name"/>
-										<field name = "module_code"/>
-										<field name = "master_req"/>
+								<label for="prog_req_line" string = "Program Level Requirments"/>
+								<field name='prog_req_line' nolabel='1' style="height:150px">
+									<tree string="Req Order Lines" editable="bottom">
+										<field name = "program_master_req" on_change="on_change_program_master_req(program_master_req)"/>
 										<field name = "description"/>
 										<field name = "musthave"/>
 										<field name = "verification"/>
-										<button name="views" string="View Module" icon="view_mod" type="object"/>
 									</tree>
-							</field>
+								</field>
+						</div>
+						<div>
+								<label for="program_mod_req_line" string = "Module Level Requirments"/>
+								<field name='program_mod_req_line' nolabel='1'  >
+											<tree string="Req Order Lines">
+												<field name = "module_name"/>
+												<field name = "module_code"/>
+												<field name = "master_req"/>
+												<field name = "description"/>
+												<field name = "musthave"/>
+												<field name = "verification"/>
+												<button name="views" string="View Module" icon="view_mod" type="object"/>
+											</tree>
+								</field>
 						</div>
 					</group>
 					</page>
-					
-					<!-- Desc -->
-					
                     <page string="Desc">
 					
 							<group col="6">
@@ -449,7 +174,7 @@
 									<label string="Descriptions of Attached Modules"  readonly="context.get('ctx', False)"/>
 								</h2>
 								<field name='program_module_desc_line'  create='false' delete='false'>
-								<tree string="Req Order Lines" class="grey_border">
+								<tree string="Req Order Lines">
 									<field name = "s_no"/>
 									<field name = "name"/>
 									<field name = "module_code" string="Module Code"/>
@@ -459,12 +184,9 @@
 							</div>
 							</group>
 					</page>
-					
-					<!-- M O I -->
-					
 					<page string="M.O.I">
 						<field name='program_modality_line' nolabel='1'  create='false' delete='false'>
-							<tree string="Req Order Lines" class="grey_border">
+							<tree string="Req Order Lines">
 								<field name = "s_no"/>
 								<field name = "name"/>
 								<field name = "module_code" string="Module Code"/>
@@ -474,12 +196,9 @@
 							</tree>
 						</field>
 					</page>
-					
-					<!-- Test / Assessments -->
-					
 					<page string="Test / Assessments">
 						<field name='program_test_line' nolabel='1'  create='false' delete='false'>
-							<tree string="Req Order Lines" class="grey_border">
+							<tree string="Req Order Lines">
 								<field name = "s_no"/>
 								<field name = "name"/>
 								<field name = "module_code" string="Module Code"/>
@@ -489,20 +208,17 @@
 							</tree>
 						</field>
 					</page>
-					
-					<!-- Show Do -->
-					
 					<page string="Show &amp; Do">
 						<group>
 							<div>
 								<field name='program_show_do_line' nolabel='1'  create='false' delete='false'>
-									<tree string="Req Order Lines" editable="bottom" class="col-2 grey_border">
+									<tree string="Req Order Lines" editable="bottom">
 										<field name = "master_show_do" on_change="on_change_master_show_do(master_show_do)"/>
 										<field name = "supp_doc_req"/>
 									</tree>
 								</field>
 							</div>
-							<!-- <div>
+							<div>
 								<field name='program_module_show_do_line' nolabel='1' >
 											<tree string="Req Order Lines" create='false' delete='false' edit="false" editable="top">
 												<field name = "module_name"/>
@@ -511,35 +227,31 @@
 												<button name="views" string="View Module" icon="view_mod" type="object"/>
 											</tree>
 								</field>
-							</div> -->
+							</div>
 						</group>
 					</page>
-					
-					<!-- Fee -->
-					
 					<page string="Fees &amp; Subsidies">
 						<h2>
 					    <label string="Fees &amp; Subsidies"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<!-- <group>
+						<group>
 							<field name = "program_total_fee" string="Total Program Fee(Baseline Only) $"/>
-						</group>	 -->
+						</group>	
 						<group>		
-							 <div>	
+						<div>	
 								<label for="program_cost_line" string = "Module Cost Items"/>
-								<field name='program_cost_line' nolabel='1'  create='false' delete='false'>
-									 <tree string="Req Order Lines" class="grey_border">
-										<field name = "name"/>
+								<field name='program_cost_line' nolabel='1'  create='false' delete='false' style="height:150px">
+									<tree string="Req Order Lines">
+										<field name = "name" />
 										<field name = "module_code" string="Module Code"/>
-										 <field name = "module_fee" string="Module Cost"/>
-									</tree> 
+										<field name = "module_fee" string="Module Cost"/>
+									</tree>
 								</field>
-								<span>Hello</span>
-							</div>
+						</div>
 							<div>
 								<label for="subsidy_line"/>
 								<field name="subsidy_line" nolabel="1">
-									<tree string="Cost Order Lines" editable="bottom" class="grey_border">
+									<tree string="Cost Order Lines" editable="bottom">
 										<field name = "s_no"/>
 										<field name = "master_subsidy"   on_change="on_change_master_subsidy(master_subsidy)"/>
 										<field name = "per_fee_mod" on_change="on_change_per_fee_mod(per_fee_mod)"/>
@@ -549,15 +261,12 @@
 							</div>
 						</group>
 					</page>
-					
-					<!-- Durations -->
-					
 					<page string="Durations">
-					<!-- <group>
+					<group>
 						<field name = "program_tot_duration" string="Total Duration(Hours)"/>
-					</group> -->
+					</group>
 						<field name='program_duration_line' nolabel='1'  create='false' delete='false'>
-							<tree string="Req Order Lines" class="grey_border">
+							<tree string="Req Order Lines">
 								<field name = "s_no"/>
 								<field name = "name" />
 								<field name = "module_code" string="Module Code"/>
@@ -565,15 +274,12 @@
 							</tree>
 						</field>
 					</page>
-					
-					<!-- Alerts -->
-					
 					<page string="Alerts">
 					  <group col="6">
 						  <div>
 								<label for="program_alert_line" string = "Alerts for Programs"/>
 								<field name="program_alert_line">
-										<tree string="Alert Order Lines" editable="bottom" class="grey_border">
+										<tree string="Alert Order Lines" editable="bottom">
 											<field name = "s_no"/>
 											<field name = "program_alert_list" on_change="on_change_master_program_alerts(program_alert_list)"/>
 											<field name = "time" widget="float_time" on_change="on_change_alert_time(time)"/>
@@ -585,9 +291,9 @@
 									</field>
 							</div>
 							<div>	
-								<label for="program_alert_line_2" string = "Alerts for attached Modules"/>
-								<field name='program_alert_line_2' nolabel='1'  create='false' delete='false' style="height:150px">
-									<tree string="Req Order Lines" class="grey_border">
+								<label for="program_cost_line" string = "Alerts for attached Modules"/>
+								<field name='program_cost_line' nolabel='1'  create='false' delete='false' style="height:150px">
+									<tree string="Req Order Lines">
 										<field name = "name" />
 										<field name = "module_code" string="Module Code"/>
 										<field name = "alert_line"/>
@@ -596,12 +302,9 @@
 						</div>
 						</group>
 					</page>
-					
-					<!-- History -->
-					
 					<page string="History">
 						<field name="program_history_line">
-								<tree string="History Order Lines" create="false" delete="false" class="grey_border">
+								<tree string="History Order Lines" create="false" delete="false">
 									<field name = "s_no"/>
 									<field name = "date_created"/>
 									<field name = "created_by"/>
@@ -615,9 +318,6 @@
 					</page>
 					
                 </notebook>
-				
-				<!-- EOF TABS -->
-				
            </sheet>
         </form>
    </field>
@@ -706,9 +406,23 @@
     <field name="arch" type="xml">
         <form string="module" version="7.0">
             <sheet>
+				<script>
+				/*	function myfunction {
+						$(selector).pagination({
+							items: 100,
+							itemsOnPage: 10
+						});
+					
+						function myfunction {
+						$(selector).pagination('prevPage');
+					});
+						function myfunction {
+						$(selector).pagination('nextPage');
+					});
+					}); */
+				</script>
                 <group>
 						<div class="oe_title">
-
                             <label for="name" class="oe_edit_only" invisible="context.get('ctx', False)"/>
                             <h1 style="width:320px;"><field name="name" class="oe_inline"  readonly="context.get('ctx', False)"/></h1>
 							<label for="module_code" class="oe_edit_only" style="width:300px;" invisible="context.get('ctx', False)"/>
@@ -776,11 +490,11 @@
 						 <label for="description"/>
 						 <field name="description"  on_change="on_change_module_desc(description)" readonly="context.get('ctx', False)" />
 					</div>
-					<!-- <group>
+					<group>
 						<field name = "module_center"  widget="selection/"  readonly="context.get('ctx', False)"/>
 						
 						<field name = "select_program"  widget="selection/" readonly="context.get('ctx', False)"/>
-					</group> -->
+					</group>
 				</group>
 				<notebook colspan="5" col="10">
                     <page string="Requirements">
@@ -907,7 +621,7 @@
 								</tree>
 							</field>
                     </page>
-					<!-- <page string="Modules">
+					<page string="Modules">
 						<group>
 							<field name = "no_of_modules"/>
 						</group>
@@ -961,7 +675,7 @@
 								</field>
 							 </div>
 						</group>
-                    </page> -->
+                    </page>
                 </notebook>
            </sheet>
         </form>
