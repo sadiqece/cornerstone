@@ -197,7 +197,7 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
             }
             this.sidebar.add_items('other', _.compact([
                 self.is_action_enabled('delete') && { label: _t('Delete'), callback: self.on_button_delete },
-               // self.is_action_enabled('create') && { label: _t('Duplicate'), callback: self.on_button_duplicate }
+              // self.is_action_enabled('create') && { label: _t('Duplicate'), callback: self.on_button_duplicate }
             ]));
         }
 
@@ -320,7 +320,7 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
             this.do_warn(_t("Form"), _t("The record could not be found in the database."), true);
             return $.Deferred().reject();
         }
-        this.datarecord = record;
+	    this.datarecord = record;
         this._actualize_mode();
         this.set({ 'title' : record.id ? record.display_name : _t("New") });
 
@@ -727,7 +727,7 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
             self.reload().then(function() {
                 self.to_view_mode();
                 var parent = self.ViewManager.ActionManager.getParent();
-                if(parent){
+			    if(parent){
                     parent.menu.do_reload_needaction();
                 }
             });
@@ -843,11 +843,14 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
                     // Special case 'id' field, do not save this field
                     // on 'create' : save all non readonly fields
                     // on 'edit' : save non readonly modified fields
-                    if (!f.get("readonly")) {
-                        values[f.name] = f.get_value();
-                    } else {
+                    //if (!f.get("readonly")) {
+                    //    values[f.name] = f.get_value();
+                    //} else {
+                    //    readonly_values[f.name] = f.get_value();
+                    //}
+					values[f.name] = f.get_value();
+                    if (f.get("readonly"))
                         readonly_values[f.name] = f.get_value();
-                    }
                 }
             }
             if (form_invalid) {
@@ -896,6 +899,7 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
      * @param {Object} r result of the write function.
      */
     record_saved: function(r) {
+	    
         this.trigger('record_saved', r);
         if (!r) {
             // should not happen in the server, but may happen for internal purpose
@@ -935,10 +939,10 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
             if (this.sidebar) {
                 this.sidebar.do_attachement_update(this.dataset, this.datarecord.id);
             }
-            //openerp.log("The record has been created with id #" + this.datarecord.id);
-            return $.when(this.reload()).then(function () {
-                self.trigger('record_created', r);
-                return _.extend(r, {created: true});
+		    return $.when(this.reload()).then(function () {
+			    self.trigger('record_created', r);
+				var t = _.extend(r, {created: true})
+			    return t;
             });
         }
     },
@@ -949,13 +953,13 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
         var self = this;
         return this.reload_mutex.exec(function() {
             if (self.dataset.index == null) {
-                self.trigger("previous_view");
+				self.trigger("previous_view");
                 return $.Deferred().reject().promise();
             }
             if (self.dataset.index == null || self.dataset.index < 0) {
                 return $.when(self.on_button_new());
             } else {
-                var fields = _.keys(self.fields_view.fields);
+			    var fields = _.keys(self.fields_view.fields);
                 fields.push('display_name');
                 return self.dataset.read_index(fields,
                     {
@@ -964,7 +968,7 @@ instance.web.FormView = instance.web.View.extend(instance.web.form.FieldManagerM
                             'future_display_name': true
                         }
                     }).then(function(r) {
-                        self.trigger('load_record', r);
+				        self.trigger('load_record', r);
                     });
             }
         });
