@@ -17,74 +17,107 @@
                             <h2 style="width:280px;">
                                 <field name = "commision_code"  readonly="context.get('ctx', False)"/>
                             </h2>
-							<label for="bussiness_id" class="oe_edit_only" style="width:200px;"/>
-							<h4 style="width:280px;">
-								<field name = "bussiness_id" on_change="on_change_bussiness_id(bussiness_id)"/>
-							</h4>
-							<label for="date_added" class="oe_edit_only" style="width:280px;"/>
-								<field name = "date_added"/>
-							
 				        </div>
 		       </group>
-			   <group style="width:280px;">
-			   <field name='pay_value'/>
-			   </group>
-			 		<field name='program_line' nolabel='1'>
-						<tree string='List'  editable="bottom">
-							<field name = 's_no'/>
-							<field name='program_id'/>
-							<field name='program_code'/>
-							<field name='value'/>
-						</tree>
-				</field>
+				<group style="width:280px;">
+					<field name='pay_value' attrs="{'readonly':[('pay_value','!=',False)]}" on_change="on_change_pay_value(pay_value)"/> 
+				</group>
+				<group style="width:250px;">
+					<field name="commision_status"/>
+				</group>
+			 	<group>
+			 		<div>	
+						<group attrs="{'invisible': [('pay_value_2', '=' , True)]}">
+							<field name='pay_value_1' invisible="1"/>
+						</group>
+					
+						<group attrs="{'invisible': [('pay_value_1', '=' , True)]}">
+							<field name='pay_value_2' invisible="1"/>
+						</group>
+					</div>
+				</group> 
+					
+							<div attrs="{'invisible': [('pay_value_1', '=' , False)]}">
+							<notebook colspan="5" col="10">
+								<page string="Program">
+								<group>
+									<div>
+										<h2>
+											<label for="program_line" string = "Programs"/>
+										</h2>
+										<field name='program_line' nolabel='1' readonly="context.get('ctx', False)">
+											<tree string="Req Order Lines" editable="bottom">
+												<field name = "s_no"/>
+												<field name="program_id"/>
+												<field name="program_code"/>
+												<field name="value" on_change="on_change_commvalue(value)"/>
+											</tree>
+										</field>
+									</div>
+								</group>
+								</page>
+								<page string="People">
+								<group>
+									<div>
+										<h2>
+											<label for="people_bu" string = "People"/>
+										</h2>
+										<field name='people_bu' nolabel='1' readonly="context.get('ctx', False)">
+											<tree string="Req Order Lines" editable="bottom">
+												<field name = "sr_no"/>
+												<field name="p_line_id" on_change="on_change_people_id(p_line_id)"/>
+												<field name="business_id" />
+												<field name="date_added"/>
+											</tree>
+										</field>
+									</div>
+								</group>
+								</page>
+								</notebook>
+								</div>
+								<div attrs="{'invisible': [('pay_value_2', '=' , False)]}" readonly="context.get('ctx', False)">
+								<notebook colspan="5" col="10">
+								<page string="Schedule" readonly="context.get('ctx', False)">
+									<group>
+										<div>
+											<h2>
+												<label for="project_value_line" string = "Schedule"/>
+											</h2>
+											<field name='project_value_line' nolabel="1" readonly="context.get('ctx', False)">
+												<tree string="Project Value" editable="bottom">
+													<field name = "sr_no"/>
+													<field name = "s_range1" on_change="on_change_srangevalue(s_range1)"/>
+													<field name = "e_range1" on_change="on_change_erangevalue(e_range1)"/>
+													<field name = "value1" on_change="on_change_value1(value1)"/>
+												</tree>
+											</field>
+										</div>
+									</group>
+									</page>
+									<page string="People">
+									<group>
+										<div>
+											<h2>
+												<label for="people_bu_1" string = "People"/>
+											</h2>
+											<field name='people_bu_1' nolabel='1' readonly="context.get('ctx', False)">
+												<tree string="Req Order Lines" editable="bottom">
+													<field name = "sr_no"/>
+													<field name="p_line_id" on_change="on_change_people1_id(p_line_id)"/>
+													<field name="bu_1"/>
+													<field name="date_added_1"/>
+												</tree>
+											</field>
+										</div>
+									</group>
+								</page>
+								</notebook>
+								</div>
 			</sheet>
         </form>
    </field>
 </record>
 
-<!-- ===================== This is location form layout of By Project Value =============================-->
-
-<record id="commision1_form" model="ir.ui.view">
-    <field name="name">commision1.form</field>
-    <field name="model">commisions_1</field>
-    <field name="arch" type="xml">
-        <form string="test" version="7.0">
-            <sheet>
-                <group>
-						<div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
-                            <h1 style="width:380px;">
-								<field name="name" class="oe_inline"/>
-							</h1>
-							<label for="commision_code" class="oe_edit_only" style="width:280px;"/>
-                            <h2 style="width:280px;">
-                                <field name = "commision_code"  readonly="context.get('ctx', False)"/>
-                            </h2>
-							<label for="bussiness_id" class="oe_edit_only" style="width:200px;"/>
-							<h4 style="width:280px;">
-								<field name = "bussiness_id" on_change="on_change_bussiness_id(bussiness_id)" />
-							</h4>
-							<label for="date_added1" class="oe_edit_only" style="width:280px;"/>
-							
-								<field name = "date_added1"/>
-							
-				        </div>
-		       </group>
-			   <group style="width:280px;">
-			   <field name='pay_value'/>
-			   </group>
-			 		<field name='project_value_line' nolabel='1'>
-						<tree string='List' editable="bottom" >
-							<field name = 'sr_no'/>
-							<field name='s_range'/>
-							<field name='e_range'/>
-							<field name='value'/>
-						</tree>
-				</field>
-			</sheet>
-        </form>
-   </field>
-</record>
 
 <!-- ===================== This is location tree layout =============================-->
 		 <record id="commision_tree" model="ir.ui.view">
@@ -93,24 +126,11 @@
             <field name="arch" type="xml">
                 <tree string="Commision">
 					<field name = "s_no"/>
-					<field name = "name"/>
-					<field name = "commision_code"/>
-					<field name = "bussiness_id"/>
+					<field name = "name" string="Defination"/>
+					<field name="commision_status"/>
+					<field name = "applied_to"/>
 					<field name = "date_added"/>
-			    </tree>
-            </field>
-        </record>
-		
-		<record id="commision_1_tree" model="ir.ui.view">
-            <field name="name">commisions_1.tree</field>
-            <field name="model">commisions_1</field>
-            <field name="arch" type="xml">
-                <tree string="Commision1">
-					<field name = "sr_no"/>
-					<field name = "name"/>
-					<field name = "commision_code"/>
-					<field name = "bussiness_id"/>
-					<field name = "date_added1"/>
+					<field name='pay_value' string="Mode"/> 
 			    </tree>
             </field>
         </record>
@@ -118,35 +138,21 @@
 
 		
 		<record model="ir.actions.act_window" id="action_commision">
-            <field name="name">By Program</field>
+            <field name="name">Commissions</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">commisions</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new location.
+                Click to define a new Commissions.
               </p>
             </field>
         </record>
 
-		<record model="ir.actions.act_window" id="action_commision_1">
-            <field name="name">By Project Value</field>
-			<field name="type">ir.actions.act_window</field>
-            <field name="res_model">commisions_1</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-		    <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to define a new location.
-              </p>
-            </field>
-        </record>
 
 		
-<menuitem name = "Commisions" id = "commision" parent = "menu_sub2"/>
-<menuitem name = "By Program" id = "commision_1" parent = "commision" action = "action_commision" />
-<menuitem name = "By Project Value" id = "commision_2" parent = "commision" action = "action_commision_1" />
+<menuitem name = "Commissions" id = "commision" parent = "menu_sub2" action = "action_commision"/>
 
 </data> 
 </openerp>

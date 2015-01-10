@@ -83,7 +83,6 @@ class test(osv.osv):
 	_description = "This table is for keeping test data"
 	_columns = {
 		's_no': fields.integer('S.No',size=3),
-		'location_id': fields.char('Id',size=20),
 		'name': fields.char('Test Name', size=100,required=True, select=True),
 		'test_code': fields.char('Test Code', size=20),
 		'test_fee': fields.float('Test Fee', size=4),
@@ -94,6 +93,9 @@ class test(osv.osv):
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
+	}
+	_defaults = {
+		'test_status': 'Active'
 	}
 	_constraints = [(_check_unique_name, 'Error: Test Name Already Exists', ['name']),(_check_unique_code, 'Error: Test Code Already Exists', ['test_code'])]
 test()
@@ -121,6 +123,20 @@ class test_mod_line(osv.osv):
 			globvar = 0
 			res['arch'] = etree.tostring(doc)
 			return res	
+			
+	def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
+		res = super(cs_module,self).fields_view_get(cr, user, view_id, view_type, context, toolbar=toolbar, submenu=submenu)
+		doc = etree.XML(res['arch'])
+
+		global globvar
+		if globvar == 1:
+			for node in doc.xpath("//div[@id='div_status1']"):
+				node.set('class', "view_red")
+			for node in doc.xpath("//div[@id='div_status2']"):
+				node.set('class', "view_green")
+		globvar = 0
+		res['arch'] = etree.tostring(doc)
+		return res
 	
 	
 	_name = "test.module.line"
@@ -129,9 +145,9 @@ class test_mod_line(osv.osv):
 		'test_mod_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-		'pre_test': fields.boolean('Pre Test'),
-		'inclass_test': fields.boolean('In Class Test'),
-		'post_test': fields.boolean('Post Test'),
+		'pre_test': fields.boolean("Pre Test"),
+		'inclass_test': fields.boolean("In Class Test"),
+		'post_test': fields.boolean("Post Test"),
 	}
 	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
 	

@@ -4,34 +4,16 @@
 
 <!-- ========================= EMI Admin ============================= -->
 
-	<record model="ir.actions.act_window" id="admin_panel">
-            <field name="name">EM Admin Panel</field>
-			<field name="type">ir.actions.act_window</field>
-            <field name="res_model">panel.info</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-			<field name="search_view_id" ref="view_panel_filter"/>
-		    <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to define a new location.
-              </p>
-            </field>
-    </record>
-
 	<record id="edu_form" model="ir.ui.view">
 		<field name="name">edu.form</field>
 		<field name="model">edu.info</field>
 		<field name="arch" type="xml">
 			<form string="edu_info" version="7.0">
-			<header>
-				<button name="%(admin_panel)d" type="action" string="Admin Panel" class="oe_right"/>
-			</header>
 			<sheet>
 		<group>	
                 <h3>  
 					<label string="Admin Panel" />
                 </h3>
-				
 				<div>
 					<group>
 								<tree string="Program Status Order Lines" create="false" delete="false">
@@ -75,11 +57,11 @@
 									<div class="number_100">	
 										100
 									</div>
-								</div>					
+								</div>
 							</tree>
 					</group>		
 				</div>	
-		</group>			
+		</group>		
 				<notebook colspan="5" col="10">
 				<page string="Assignment Required">				
 						<field name='assign_line' nolabel='1'>
@@ -243,7 +225,7 @@
 						</group>	
 					<group>
 						<div>
-						<!--<group>				
+						<group>				
 								<?xml-stylesheet type="text/css" href="base.css"?>
 								<MyTable>
 								<title>
@@ -318,7 +300,7 @@
 									</record>
 									</records>
 								</MyTable>		
-						</group>-->
+						</group>
 					</div>
 					<div>
 					<group>
@@ -549,7 +531,7 @@
 
 			    </tree>
             </field>
-    </record>
+        </record>
 		
 	<record id="panel_tree" model="ir.ui.view">
           <field name="name">panel.tree</field>
@@ -624,7 +606,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">panel.info</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">form</field>
 			<field name="search_view_id" ref="view_panel_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -647,12 +629,12 @@
               </p>
             </field>
     </record>	
-			
+		
 		
 		
 <menuitem name = "Educator Management" id = "menu_educator" parent = "menu_lis_lab"/>
-<menuitem name = "Trainer Enrollment" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />
-<!--<menuitem name = "Trainer Enrollment1" id = "educator_panel" parent = "menu_educator" action="action_panel" />-->
+<!--<menuitem name = "EM Admin Dashboard" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />-->
+<menuitem name = "Trainer Enrollment" id = "educator_panel" parent = "menu_educator" action="action_panel" />
 <!--<menuitem name = "Trainer Profile" id = "trainer_profile" parent = "menu_educator" action="action_trainers" />-->
 
 </data> 

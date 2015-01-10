@@ -9,12 +9,13 @@
 		<field name="arch" type="xml">
 			<form string="enroll_info" version="7.0">
 			<sheet>
+			
+
 				<field name="image_medium" widget='image' class="oe_left oe_avatar"/>
-				 
-						<div class="oe_title">
-                            <label for="learner_name" class="oe_edit_only"/>
+							<div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
                             <h1 style="width:380px;">
-                                <field name = "learner_name"/>
+                                <field name = "name"/>
                             </h1>
 						    <label for="learnerfull_name" class="oe_edit_only"/>
                             <h2 style="width:380px;">
@@ -24,8 +25,8 @@
                             <h2 style="width:380px;">
                                 <field name = "learner_nric"/>
                             </h2>
-							<label for="program_learner" class="oe_edit_only"/>
-							<field name = "program_learner" style="width:280px;"/>
+							<label for="program_learner" class="oe_edit_only" />
+							<field name = "program_learner" style="width:280px;" on_change="load_prog_show_do2(program_learner)"/> <!--on_change="load_prog_show_do(program_learner)"/>-->
 							<field name = "id" />
 							
 						</div>
@@ -38,7 +39,7 @@
 						<field name='module_line' nolabel='1'>
 									<tree string='List' editable="bottom">
 										<field name='enroll_id' invisible="1" />
-										<field name = "enroll_module_id"/>
+										<field name = "module_id"/>
 										<field name = "enroll_code"/>
 										<field name = "no_of_hrs"/>
 									</tree>
@@ -49,13 +50,13 @@
 					    <label string="Checklist"  readonly="context.get('ctx', False)"/>
 						</h2>
 						<field name='check_line' nolabel='1'>
-									<tree string='List' >
+									<tree string='List' editable="bottom" >
 										<field name='checklist_id' invisible="1" />
 										<field name = "s_no"/>
-										<field name = "item"/>
+										<field name = "item" />
 										<field name = "confirmation"/>
-										<field name = "upload_docs"/>
-										<button name="import_Upload_Documents" string="Import" type="object"  class="oe_highlight" />
+										<field name = "upload_docs" />
+										<button name="import_Upload_Documents" string="Import" type="object" icon="upld_doc"  class="oe_highlight" />
 									</tree>
 						</field>
 					</page>
@@ -67,7 +68,7 @@
 						   <div>
 							   <group style="width:180px;">
 									<field name = "select_center" style="width:180px;" />
-									<field name = "select_module" style="width:180px;" />
+									<field name = "select_module" on_change="onchange_populate_schedule(select_module)" style="width:180px;" />
 								</group>
 						<group>
 									<field name = "date_1" />		
@@ -143,7 +144,7 @@
 									<MyColumn7>.</MyColumn7>
 								</record>
 								</records>
-							</MyTable>
+							</MyTable>  
 									
 						</group>
 							</div>
@@ -212,7 +213,7 @@
 						<field name = "marital_status" style="width:280px;" />
 						<field name = "race" style="width:280px;" />
 						<field name = "gender" style="width:280px;" />
-						<field name = "birth_date" />									
+						<field name = "birth_date" on_change="onchange_dob(birth_date)"/>									
 					</group>					
 					<h2>
 					    <label string="Educational Details"  readonly="context.get('ctx', False)"/>
@@ -226,10 +227,10 @@
 					</h2>
 					<group>
 					<field name = "emp_staus" style="width:280px;" />
-					<field name = "company_name" style="width:280px;" />
-					<field name = "desig_detail" style="width:280px;" />
+					<field name = "company_name" string="Company" style="width:280px;" />
+					<field name = "desig_detail" style="width:280px;" editable="bottom" />
 					<field name = "sal_range" style="width:280px;" />
-					<field name = "sponsor_ship" style="width:280px;" />
+					<field name = "sponsor_ship" style="width:280px;"/>
 					</group>
 				</div>	
 				
@@ -239,7 +240,7 @@
 						<label string="Contact Details"  readonly="context.get('ctx', False)"/>
 					</h2>
 					<group>	
-					<field name = "email_id" style="width:280px;"/>
+					<field name="email_id" on_change="ValidateEmail(email_id)"/> <!--on_change="onchange_email(email_id)"/>-->
 					<field name = "addr_1" style="width:280px;"/>
 					<field name = "mobile_no" style="width:280px;"/>
 					<field name = "landline_no" style="width:280px;"/>
@@ -251,25 +252,6 @@
 				</page>
 					
 					<page string="Payment">
-					</page>
-					
-					<page string="History">
-						<h2>
-					    <label string="History"  readonly="context.get('ctx', False)"/>
-						</h2>
-						<field name='history_learner_line' nolabel='1'>
-									<tree string='List' create="false" delete="false" >
-										<field name='history_id' invisible="1" />
-										<field name = "s_no"/>
-										<field name = "date_created"/>
-										<field name = "created_by"/>
-										<field name = "last_update"/>
-										<field name = "last_update_by"/>
-										<field name = "date_status_change"/>
-										<field name = "status_change_by"/>
-										<field name = "changes"/>
-									</tree>
-						</field>
 					</page>
 					
 				</notebook>
@@ -290,9 +272,9 @@
 				<field name="image_medium" widget='image' class="oe_left oe_avatar"/>
 				
 				<div class="oe_title">
-                            <label for="learner_name" class="oe_edit_only"/>
+                            <label for="name" class="oe_edit_only"/>
                             <h1 style="width:380px;">
-                                <field name = "learner_name" on_change="true_false(id)"/>
+                                <field name = "name"/>
                             </h1>
 						    <label for="learnerfull_name" class="oe_edit_only"/>
                             <h2 style="width:380px;">
@@ -365,8 +347,8 @@
 							<label string="Current Information" />
 							</h3>
 							<group>								
-								<field name = "program_learner" string="Program" style="width:280px;" />
-								<field name = "module_id" string="Module" style="width:280px;" />	
+								<field name = "program_learner" string="Program" on_change="load_prog_Qualifi_award(program_learner)" style="width:280px;" />
+								<field name = "select_module" string="Module"   on_change="onchange_populate_schedule(select_module)" style="width:280px;" />	
 							</group>	
 						</div>	
 						</group>
@@ -376,91 +358,9 @@
 								<label string="Class Detail" />
 							</h3>
 							<group>
-								<field name = "class_codel1" style="width:100px;" />
-								<field name = "start_datel1" />
-								<field name = "end_datel1" />
-							</group>
-							</div>
-							
-							<MyTable>
-								<title>
-									>>    December 2014     >>
-								</title>
-								<cols>
-									<MyColumn1/>
-									<MyColumn2/>
-									<MyColumn3/>
-									<MyColumn4/>
-									<MyColumn5/>
-									<MyColumn6/>
-									<MyColumn7/>
-								</cols>
-								<headings>
-									<record>
-										<MyColumn1>Sun</MyColumn1>
-										<MyColumn2>Mon</MyColumn2>
-										<MyColumn3>Tue</MyColumn3>
-										<MyColumn1>Wed</MyColumn1>
-										<MyColumn2>Thu</MyColumn2>
-										<MyColumn3>Fri</MyColumn3>
-										<MyColumn3>Sat</MyColumn3>
-									</record>
-								</headings>
-								<records>
-									<record>
-										<MyColumn1>.</MyColumn1>
-										<MyColumn2>1</MyColumn2>
-										<MyColumn3>2</MyColumn3>
-										<MyColumn4>3</MyColumn4>
-										<MyColumn5>4</MyColumn5>
-										<MyColumn6>5</MyColumn6>
-										<MyColumn7>6</MyColumn7>
-									</record>        <record>
-										<MyColumn1>7</MyColumn1>
-										<MyColumn2 style="background-color:#E6E6E6;">8</MyColumn2>
-										<MyColumn3>9</MyColumn3>
-										<MyColumn4>10</MyColumn4>
-										<MyColumn5>11</MyColumn5>
-										<MyColumn6>12</MyColumn6>
-										<MyColumn7>13</MyColumn7>
-									</record>
-
-									<record>
-										<MyColumn1>14</MyColumn1>
-										<MyColumn2>15</MyColumn2>
-										<MyColumn3 style="background-color:#E6E6E6;">16</MyColumn3>
-										<MyColumn4>17</MyColumn4>
-										<MyColumn5>18</MyColumn5>
-										<MyColumn6>19</MyColumn6>
-										<MyColumn7>20</MyColumn7>
-									</record>
-									<record>
-										<MyColumn1>21</MyColumn1>
-										<MyColumn2>22</MyColumn2>
-										<MyColumn3>23</MyColumn3>
-										<MyColumn4>24</MyColumn4>
-										<MyColumn5>25</MyColumn5>
-										<MyColumn6>26</MyColumn6>
-										<MyColumn7>27</MyColumn7>
-									</record>
-
-									<record>
-										<MyColumn1>28</MyColumn1>
-										<MyColumn2>29</MyColumn2>
-										<MyColumn3>30</MyColumn3>
-										<MyColumn4>31</MyColumn4>
-										<MyColumn5>.</MyColumn5>
-										<MyColumn6>.</MyColumn6>
-										<MyColumn7>.</MyColumn7>
-									</record>
-								</records>
-							</MyTable>
-							
-							
-							<div>
-							<group>
-								<field name = "select_learner_center" string="Select Center" style="width:100px;" />
-								<field name = "module_id" string="Select Module" style="width:100px;" />
+								<field name = "class_code" style="width:100px;" />
+								<field name = "start_date" />
+								<field name = "end_date" />
 							</group>
 							</div>
 						</group>
@@ -470,15 +370,16 @@
 							<h2>
 								<label string="Outstanding"  readonly="context.get('ctx', False)"/>
 							</h2>
-						<field name='outstanding_line' nolabel='1'>
-									<tree string='List' >
+								<field name='outstanding_line' nolabel='1'>
+									<tree string='List' editable="bottom">
 										<field name='outstanding_id' invisible="1" />
 										<field name = "s_no"/>
 										<field name = "outs_item"/>
 										<field name = "outs_confirmation"/>
 										<field name = "outs_upload_docs"/>
+										<button name="import_Upload_Documents1" string="Import" type="object" icon="upld_doc"  class="oe_highlight" />
 									</tree>
-						</field>						
+								</field>						
 						</page>				
 					<page string="Personal Details">
 					<group>
@@ -519,7 +420,7 @@
 								<label string="Contact Details"  readonly="context.get('ctx', False)"/>
 							</h2>
 							<group>	
-							<field name = "email_id" style="width:280px;"/>
+							<field name="email_id" on_change="ValidateEmail(email_id)"/>
 							<field name = "addr_1" style="width:280px;"/>
 							<field name = "mobile_no" style="width:280px;"/>
 							<field name = "landline_no" style="width:280px;"/>
@@ -533,14 +434,19 @@
 							<h2>
 								<label string="Action"  readonly="context.get('ctx', False)"/>
 							</h2>
-						<group>								
+						<field name='action_learn_line' nolabel='1'>
+						<tree string='List' editable="bottom">
+							<field name = "s_no" />						
 							<field name = "action_learner" style="width:280px;"/>
 							<field name = "remarks_learner" style="width:280px;"/>
 							<field name = "support_docs_learner" style="width:280px;"/>
 							<field name = "upload_learner" style="width:280px;"/>
+						<!--	<button name="_get_attachments" string="Import" type="object" icon="upld_doc"  class="oe_highlight" />  -->
 							<field name = "date_action" />
 							<field name = "action_taken_learner" style="width:280px;"/>
-						</group>
+							
+						</tree>
+						</field>
 						</page>	
 						
 						<page string="Payment History">
@@ -551,13 +457,13 @@
 								<label string="Class History"  readonly="context.get('ctx', False)"/>
 							</h2>
 						<field name='class_history_line' nolabel='1'>
-						<tree string='List' create='false' >
+						<tree string='List' editable="bottom" >
 							<field name = "s_no" />
-							<field name = "program_name"  />
-							<field name = "module_name" />
+							<field name = "program_name" />
+							<field name = "module_name"  />
 							<field name = "class_code" />
-							<field name = "Date_Commenced" />
-							<field name = "Date_Completed" />
+							<field name = "start_date" />
+							<field name = "end_date" />
 							<field name = "empl_staus" />
 							<field name = "designa_detail" />
 							<field name = "sponsors_ship" />
@@ -569,7 +475,7 @@
 							<h2>
 								<label string="Test History"  readonly="context.get('ctx', False)"/>
 							</h2>
-							<field name='test_history_line' nolabel='1'>
+							<field name='test_history_line' nolabel='1'   >
 							<tree string='List' create='false' >
 								<field name = "test_type" />
 								<field name = "test_code"  />
@@ -610,12 +516,12 @@
 							<h2>
 								<label string="Qualification &amp; Awards"  readonly="context.get('ctx', False)"/>
 							</h2>
-							<field name='qualification_line' nolabel='1'>
-							<tree string='List' create='false' >
+							<field name='qualification_line'  nolabel='1'>
+							<tree string='List' editable="bottom" >
 								<field name = "s_no" />
 								<field name = "qual_award_name"  />
 								<field name = "prog_name" />
-								<field name = "module_name" />
+								<field name = "module_name" />   
 								<field name = "class_code" />
 								<field name = "date_award" />
 							</tree>
@@ -648,7 +554,7 @@
 							<tree string='List' editable="bottom" >
 								<field name = "s_no"  />
 								<field name = "descriptions"  />
-								<field name = "date_of_feedback" />
+								<field name = "date_of_remarks" />
 								<field name = "enter_by" />	
 							</tree>
 							</field>
@@ -668,26 +574,27 @@
             <field name="model">learner.info</field>
             <field name="arch" type="xml">
                 <tree string="Learner">
-					<field name = "learner_name"/>
+					<field name = "name"/>
 					<field name="learnerfull_name"/>
 					<field name="learner_status"/>
-					<button name="views_enroll" string="View Learner" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/>
+				<button name="views_enroll" string="View Learner" icon="view_mod" type="object" class="openerp oe_form_readonly status_box"/> 
 			    </tree>
             </field>
         </record>
 		
 		<record id="view_learner_filter" model="ir.ui.view">
-            <field name="name">Learner</field>
+            <field name="name">learner.tree</field>
             <field name="model">learner.info</field>
             <field name="arch" type="xml">
                 <search string="Learner">
-
+					<field name = "name"/>
+					<field name="learnerfull_name"/>
 	           </search>
             </field>
         </record>
 	
 		<record model="ir.actions.act_window" id="action_learner">
-            <field name="name">Learner</field>
+            <field name="name">learner.tree</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">learner.info</field>
             <field name="view_type">form</field>
@@ -697,7 +604,7 @@
 			
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new location.
+                Click to define a new form.
               </p>
             </field>
         </record>

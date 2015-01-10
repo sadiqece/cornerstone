@@ -71,7 +71,6 @@ assignment_outstanding ()
 
 
 class panel_info(osv.osv):
-		
 	_name = "panel.info"
 	_description = "This table is for keeping location data"
 	_columns = {

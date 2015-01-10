@@ -21,27 +21,29 @@
 						</div>
 		       </group>
 			   <group style="width:380px;">
-					<field name = "location_type" />
+					<field name='location_type_permanent' invisible="1"/>
+					<field name='location_type_temporary' invisible="1"/>
+					<field name = "location_type" on_change="on_change_location_type(location_type)"/>
 					<field name = "location_address"/>
-					<field name = "location_postal_code"/>
-					<field name = "location_contact_no"/>
-					<field name = "no_of_rooms"/>
+					<field name = "location_postal_code" on_change="on_change_postalcode(location_postal_code)"/>
+					<field name = "location_contact_no" on_change="on_change_contactnum(location_contact_no)"/>
 		        </group>
+				<div attrs="{'invisible': [('location_type_permanent', '=' , False)]}">
 				<notebook colspan="5" col="10">
                     <page string="Rooms">
 					<field name='location_room_line' nolabel='1'>
-						<tree string="Room Lines" nolabel='1' editable="bottom" >
+						<tree string="Room Lines" nolabel='1'  >
 							<field name = "s_no"/>
-							<field name = "room_id"/>
-							<field name = "room_floor_area"/>
-							<field name = "room_max_cap"/>
-							<field name = "room_setup"/>
-							
-							<button name="views" string="View Room" icon="view_room" type="object"/>
+							<field name = "name" string="Rooms"/> 
+							<field name = "room_floor_area" string="Size(SqM)" on_change="on_change_floorarea(room_floor_area)"/>
+							<field name = "room_max_cap" string="Max Capacity" on_change="on_change_maxcap(room_max_cap)"/>
+							<field name = "room_setup" string="Default Setup"/>
+						<!--	<button name="views" string="View Room" icon="view_room" type="object"/>  -->
 						</tree>				
 					</field>
 					</page>
                 </notebook>
+				</div>
            </sheet>
         </form>
    </field>
@@ -52,12 +54,13 @@
             <field name="model">location</field>
             <field name="arch" type="xml">
                 <tree string="Location">
+					<field name='location_type_temporary' invisible="1"/>
 					<field name = "s_no"/>
 					<field name = "name"/>
 					<field name = "location_code"/>
 					<field name = "location_type"/>
-					<field name = "no_of_rooms" readonly="1"/>
 					<field name = "location_contact_no"/>
+					<field name = "no_of_rooms" attrs="{'invisible': [('location_type_temporary', '=' , True)]}"/>
 		        </tree>
             </field>
         </record>
@@ -79,6 +82,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">location</field>
             <field name="view_type">form</field>
+			<field name="limit">10</field>
             <field name="view_mode">tree,form</field>
 			<field name="search_view_id" ref="view_location_filter"/>
 		    <field name="help" type="html">
@@ -110,22 +114,23 @@
 		       </group>
 			   <group>
 					<group style="width:380px;">
-						<field name = "location_id" readonly="context.get('ctx', False)"/>
+						<field name = "location_id" on_change="on_change_location_id(location_id)"/>
 						<field name = "room_setup" readonly="context.get('ctx', False)"/>
 					</group>
 					<group>
-						<field name = "room_floor_area" readonly="context.get('ctx', False)"/>
-						<field name = "room_max_cap" readonly="context.get('ctx', False)"/>
+						<field name = "room_floor_area" readonly="context.get('ctx', False)" on_change="on_change_floorarea(room_floor_area)"/>
+						<field name = "room_max_cap" readonly="context.get('ctx', False)" on_change="on_change_maxcap(room_max_cap)"/>
 					</group>
 		        </group>
 				<notebook colspan="5" col="10">
                     <page string="Equipment">
-						<field name="pf_line" readonly="context.get('ctx', False)">
-									<tree string="PF Order Lines" editable="bottom">
-										<field name = "pf_id" readonly="True"/>
-										<field name = "equip_list" required='True'/>
-									</tree>
-								</field>
+						<field name='room_equip' nolabel='1' readonly="context.get('ctx', False)">
+							<tree string='Equipment' editable="bottom" readonly="context.get('ctx', False)">
+								<field name='equip_id' invisible="1" />
+								<field name='s_no' readonly="True"/>
+								<field name='equip_list' readonly="context.get('ctx', False)"/>
+							</tree>
+						</field>
 					</page>
                 </notebook>
            </sheet>
@@ -158,7 +163,7 @@
 	
 
 
-		<record model="ir.actions.act_window" id="action_room">
+		<record model="ir.actions.act_window" id="action_room">   <!-- <record model="ir.actions.act_window" id="action_room">  -->
             <field name="name">Room</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">room</field>

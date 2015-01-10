@@ -302,7 +302,7 @@
 								
 									<tree string='List' editable="bottom">
 										<field name='learner_mod_id' invisible="1" />
-										<field name='learner_id' on_change="on_change_learner_id(learner_id)"/>
+										<field name='learner_id' on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]"/>
 										<field name = "learner_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>

@@ -16,17 +16,19 @@
 				        </div>
 						
 		       </group>
-			   <group style="width:300px;">
+			   <group style="width:200px;">
 					<field name='year'/>
 			   </group>
 			 		<field name='holiday_line'>
 						<tree string='List'  editable="bottom" >
 							<field name='s_no'/>
 							<field name='description'/>
-							<field name='date_start'/>
-							<field name='date_end'/>
+							<!-- Zeya 9-1-15 -->
+							<field name='date_start' on_change="onchange_date(date_start, date_end)"/>
+							<field name='date_end' on_change="onchange_dateend(date_end, date_start)"/>
+							<!-- EOF -->
 						</tree>
-				</field>
+					</field>
 			</sheet>
         </form>
    </field>
@@ -38,6 +40,7 @@
             <field name="arch" type="xml">
                 <tree string="Holidays">
 					<field name = "year"/>
+					<field name = "no_of_holidays"/>
 			    </tree>
             </field>
         </record>
@@ -62,7 +65,7 @@
 			<field name="search_view_id" ref="view_holiday_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new location.
+                Click to define a new Holidays and Closures.
               </p>
             </field>
         </record>
