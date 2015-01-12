@@ -132,7 +132,6 @@ class class_info(osv.osv):
 		sr_ids = self.search(cr, 1, [('parent_id', '=', 0)])
 		if new_class[0].parent_id == 0 :
 			for x in self.browse(cr, uid, sr_ids, context=context) : 
-				_logger.info('Unique Code %s %s %s',new_class[0].parent_id,new_class[0].id,sr_ids)
 				if new_class[0].parent_id == 0 and new_class[0].id != x.id and new_class[0].class_code.lower() == x.class_code.lower() :
 					return False
 		else :
@@ -150,7 +149,7 @@ class class_info(osv.osv):
 		'name': fields.char('Class Name', size=100,required=True, select=True),
 		'class_code': fields.char('Class Code',size=40,required=True, select=True), 
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
-		'room_id':fields.many2one('room', 'Rooms', ondelete='cascade', help='Room', select=True, required=True),
+		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True, required=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'start_date': fields.datetime('Start Date', required=True),
 		'end_date': fields.datetime('End Date'),

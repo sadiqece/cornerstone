@@ -64,17 +64,20 @@ class location(osv.osv):
 			val['location_type_temporary'] = True
 			
 		return {'value': val}
-		
-	def on_change_postalcode(self, cr, uid, ids, location_postal_code):
+
+
+	def on_change_postal_code(self, cr, uid, ids, location_postal_code):
 		if location_postal_code < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return location_postal_code
+			raise osv.except_osv(_('Error!'),_("Postal Code - Cannot be negative value"))
+		return location_postal_code	
 		
-	def on_change_contactnum(self, cr, uid, ids, location_contact_no):
+	def on_change_contact_no(self, cr, uid, ids, location_contact_no):
 		if location_contact_no < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return location_contact_no
-	
+			raise osv.except_osv(_('Error!'),_("Contact No. - Cannot be negative value"))
+		return location_contact_no	
+
+
+		
 	_name = "location"
 	_description = "This table is for keeping location data"
 	_columns = {
@@ -86,8 +89,8 @@ class location(osv.osv):
 		'location_type_permanent': fields.boolean('Permanent'),
 		'location_type_temporary': fields.boolean('Temporary'),
 		'location_address':fields.text('Location', size=150, select=True),
-		'location_postal_code':fields.integer('Postal Code', size=6),
-		'location_contact_no':fields.integer('Contact', size=9),
+		'location_postal_code':fields.integer('Postal Code', size=6, select=True),
+		'location_contact_no':fields.integer('Contact', size=9, select=True),
 		'location_room_line': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
 		'no_of_rooms': fields.function(_calculate_total_room, relation="room", readonly=1, string='Number of Rooms', type='integer'),
 	}
@@ -144,16 +147,6 @@ class room(osv.osv):
 		
 		value_ids = self.pool.get('location').search(cr, uid, [('location_id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])
-		
-	def on_change_maxcap(self, cr, uid, ids, room_max_cap):
-		if room_max_cap < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return room_max_cap
-		
-	def on_change_floorarea(self, cr, uid, ids, room_floor_area):
-		if room_floor_area < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return room_floor_area
 		
 		
 	_name = "room"
@@ -233,16 +226,6 @@ class location_room_line(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
-		
-	def on_change_maxcap(self, cr, uid, ids, room_max_cap):
-		if room_max_cap < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return room_max_cap
-		
-	def on_change_floorarea(self, cr, uid, ids, room_floor_area):
-		if room_floor_area < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return room_floor_area
 
 	
 	_name = "location.room.line"

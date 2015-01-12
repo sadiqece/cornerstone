@@ -146,7 +146,7 @@ class unit_line(osv.osv):
 		# Zeya 3-1-15
 		'order_priority': fields.integer('Order Of Priority', size=2,required=True, select=True),  
 		# EOF Zeya
-		'unit': fields.char('Unit', size=30),
+		'unit': fields.char('Unit', size=30, required=True),
 		'unit_line_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
 	}
 	_constraints = [(_check_unique_order_id, 'Error: Order of Priority should be unique', ['order_priority'])]

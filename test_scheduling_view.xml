@@ -58,18 +58,18 @@
 					<group>
                             <field name = "test_code" string="Test Code"/>
                             <field name = "test_code_compliance" string="Test Code(compliance)"/>
-							<field name = "location_id" string="Location" on_change="on_change_location_id(location_id)" />
-							<field name = "room_id" domain="[('location_id','=',location_id)]" string="Rooms"/>
+							<field name = "location_id" options="{'create': False, 'create_edit': False}" string="Location" on_change="on_change_location_id(location_id)" />
+							<field name = "room_id" options="{'create': False, 'create_edit': False}" domain="[('location_id','=',location_id)]" string="Room"/>
 					</group>
 					<group>
 							<field name = "module_ids" invisible="1"/>
-                            <field name = "module_id" on_change="on_change_module_id(module_id,test_def_id,context)"  string="Module Name"/>
+                            <field name = "module_id" on_change="on_change_module_id(module_id,test_def_id,context)" options="{'create': False, 'create_edit': False}" string="Module Name"/>
                             <field name = "module_code" string="Module Code" />
 							<field name = "test_type_id" invisible="1" />
 							<field name = "test_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',1)]}"  />
 							<field name = "test_pre_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',2)]}"/>
 							<field name = "test_post_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',3)]}"/>
-                            <field name = "class_info" domain="[('module_id','=',module_id),('parent_id','=',0)]" attrs="{'invisible':[('test_type','!=','Post Test')]}" string="Select Class"/>
+                            <field name = "class_info" domain="[('module_id','=',module_id),('parent_id','=',0)]" attrs="{'invisible':[('test_type','!=','Post Test')]}" string="Select Class" options="{'create': False, 'create_edit': False}"/>
 					</group>
 					
 					<group style="width:400px;" >
@@ -107,13 +107,13 @@
 							<field name='learner_line' nolabel='1'  context="{'class_id': class_info,'test_code':test_code_compliance}">
 								<tree string='List' editable="bottom">
 									<field name='learner_mod_id' invisible ="1" />
-									<field name='learner_id'  on_change="on_change_learner_id(learner_id,context)" domain="[('module_line.module_id','=',parent.module_id)]"/>
+									<field name='learner_id'  options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id,context)" domain="[('module_line.module_id','=',parent.module_id)]"/>
 									<field name='learner_nric'/>
 									<field name='class_code'/>
 									<field name='compliance_code'/>
 									<field name='level'/>
 									<field name='attendance'/>
-									<button  name="view_learner_modality"  string="Add Modality" type="object"/>
+									<button  name="view_learner_modality"  string="Add Modality" type="object" icon="view_modalities"/>
 									</tree>
 							</field>
 						</page>

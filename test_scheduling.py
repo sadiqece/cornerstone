@@ -69,7 +69,7 @@ class test_info(osv.osv):
 		'end_date': fields.datetime('End Date'),
 		'duration': fields.float('Duration(Hrs)'),
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
-		'room_id':fields.many2one('room', 'Rooms', ondelete='cascade', help='Room', select=True, required=True),
+		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True, required=True),
 		'test_modality': fields.one2many('test.modality','test_modality_id', 'Test Modality'),
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 		'learner_line': fields.one2many('test.learner', 'learner_mod_id', 'Learner Lines', select=True, required=True),
@@ -321,6 +321,11 @@ class test_learner(osv.osv):
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
+		learner_obj = self.browse(cr,uid,ids[0])
+		if 'learner_id' in values :
+			scores_obj = self.pool.get('test.scores')
+			scores_obj_id = scores_obj.search(cr,uid,[('learner_id','=',learner_obj['learner_id'].id)])
+			scores_obj.write(cr,uid,scores_obj_id,values)
 		id = super(test_learner, self).write(cr, uid, ids,values, context=context)
 		return id
 

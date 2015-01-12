@@ -93,6 +93,7 @@ class commisions(osv.osv):
 	
 	_defaults = { 
 	   'date_added': fields.date.context_today,
+	   'commision_status': 'Active',
 	  }
 	
 	def on_change_bussiness_id(self, cr, uid, ids, bussiness_id):
@@ -176,7 +177,7 @@ class project_value_line(osv.osv):
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
-		res = super(project_value, self).read(cr, uid,ids, fields, context, load)
+		res = super(project_value_line, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+1
@@ -232,6 +233,15 @@ class people_bu(osv.osv):
 		
 		return res
 		
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.sr_no == self_obj.sr_no and x.p_line_id == self_obj.p_line_id:
+						return False
+		return True
+		
 	def on_change_people_id(self, cr, uid, ids, p_line_id):
 		business_obj = self.pool.get('people.line').browse(cr, uid, p_line_id)
 		_logger.info("Business name %s %s", business_obj, p_line_id) 
@@ -250,6 +260,7 @@ class people_bu(osv.osv):
 	_defaults = { 
 	   'date_added': fields.date.context_today,
 	  }
+	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['p_line_id'])]
 people_bu
 
 class people_bu_1(osv.osv):
@@ -268,6 +279,16 @@ class people_bu_1(osv.osv):
 			r['sr_no'] = seq_number
 		
 		return res
+		
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.sr_no == self_obj.sr_no and x.p_line_id == self_obj.p_line_id:
+						return False
+		return True
+		
 	_name = "people.bu.one"
 	_description = "People"
 	_columns = {
@@ -280,5 +301,6 @@ class people_bu_1(osv.osv):
 	_defaults = { 
 	   'date_added_1': fields.date.context_today,
 	  }
+	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['p_line_id'])]
 people_bu_1
 

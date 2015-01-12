@@ -65,7 +65,7 @@
 										<field name='people_bu' nolabel='1' readonly="context.get('ctx', False)">
 											<tree string="Req Order Lines" editable="bottom">
 												<field name = "sr_no"/>
-												<field name="p_line_id" on_change="on_change_people_id(p_line_id)"/>
+												<field name="p_line_id" on_change="on_change_people_id(p_line_id)" widget="selection"/>
 												<field name="business_id" />
 												<field name="date_added"/>
 											</tree>
@@ -103,8 +103,8 @@
 											<field name='people_bu_1' nolabel='1' readonly="context.get('ctx', False)">
 												<tree string="Req Order Lines" editable="bottom">
 													<field name = "sr_no"/>
-													<field name="p_line_id" on_change="on_change_people1_id(p_line_id)"/>
-													<field name="bu_1"/>
+													<field name="p_line_id" on_change="on_change_people1_id(p_line_id)" widget="selection"/>
+													<field name="bu_1" />
 													<field name="date_added_1"/>
 												</tree>
 											</field>
@@ -142,6 +142,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">commisions</field>
             <field name="view_type">form</field>
+			<field name="limit">10</field>
             <field name="view_mode">tree,form</field>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">

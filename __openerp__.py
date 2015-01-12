@@ -22,6 +22,9 @@
 		'class_status_dashboard.xml',
 		'educator_view.xml'
     ],
+'js': [
+        'static/src/js/form.js',
+    ],
 "active": False,
 "installable": True
 }

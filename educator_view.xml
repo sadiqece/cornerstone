@@ -633,9 +633,7 @@
 		
 		
 <menuitem name = "Educator Management" id = "menu_educator" parent = "menu_lis_lab"/>
-<!--<menuitem name = "EM Admin Dashboard" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />-->
 <menuitem name = "Trainer Enrollment" id = "educator_panel" parent = "menu_educator" action="action_panel" />
-<!--<menuitem name = "Trainer Profile" id = "trainer_profile" parent = "menu_educator" action="action_trainers" />-->
 
 </data> 
 </openerp>

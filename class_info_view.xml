@@ -47,9 +47,9 @@
 						</div>
 				</group>
 			    <group col="9">					
-					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
-					<field name = "location_id"/>
-					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)"/>
+					<field name = "module_id" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
+					<field name = "location_id" options="{'create': False, 'create_edit': False}"/>
+					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)" options="{'create': False, 'create_edit': False}"/>
 				</group>
 				<group>
 					<field name = "status" invisible="1"/>
@@ -96,7 +96,7 @@
 										</h4>
 									</group>
 									<group col="16">
-										<field name="include_1"  nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_1"  readonly="1" attrs="{'invisible':['|',('day_1','=',False),('day_1','=',''),],}" nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_1"  nolabel='1'  attrs="{'invisible': [('include_1','=', False)]}"/>
 										</h4>
@@ -111,7 +111,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_2"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_2"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_2','=',False),('day_2','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_2"  nolabel='1' attrs="{'invisible': [('include_2','=', False)]}"/>
 										</h4>
@@ -126,7 +126,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_3"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_3"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_3','=',False),('day_3','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_3"  nolabel='1' attrs="{'invisible': [('include_3','=', False)]}"/>
 										</h4>
@@ -141,7 +141,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_4"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_4"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_4','=',False),('day_4','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_4"  nolabel='1' attrs="{'invisible': [('include_4','=', False)]}"/>
 										</h4>
@@ -156,7 +156,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_5"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_5"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_5','=',False),('day_5','=',''),],}"   on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_5"  nolabel='1'  attrs="{'invisible': [('include_5','=', False)]}"/>
 										</h4>
@@ -171,7 +171,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_6"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_6"  nolabel='1' attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_6','=',False),('day_6','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_6"  nolabel='1'  attrs="{'invisible': [('include_6','=', False)]}"/>
 										</h4>
@@ -186,7 +186,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_7"  nolabel='1'  on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
+										<field name="include_7"  nolabel='1' attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_7','=',False),('day_7','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7)'/>
 										<h4>
 											<field name="day_7"  nolabel='1' attrs="{'invisible': [('include_7','=', False)]}"/>
 										</h4>
@@ -244,7 +244,7 @@
 									<field name="trainer_line"  nolabel="1" readonly="context.get('ctx', False)">
 										<tree string="Broadcast" editable="bottom">
 											<field name = "s_no"/>
-											<field name = "trainer_id"/>
+											<field name = "trainer_id" options="{'create': False, 'create_edit': False}"/>
 											<field name = "confirmation"/>
 											<field name = "attendance"/>
 										</tree>
@@ -302,7 +302,7 @@
 								
 									<tree string='List' editable="bottom">
 										<field name='learner_mod_id' invisible="1" />
-										<field name='learner_id' on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]"/>
+										<field name='learner_id' options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]"/>
 										<field name = "learner_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>

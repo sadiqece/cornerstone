@@ -23,10 +23,8 @@
 						<tree string='List'  editable="bottom" >
 							<field name='s_no'/>
 							<field name='description'/>
-							<!-- Zeya 9-1-15 -->
 							<field name='date_start' on_change="onchange_date(date_start, date_end)"/>
 							<field name='date_end' on_change="onchange_dateend(date_end, date_start)"/>
-							<!-- EOF -->
 						</tree>
 					</field>
 			</sheet>

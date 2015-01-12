@@ -25,8 +25,8 @@
 					<field name='location_type_temporary' invisible="1"/>
 					<field name = "location_type" on_change="on_change_location_type(location_type)"/>
 					<field name = "location_address"/>
-					<field name = "location_postal_code" on_change="on_change_postalcode(location_postal_code)"/>
-					<field name = "location_contact_no" on_change="on_change_contactnum(location_contact_no)"/>
+					<field name = "location_postal_code" on_change="on_change_postal_code(location_postal_code)"/>
+					<field name = "location_contact_no" on_change="on_change_contact_no(location_contact_no)"/>
 		        </group>
 				<div attrs="{'invisible': [('location_type_permanent', '=' , False)]}">
 				<notebook colspan="5" col="10">
@@ -35,8 +35,8 @@
 						<tree string="Room Lines" nolabel='1'  >
 							<field name = "s_no"/>
 							<field name = "name" string="Rooms"/> 
-							<field name = "room_floor_area" string="Size(SqM)" on_change="on_change_floorarea(room_floor_area)"/>
-							<field name = "room_max_cap" string="Max Capacity" on_change="on_change_maxcap(room_max_cap)"/>
+							<field name = "room_floor_area" string="Size(SqM)"/>
+							<field name = "room_max_cap" string="Max Capacity"/>
 							<field name = "room_setup" string="Default Setup"/>
 						<!--	<button name="views" string="View Room" icon="view_room" type="object"/>  -->
 						</tree>				
@@ -118,8 +118,8 @@
 						<field name = "room_setup" readonly="context.get('ctx', False)"/>
 					</group>
 					<group>
-						<field name = "room_floor_area" readonly="context.get('ctx', False)" on_change="on_change_floorarea(room_floor_area)"/>
-						<field name = "room_max_cap" readonly="context.get('ctx', False)" on_change="on_change_maxcap(room_max_cap)"/>
+						<field name = "room_floor_area" readonly="context.get('ctx', False)"/>
+						<field name = "room_max_cap" readonly="context.get('ctx', False)"/>
 					</group>
 		        </group>
 				<notebook colspan="5" col="10">
@@ -168,6 +168,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">room</field>
             <field name="view_type">form</field>
+			<field name="limit">10</field>
             <field name="view_mode">tree,form</field>
 			<field name="search_view_id" ref="view_room_filter"/>
 		    <field name="help" type="html">

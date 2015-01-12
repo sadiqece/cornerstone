@@ -117,14 +117,14 @@ class asset_line(osv.osv):
 				if d > 0:
 					res['value']['date_issue'] = ''
 					#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 					return res
 				elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
 					if c < 0:
 						res['value']['date_issue'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-						res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
+						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
 				return issue
 				
@@ -136,14 +136,14 @@ class asset_line(osv.osv):
 			if d > 0:
 				res['value']['date_stopped'] = ''
 				#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 				return res
 			elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
 					if c < 0:
 						res['value']['date_stopped'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-						res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
+						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
 			return issue
 				
