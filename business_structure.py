@@ -106,7 +106,7 @@ class business(osv.osv):
 		'nodestroy': True,
 		'context': ctx,
 		}
-	_constraints = [(_check_unique_name, 'Error: Name already exist', ['name']),(_check_unique_code, 'Error: Code already exist', ['business_code'])]
+	_constraints = [(_check_unique_name, 'Error: Name already exist', ['Business Unit Name']),(_check_unique_code, 'Error: Code already exist', ['Business Code'])]
 business
 
 
@@ -130,7 +130,17 @@ class unit_line(osv.osv):
 				for self_obj in self.browse(cr, uid, ids, context=context):
 					if x.unit_line_id == self_obj.unit_line_id and x.order_priority == self_obj.order_priority:
 						return False
-		return True	
+		return True
+		
+	def _check_unique_unit(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.unit_line_id == self_obj.unit_line_id and x.unit == self_obj.unit:
+						return False
+		return True
+		
 
 # Zeya 7-1-15		
 	def on_change_orderprior(self, cr, uid, ids, order_priority):
@@ -149,7 +159,7 @@ class unit_line(osv.osv):
 		'unit': fields.char('Unit', size=30, required=True),
 		'unit_line_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
 	}
-	_constraints = [(_check_unique_order_id, 'Error: Order of Priority should be unique', ['order_priority'])]
+	_constraints = [(_check_unique_order_id, 'Error: Order of Priority should be unique', ['Order Of Priority']),(_check_unique_unit, 'Error: Unit should be unique', ['Unit'])]
 unit_line
 
 class people_line(osv.osv):

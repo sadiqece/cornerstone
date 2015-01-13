@@ -86,8 +86,8 @@
 											<field name='project_value_line' nolabel="1" readonly="context.get('ctx', False)">
 												<tree string="Project Value" editable="bottom">
 													<field name = "sr_no"/>
-													<field name = "s_range1" on_change="on_change_srangevalue(s_range1)"/>
-													<field name = "e_range1" on_change="on_change_erangevalue(e_range1)"/>
+													<field name = "s_range1"/>
+													<field name = "e_range1"/>
 													<field name = "value1" on_change="on_change_value1(value1)"/>
 												</tree>
 											</field>

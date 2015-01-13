@@ -81,34 +81,31 @@ class holiday_line(osv.osv):
 		return res
 		
 	def months_between1(self, date1, date2):
-		date11 = datetime.datetime.strptime(date1, "%Y-%m-%d %H:%M:%S")
-		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d %H:%M:%S")
+		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
+		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d")
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 		
 	def months_between2(self, date1, date2):
 		date11 = datetime.datetime.strptime(date1, "%Y-%m-%d %H:%M:%S")
-		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d %H:%M:%S")
+		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d")
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 	   
 	def onchange_date(self, cr, uid, ids, issue, stop, context=None):
 			if issue:
-				'''ccc = datetime.datetime.strptime(issue, "%Y-%m-%d %H:%M:%S")
-				if ccc.year != self.browse(cr, uid, ids, context=context):
-					raise osv.except_osv(_('Warning!'),_('Enter Correct Year.')%())'''
-				d = self.months_between1(issue, str(datetime.datetime.now())) 
+				d = self.months_between1(issue, str(datetime.datetime.now().date())) 
 				res = {'value':{}}
 				#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(d))
 				if d > 0:
-					res['value']['date_start'] = ''
+					res['value']['date_issue'] = ''
 					#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 					return res
 				elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
 					if c < 0:
-						res['value']['date_start'] = ''
+						res['value']['date_issue'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
 						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
@@ -116,21 +113,18 @@ class holiday_line(osv.osv):
 			
 	def onchange_dateend(self, cr, uid, ids, stop, issue, context=None):
 		if stop:
-			'''ccc = datetime.datetime.strptime(issue, "%Y-%m-%d %H:%M:%S")
-			if ccc.year != self.browse(cr, uid, ids, context=context):
-				raise osv.except_osv(_('Warning!'),_('Enter Correct Year.')%())'''
-			d = self.months_between1(stop, str(datetime.datetime.now()))
+			d = self.months_between1(stop, str(datetime.datetime.now().date()))
 			#c = self.months_between2(stop, str(sd))
 			res = {'value':{}}
 			if d > 0:
-				res['value']['date_end'] = ''
+				res['value']['date_stopped'] = ''
 				#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 				return res
 			elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
-					if c > 0:
-						res['value']['date_end'] = ''
+					if c < 0:
+						res['value']['date_stopped'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
 						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res

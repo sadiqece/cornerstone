@@ -79,6 +79,20 @@ class test(osv.osv):
 		name = super(test, self).write(cr, uid, ids,values, context=context)
 		return name
 		
+	'''def _modules_applied(self, cr, uid, ids, field_names, args,  context=None):
+		modules_applied = self.pool.get('test.module.line')
+		test = modules_applied.browse(cr, uid, ids[0],context=context)
+		module_mod_ids = modules_applied.search(cr, uid, [('test_mod_id', '=', ids[0])])
+		module_ids =[]
+		res = {}
+		for prog_module_line in modules_applied.browse(cr, uid, module_mod_ids,context=context):
+			module_ids.append(prog_module_line['test_mod_id'].id)
+		return res'''
+		
+	def _modules_applied(self, cr, uid, ids, module_id, args,  context=None):
+		modules_applied = self.pool.get('test.module.line').browse(cr, uid, module_id)
+		return {'value': {'module_code': modules_applied.module_code}}
+		
 	_name = "test"
 	_description = "This table is for keeping test data"
 	_columns = {
@@ -89,10 +103,12 @@ class test(osv.osv):
 		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
 		'test_description': fields.text('Description'),
-		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', select=True, required=True),
+		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
+		'test_type': fields.char('Test Type'),
+		'modules_applied': fields.function(_modules_applied, 'Modules Applied', type="one2many"),
 	}
 	_defaults = {
 		'test_status': 'Active'
@@ -145,9 +161,9 @@ class test_mod_line(osv.osv):
 		'test_mod_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-		'pre_test': fields.boolean("Pre Test"),
-		'inclass_test': fields.boolean("In Class Test"),
-		'post_test': fields.boolean("Post Test"),
+		'pre_test': fields.related('module_id','pre_test',type="boolean",relation="cs.module",string="Pre Test", readonly=1),
+		'inclass_test': fields.related('module_id','in_class_test',type="boolean",relation="cs.module",string="In Class Test", readonly=1),
+		'post_test': fields.related('module_id','post_test',type="boolean",relation="cs.module",string="Post Test", readonly=1),
 	}
 	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
 	

@@ -148,6 +148,16 @@ class room(osv.osv):
 		value_ids = self.pool.get('location').search(cr, uid, [('location_id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])
 		
+	def on_change_room_max_cap(self, cr, uid, ids, room_max_cap):
+		if room_max_cap < 0:
+			raise osv.except_osv(_('Error!'),_("Maximum Capacity - Cannot be negative value"))
+		return room_max_cap
+		
+	def on_change_room_floor_area(self, cr, uid, ids, room_floor_area):
+		if room_floor_area < 0:
+			raise osv.except_osv(_('Error!'),_("Floor Area (sqm) - Cannot be negative value"))
+		return room_floor_area
+		
 		
 	_name = "room"
 	_description = "This table is for keeping room data"

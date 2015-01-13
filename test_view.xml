@@ -81,13 +81,11 @@
             <field name="name">test.tree</field>
             <field name="model">test</field>
             <field name="arch" type="xml">
-                <tree string="Location">
+                <tree string="Test">
 					<field name = "s_no"/>
-					<field name = "name"/>
-					<field name = "test_code"/>
-					<field name = "test_fee" />
-					<field name = "test_max_Pax"/>
-					<field name = "test_status"/>
+					<field name = "name" string="Test Defination"/>
+					<field name = "test_type"/>
+					<field name = "test_mod_line" string="Modules Applied"/>
 		        </tree>
             </field>
         </record>

@@ -35,8 +35,8 @@
 						<tree string="Room Lines" nolabel='1'  >
 							<field name = "s_no"/>
 							<field name = "name" string="Rooms"/> 
-							<field name = "room_floor_area" string="Size(SqM)"/>
-							<field name = "room_max_cap" string="Max Capacity"/>
+							<field name = "room_floor_area" string="Size(SqM)" />
+							<field name = "room_max_cap" string="Max Capacity" />
 							<field name = "room_setup" string="Default Setup"/>
 						<!--	<button name="views" string="View Room" icon="view_room" type="object"/>  -->
 						</tree>				
@@ -118,8 +118,8 @@
 						<field name = "room_setup" readonly="context.get('ctx', False)"/>
 					</group>
 					<group>
-						<field name = "room_floor_area" readonly="context.get('ctx', False)"/>
-						<field name = "room_max_cap" readonly="context.get('ctx', False)"/>
+						<field name = "room_floor_area" readonly="context.get('ctx', False)" on_change="on_change_room_floor_area(room_floor_area)"/>
+						<field name = "room_max_cap" readonly="context.get('ctx', False)" on_change="on_change_room_max_cap(room_max_cap)"/>
 					</group>
 		        </group>
 				<notebook colspan="5" col="10">

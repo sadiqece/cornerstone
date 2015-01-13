@@ -144,6 +144,9 @@
 					<!-- START OF MODULE TAB -->
 					<page string="Modules">						
 						<!-- Dropdown to select no. of boxes -->
+						<h3>
+						<label string = "Modules"/>
+						</h3>
 						<group class="oe_edit_only">
 							<field name='no_of_mod_gp' style="width:50px;" on_change="onchange_no_of_mod_gp(no_of_mod_gp)"/>
 							<field name='no_module_box1' invisible="1"/>
@@ -220,9 +223,9 @@
 								</div>
 
 								<div attrs="{'invisible': [('set_module_select_2', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_2"/>
+									<label for="min_no_modules_2" />
 									<span><field name='min_no_modules_2'/></span>								
-									<label for="max_no_modules_2"/>
+									<label for="max_no_modules_2" />
 									<span><field name='max_no_modules_2'/></span>	
 								</div>
 							</div>
@@ -299,10 +302,10 @@
 								</div>
 
 								<div attrs="{'invisible': [('set_module_select_4', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_4"/>
+									<label for="min_no_modules_4" />
 									<span><field name='min_no_modules_4'/></span>								
-									<label for="max_no_modules_4"/>
-									<span><field name='max_no_modules_4'/></span>	
+									<label for="max_no_modules_4" />
+									<span><field name='max_no_modules_4' /></span>	
 								</div>
 							</div>
 							<!---->
@@ -338,10 +341,10 @@
 								</div>
 
 								<div attrs="{'invisible': [('set_module_select_5', '=' , False)]}" class="border_box">
-									<label for="min_no_modules_5"/>
-									<span><field name='min_no_modules_5'/></span>								
-									<label for="max_no_modules_5"/>
-									<span><field name='max_no_modules_5'/></span>	
+									<label for="min_no_modules_5" />
+									<span><field name='min_no_modules_5' /></span>								
+									<label for="max_no_modules_5" />
+									<span><field name='max_no_modules_5' /></span>	
 								</div>
 							</div>
 							<!---->
@@ -378,9 +381,9 @@
 
 								<div attrs="{'invisible': [('set_module_select_6', '=' , False)]}" class="border_box">
 									<label for="min_no_modules_6"/>
-									<span><field name='min_no_modules_6'/></span>								
+									<span><field name='min_no_modules_6' /></span>								
 									<label for="max_no_modules_6"/>
-									<span><field name='max_no_modules_6'/></span>	
+									<span><field name='max_no_modules_6' /></span>	
 								</div>
 							</div>
 								<!---->
@@ -402,8 +405,10 @@
 					
                     <page string="Req">
 					<group col="6">
-						<div>	
+						<div>
+							<h3>
 							<label for="prog_req_line" string = "Program Level Requirments"/>
+							</h3>
 							<field name='prog_req_line' nolabel='1' style="height:150px">
 								<tree string="Req Order Lines" editable="bottom" class="grey_border">
 									<field name = "program_master_req" on_change="on_change_program_master_req(program_master_req)"/>
@@ -416,7 +421,9 @@
 					</group>
 					<group col="6">
 						<div>
+						<h2>
 							<label for="program_mod_req_line" string = "Module Level Requirments"/>
+						</h2>
 							<field name='program_mod_req_line' nolabel='1'  >
 									<tree string="Req Order Lines" class="grey_border">
 										<field name = "module_name"/>
@@ -438,18 +445,18 @@
 					
 							<group col="6">
 								<div>
-								<h2>
+								<h3>
 									<label string="Program Descriptions"  readonly="context.get('ctx', False)"/>
-								</h2>
+								</h3>
 									<label for="program_synopsis"/>
 									<field name="program_synopsis" on_change="on_change_program_synopsis(program_synopsis)"/>
 									<label for="program_outline"/>
 									<field name="program_outline"/>
 								</div>
 								<div>
-								<h2>
+								<h3>
 									<label string="Descriptions of Attached Modules"  readonly="context.get('ctx', False)"/>
-								</h2>
+								</h3>
 								<field name='program_module_desc_line'  create='false' delete='false'>
 								<tree string="Req Order Lines" class="grey_border">
 									<field name = "s_no"/>
@@ -465,6 +472,9 @@
 					<!-- M O I -->
 					
 					<page string="M.O.I">
+							<h3>
+							<label string="Mode of Instruction"  readonly="context.get('ctx', False)"/>
+							</h3>
 						<field name='program_modality_line' nolabel='1'  create='false' delete='false'>
 							<tree string="Req Order Lines" class="grey_border">
 								<field name = "s_no"/>
@@ -480,6 +490,9 @@
 					<!-- Test / Assessments -->
 					
 					<page string="Test / Assessments">
+								<h3>
+									<label string="Test/Assessments"/>
+								</h3>
 						<field name='program_test_line' nolabel='1'  create='false' delete='false'>
 							<tree string="Req Order Lines" class="grey_border">
 								<field name = "s_no"/>
@@ -495,6 +508,9 @@
 					<!-- Show Do -->
 					
 					<page string="Show &amp; Do">
+							<h3>
+								<label string="Show and Do"  readonly="context.get('ctx', False)"/>
+							</h3>
 						<group>
 							<div>
 								<field name='program_show_do_line' nolabel='1'  create='false' delete='false'>
@@ -520,9 +536,9 @@
 					<!-- Fee -->
 					
 					<page string="Fees &amp; Subsidies">
-						<h2>
+						<h3>
 					    <label string="Fees &amp; Subsidies"  readonly="context.get('ctx', False)"/>
-						</h2>
+						</h3>
 						<!-- <group>
 							<field name = "program_total_fee" string="Total Program Fee(Baseline Only) $"/>
 						</group>	 -->
@@ -557,6 +573,9 @@
 					<!-- <group>
 						<field name = "program_tot_duration" string="Total Duration(Hours)"/>
 					</group> -->
+								<h3>
+									<label string="Durations"  readonly="context.get('ctx', False)"/>
+								</h3>
 						<field name='program_duration_line' nolabel='1'  create='false' delete='false'>
 							<tree string="Req Order Lines" class="grey_border">
 								<field name = "s_no"/>
@@ -570,6 +589,9 @@
 					<!-- Alerts -->
 					
 					<page string="Alerts">
+								<h3>
+									<label string="Alerts"  readonly="context.get('ctx', False)"/>
+								</h3>
 					  <group col="6">
 						  <div>
 								<label for="program_alert_line" string = "Alerts for Programs"/>
@@ -603,6 +625,9 @@
 					<!-- History -->
 					
 					<page string="History">
+								<h3>
+									<label string="History"  readonly="context.get('ctx', False)"/>
+								</h3>
 						<field name="program_history_line">
 								<tree string="History Order Lines" create="false" delete="false" class="grey_border">
 									<field name = "s_no"/>
@@ -767,7 +792,7 @@
 					<field name = "module_duration" on_change="on_change_module_duration(module_duration)"  readonly="context.get('ctx', False)"/>
 					<field name = "module_fee" on_change="on_change_module_fee(module_fee)"  readonly="context.get('ctx', False)"/>
 					<field name = "module_status" widget="selection/"  readonly="context.get('ctx', False)" />
-					<field name = "module_credit_value"  readonly="context.get('ctx', False)" string="Credit Value"/>
+					<field name = "module_credit_value"  readonly="context.get('ctx', False)" string="Credit Value" on_change="on_change_cvalue(module_credit_value)"/>
 					<field name = "module_level"  widget="selection/"  readonly="context.get('ctx', False)"/>
 					<field name = "module_category"  widget="selection/"  readonly="context.get('ctx', False)"/>
 					<field name = "module_pathway"  widget="selection/"  readonly="context.get('ctx', False)"/>
@@ -787,6 +812,9 @@
 				</group>
 				<notebook colspan="5" col="10">
                     <page string="Requirements">
+						<h3>
+							<label string="Requirments"/>
+						</h3>
 						<field name="req_line"  readonly="context.get('ctx', False)" >
 						<tree string="Req Order Lines" editable="bottom">
 							<field name = "master_req" on_change="on_change_master_req(master_req)"/>
@@ -797,8 +825,11 @@
 						</field>
 					</page>
                     <page string="Description">
+							<h3>
+								<label string="Description"/>
+							</h3>
 							 <group>
-								<field name = "max_num_ppl_class" readonly="context.get('ctx', False)"/>
+								<field name = "max_num_ppl_class" readonly="context.get('ctx', False)" on_change="on_change_max_num_ppl_class(max_num_ppl_class)"/>
 							 </group>
 							 <group>
 								<div>
@@ -815,9 +846,9 @@
 							
 				    </page>
 					<page string="M.O.I">
-					    <h2>
+					    <h3>
 					    <label string="Mode of Instruction"  readonly="context.get('ctx', False)"/>
-						</h2>
+						</h3>
 						<group>
 						   <div>
 							   <group>
@@ -840,6 +871,9 @@
 						</group>
 			        </page>
 					<page string="Test / Assessments">
+						<h3>
+							<label string="Test / Assessments"/>
+						</h3>
 						<group col="3">
 						   <div>
 									<group colspan="1">
@@ -848,7 +882,7 @@
 									<div attrs="{'invisible': [('pre_test', '=' , False)]}">
 									<field name="pre_test_line"  nolabel="1" readonly="context.get('ctx', False)">
 										<tree string="Pre Order Lines" editable="bottom">
-											<field name = "order_priority"/>
+											<field name = "order_priority" on_change="on_change_order_priority(order_priority)"/>
 											<field name = "test_list"/>
 										</tree>
 									</field>
@@ -861,7 +895,7 @@
 								<div attrs="{'invisible': [('in_class_test', '=' , False)]}">
 								<field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)">
 									<tree string="In Class Order Lines" editable="bottom">
-										<field name = "order_priority"/>
+										<field name = "order_priority" on_change="on_change_order_priority(order_priority)"/>
 										<field name = "test_list"/>
 									</tree>
 								</field>
@@ -874,7 +908,7 @@
 								<div attrs="{'invisible': [('post_test', '=' , False)]}">
 								<field name="post_test_line"  nolabel="1" readonly="context.get('ctx', False)">
 									<tree string="Post Order Lines" editable="bottom">
-										<field name = "order_priority" />
+										<field name = "order_priority" on_change="on_change_order_priority(order_priority)"/>
 										<field name = "test_list"/>
 									</tree>
 								</field>
@@ -883,6 +917,9 @@
 						</group>
 					</page>
 					<page string="Alerts">
+						<h3>
+							<label string="Alerts"/>
+						</h3>
 						<field name="alert_line" readonly="context.get('ctx', False)">
 								<tree string="Alert Order Lines" editable="bottom">
 									<field name = "s_no"/>
@@ -897,6 +934,9 @@
 							</field>
                     </page>
 					<page string="History">
+							<h3>
+								<label string="History"/>
+							</h3>
 							<field name="history_line" readonly="context.get('ctx', False)" class="history_line">
 								<tree string="History Order Lines" create="false" delete="false">
 									<field name = "s_no"/>

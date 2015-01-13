@@ -531,8 +531,52 @@ class program(osv.osv):
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.program_code and self_obj.program_code.lower() in  lst:
                return False
-        return True   
+        return True
 
+#Validate Min Max
+#1
+    def _check_min_max_1(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_1 < 0 or self_obj.max_no_modules_1 < self_obj.min_no_modules_1:
+                return False
+        return True
+#2
+    def _check_min_max_2(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_2 < 0 or self_obj.max_no_modules_2 < self_obj.min_no_modules_2:
+                return False
+        return True
+#3
+    def _check_min_max_3(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_3 < 0 or self_obj.max_no_modules_3 < self_obj.min_no_modules_3:
+                return False
+        return True
+#4
+    def _check_min_max_4(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_4 < 0 or self_obj.max_no_modules_4 < self_obj.min_no_modules_4:
+                return False
+        return True
+#5
+    def _check_min_max_5(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_5 < 0 or self_obj.max_no_modules_5 < self_obj.min_no_modules_5:
+                return False
+        return True
+#6
+    def _check_min_max_6(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.min_no_modules_6 < 0 or self_obj.max_no_modules_6 < self_obj.min_no_modules_6:
+                return False
+        return True
+#############
     _name = "lis.program"
     _description = "This table is for keeping lab data of cord blood"
     _columns = {
@@ -600,8 +644,8 @@ class program(osv.osv):
 		'set_module_block_1': fields.boolean('Block'),
 		'set_module_select_1': fields.boolean('Selectable'),
 		'allow_as_block_1': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_1': fields.integer('Minimum Modules'),
-		'max_no_modules_1': fields.integer('Maximum Modules'),
+		'min_no_modules_1': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_1': fields.integer('Maximum Modules', size=3, select=True),
 		#2
 		'mod_gp_name_2': fields.char('Module Group Name'),
 		'set_group_as_sel_2': fields.boolean('Set Group As Selectable'),
@@ -609,8 +653,8 @@ class program(osv.osv):
 		'set_module_block_2': fields.boolean('Block'),
 		'set_module_select_2': fields.boolean('Selectable'),
 		'allow_as_block_2': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_2': fields.integer('Minimum Modules'),
-		'max_no_modules_2': fields.integer('Maximum Modules'),
+		'min_no_modules_2': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_2': fields.integer('Maximum Modules', size=3, select=True),
 		#3
 		'mod_gp_name_3': fields.char('Module Group Name'),
 		'set_group_as_sel_3': fields.boolean('Set Group As Selectable'),
@@ -618,8 +662,8 @@ class program(osv.osv):
 		'set_module_block_3': fields.boolean('Block'),
 		'set_module_select_3': fields.boolean('Selectable'),
 		'allow_as_block_3': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_3': fields.integer('Minimum Modules'),
-		'max_no_modules_3': fields.integer('Maximum Modules'),
+		'min_no_modules_3': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_3': fields.integer('Maximum Modules', size=3, select=True),
 		#4
 		'mod_gp_name_4': fields.char('Module Group Name'),
 		'set_group_as_sel_4': fields.boolean('Set Group As Selectable'),
@@ -627,8 +671,8 @@ class program(osv.osv):
 		'set_module_block_4': fields.boolean('Block'),
 		'set_module_select_4': fields.boolean('Selectable'),
 		'allow_as_block_4': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_4': fields.integer('Minimum Modules'),
-		'max_no_modules_4': fields.integer('Maximum Modules'),
+		'min_no_modules_4': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_4': fields.integer('Maximum Modules', size=3, select=True),
 		#5
 		'mod_gp_name_5': fields.char('Module Group Name'),
 		'set_group_as_sel_5': fields.boolean('Set Group As Selectable'),
@@ -636,8 +680,8 @@ class program(osv.osv):
 		'set_module_block_5': fields.boolean('Block'),
 		'set_module_select_5': fields.boolean('Selectable'),
 		'allow_as_block_5': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_5': fields.integer('Minimum Modules'),
-		'max_no_modules_5': fields.integer('Maximum Modules'),
+		'min_no_modules_5': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_5': fields.integer('Maximum Modules', size=3, select=True),
 		#6
 		'mod_gp_name_6': fields.char('Module Group Name'),
 		'set_group_as_sel_6': fields.boolean('Set Group As Selectable'),
@@ -645,8 +689,8 @@ class program(osv.osv):
 		'set_module_block_6': fields.boolean('Block'),
 		'set_module_select_6': fields.boolean('Selectable'),
 		'allow_as_block_6': fields.boolean('Allow scheduling as a block'),
-		'min_no_modules_6': fields.integer('Minimum Modules'),
-		'max_no_modules_6': fields.integer('Maximum Modules'),
+		'min_no_modules_6': fields.integer('Minimum Modules', size=3, select=True),
+		'max_no_modules_6': fields.integer('Maximum Modules', size=3, select=True),
     }
 	
     _defaults = { 
@@ -659,7 +703,7 @@ class program(osv.osv):
 	   'set_group_as_sel_5': True,
 	   'set_group_as_sel_6': True,
     }
-    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['name']),(_check_unique_code, 'Error: Program Code Already Exists', ['module_code']),(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['mod_gp_name_1'])]
+    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['name']),(_check_unique_code, 'Error: Program Code Already Exists', ['module_code']),(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['mod_gp_name_1']),(_check_min_max_1, 'Error: Min Max values not correct', ['Module Group 1']),(_check_min_max_2, 'Error: Min Max values not correct', ['Module Group 2']),(_check_min_max_3, 'Error: Min Max values not correct', ['Module Group 3']),(_check_min_max_4, 'Error: Min Max values not correct', ['Module Group 4']),(_check_min_max_5, 'Error: Min Max values not correct', ['Module Group 5']),(_check_min_max_6, 'Error: Min Max values not correct', ['Module Group 6'])]
 program()
 
 # Table in Module Group
@@ -1269,11 +1313,15 @@ class cs_module(osv.osv):
         return res
 
 	# Zeya 7-1-15						
+    def on_change_max_num_ppl_class(self, cr, uid, ids, max_num_ppl_class):
+       if max_num_ppl_class < 0:
+         raise osv.except_osv(_('Error!'),_("Max Number of People - Cannot be negative value"))
+       return max_num_ppl_class
+	# EOF
     def on_change_cvalue(self, cr, uid, ids, module_credit_value):
        if module_credit_value < 0:
          raise osv.except_osv(_('Error!'),_("Credit value - Cannot be negative value"))
        return module_credit_value
-	# EOF
 		
     _name = "cs.module"
     _description = "Modules"
@@ -1552,6 +1600,10 @@ class pre_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
+	def on_change_order_priority(self, cr, uid, ids, order_priority):
+		if order_priority < 0:
+			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
+		return order_priority
 	_name ='pre.test.module'
 	_description ="Pre Test Table"
 	_columns = {
@@ -1590,6 +1642,10 @@ class in_class_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
+	def on_change_order_priority(self, cr, uid, ids, order_priority):
+		if order_priority < 0:
+			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
+		return order_priority
 	_name ='in.class.test.module'
 	_description ="In Calss Table"
 	_columns = {
@@ -1629,6 +1685,10 @@ class post_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
+	def on_change_order_priority(self, cr, uid, ids, order_priority):
+		if order_priority < 0:
+			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
+		return order_priority
 	_name ='post.test.module'
 	_description ="Post Test Table"
 	_columns = {
