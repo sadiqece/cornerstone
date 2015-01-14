@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-<!-- ===================== This is location form layout =============================-->
+<!-- ===================== Location Form View=============================-->
 <record id="holiday_form" model="ir.ui.view">
     <field name="name">holiday.form</field>
     <field name="model">holiday</field>
@@ -23,8 +23,8 @@
 						<tree string='List'  editable="bottom" >
 							<field name='s_no'/>
 							<field name='description'/>
-							<field name='date_start' on_change="onchange_date(date_start, date_end)"/>
-							<field name='date_end' on_change="onchange_dateend(date_end, date_start)"/>
+							<field name='date_start' on_change="onchange_start_date_past(date_start, date_end, parent.year)"/>
+							<field name='date_end' on_change="onchange_end_date_past(date_end, date_start, parent.year)"/>
 						</tree>
 					</field>
 			</sheet>
@@ -32,6 +32,7 @@
    </field>
 </record>
 
+<!-- ===================== Location List View=============================-->
 		 <record id="holiday_tree" model="ir.ui.view">
             <field name="name">holiday.tree</field>
             <field name="model">holiday</field>
@@ -53,7 +54,7 @@
         </record>
 	
 
-
+<!-- ===================== Location Action =============================-->
 		<record model="ir.actions.act_window" id="action_holiday">
             <field name="name">Holidays &amp; Closures</field>
 			<field name="type">ir.actions.act_window</field>
@@ -68,7 +69,7 @@
             </field>
         </record>
 
-
+<!-- ===================== Menu =============================-->
 <menuitem name = "Holidays &amp; Closures" id = "holiday" parent = "menu_sub2" action = "action_holiday" />
 
 </data> 

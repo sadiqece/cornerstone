@@ -203,6 +203,15 @@ test_mod_line()
 
 
 class modalities(osv.osv):
+
+	def _check_unique_modalities(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.modality_id == self_obj.modality_id and x.modal_list == self_obj.modal_list:
+						return False
+		return True
 		
 	_name ='modalities.module'
 	_description ="Modalities Tab"
@@ -216,7 +225,7 @@ class modalities(osv.osv):
 	'store_scores':fields.boolean('Store Scores'),
 	'store_outcome':fields.boolean('Store Outcome'),
 	}
-
+	_constraints = [(_check_unique_modalities, 'Error: Test Modality Already Exists', ['Test Modalities'])]
 modalities	()
 
 class master_modalities(osv.osv):

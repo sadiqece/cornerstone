@@ -112,6 +112,7 @@ class setting_panel(osv.osv):
 	_description = "This table is for keeping location data"
 	_columns = {
 	'setting_id' : fields.integer('Id',size=20),
+	
 	}
 setting_panel()
 

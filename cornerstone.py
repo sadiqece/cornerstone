@@ -7,6 +7,13 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+####################
+#PROGRAMS
+####################
+
+#Class Program
+###############
+
 class program(osv.osv):
 
 #Dropdown to Show no. of module groups
@@ -50,6 +57,7 @@ class program(osv.osv):
         return {'value': val} 
 
 #Set Module as
+
     def onchange_set_module_as_1(self, cr, uid, ids, set_module_as_1):
         val = {}
         val['set_module_block_1'] = False
@@ -116,7 +124,8 @@ class program(osv.osv):
 
         return {'value': val}
 
-#Requirement Tab
+#To Get Requirements
+
     def _load_prog_mod_line(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
@@ -148,7 +157,8 @@ class program(osv.osv):
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids),('verification', '=', True)])
        return dict([(id, value_ids) for id in ids])
 
-#Show Do Tab
+#To Get Show Do
+
     def _load_prog_show_do_line(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
@@ -171,6 +181,7 @@ class program(osv.osv):
        return dict([(id, value_ids) for id in ids])
 
 #Load data For Multiple Tabs
+
     def _load_module_info(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
@@ -224,7 +235,9 @@ class program(osv.osv):
            max_fee += value_ids['module_fee']
        res[ids[0]] = max_fee
        return res
-#Min Fee   
+
+#Min Fee
+   
     def _calculate_total_fee_min(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
@@ -289,7 +302,9 @@ class program(osv.osv):
        min_mod = len(value_ids)
        res[ids[0]] = min_mod
        return res
-#Max Modules  
+
+#Max Modules 
+ 
     def _calculate_total_mod_max(self, cr, uid, ids, field_names, args,  context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
@@ -390,7 +405,7 @@ class program(osv.osv):
        return res
 
 #Total Credit
-	   
+   
     def _calculate_total_credit(self, cr, uid, ids, field_names, args,  context=None):
        res = {}
        for line in self.browse(cr, uid, ids, context=context):
@@ -428,7 +443,7 @@ class program(osv.osv):
           res[line.id] = line['program_status']
        return res
 	   
-	#Unique Module Group Name
+#Unique Module Group Name
     def _check_unique_group(self, cr, uid, ids, context=None):
         new_class = self.browse(cr, uid, ids, context=context)
         _logger.info('Mod G1 = %s', new_class[0].mod_gp_name_1)
@@ -452,7 +467,8 @@ class program(osv.osv):
             elif new_class[0].mod_gp_name_6 != False and x != 6 and new_class[0].mod_gp_name_6 == new_class[0]['mod_gp_name_'+str(x)]: 
                 return False
         return True
-	
+
+#History
     def create(self,cr, uid, values, context=None):
        sub_lines = []
        current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
@@ -504,13 +520,16 @@ class program(osv.osv):
        	r['s_no'] = seq_number
        
        return res
-    
+
+#Program Desc
     def on_change_program_desc(self, cr, uid, ids, program_description):
        return {'value': {'program_synopsis': program_description}}
-   
+
+#Program Synopsis
     def on_change_program_synopsis(self, cr, uid, ids, program_synopsis):
        return {'value': {'program_description': program_synopsis}} 
 
+#Validate Program Name
     def _check_unique_name(self, cr, uid, ids, context=None):
         sr_ids = self.search(cr, 1 ,[], context=context)
         lst = [
@@ -521,7 +540,8 @@ class program(osv.osv):
             if self_obj.name and self_obj.name.lower() in  lst:
                return False
         return True
-   
+
+#Validate Program Code
     def _check_unique_code(self, cr, uid, ids, context=None):
         sr_ids = self.search(cr, 1 ,[], context=context)
         lst = [
@@ -533,7 +553,7 @@ class program(osv.osv):
                return False
         return True
 
-#Validate Min Max
+#Validate Min Max values for Module Blocks
 #1
     def _check_min_max_1(self, cr, uid, ids, context=None):
         sr_ids = self.search(cr, 1 ,[], context=context)
@@ -576,7 +596,8 @@ class program(osv.osv):
             if self_obj.min_no_modules_6 < 0 or self_obj.max_no_modules_6 < self_obj.min_no_modules_6:
                 return False
         return True
-#############
+
+#Table For Class Program 'lis_program'
     _name = "lis.program"
     _description = "This table is for keeping lab data of cord blood"
     _columns = {
@@ -703,16 +724,17 @@ class program(osv.osv):
 	   'set_group_as_sel_5': True,
 	   'set_group_as_sel_6': True,
     }
-    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['name']),(_check_unique_code, 'Error: Program Code Already Exists', ['module_code']),(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['mod_gp_name_1']),(_check_min_max_1, 'Error: Min Max values not correct', ['Module Group 1']),(_check_min_max_2, 'Error: Min Max values not correct', ['Module Group 2']),(_check_min_max_3, 'Error: Min Max values not correct', ['Module Group 3']),(_check_min_max_4, 'Error: Min Max values not correct', ['Module Group 4']),(_check_min_max_5, 'Error: Min Max values not correct', ['Module Group 5']),(_check_min_max_6, 'Error: Min Max values not correct', ['Module Group 6'])]
+    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['Program Name']),(_check_unique_code, 'Error: Program Code Already Exists', ['Program Code']),(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['Module Group Name']),(_check_min_max_1, 'Error: Invalid Min/Max Values', ['Module Group 1']),(_check_min_max_2, 'Error: Invalid Min/Max Values', ['Module Group 2']),(_check_min_max_3, 'Error: Invalid Min/Max Values', ['Module Group 3']),(_check_min_max_4, 'Error: Invalid Min/Max Values', ['Module Group 4']),(_check_min_max_5, 'Error: Invalid Min/Max Values', ['Module Group 5']),(_check_min_max_6, 'Error: Invalid Min/Max Values', ['Module Group 6'])]
 program()
 
-# Table in Module Group
+
+#Class program_mod_line
+###############
 
 globvar = 0
 class program_mod_line(osv.osv):
 
-
-	#Unique Check 2-1-2015
+#Validate Unique Modules
 	def _check_unique_module(self, cr, uid, ids, context=None):
 		new_class = self.browse(cr, uid, ids, context=context)
 		module_id = -1
@@ -745,7 +767,8 @@ class program_mod_line(osv.osv):
 					return False
 					
 		return True
-
+		
+# Table for Module Group
 	_name = "program.module.line"
 	_description = "Module Line"
 	_columns = {
@@ -780,11 +803,12 @@ class program_mod_line(osv.osv):
 		'no_of_hrs_6': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
     }
 
-	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
+	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['Module'])]
 
 program_mod_line()
 
-#EOF Table in Module Group
+#Class Program Requirements
+###############
 
 class program_requirments(osv.osv):
 	def views(self,cr,uid,ids,context=None):
@@ -827,8 +851,8 @@ class program_requirments(osv.osv):
 		self.pool.get('master.req').write(cr, uid, line_id,{'description':values['description'],
 		'musthave':values['musthave'],'verification':values['verification']}, context=context)
 		return module_id
-#Aasim 7 1 2015
-#Unique Label
+
+#Validate Unique Label
 	def _check_unique_label(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -837,7 +861,9 @@ class program_requirments(osv.osv):
 					if x.req_id == self_obj.req_id and x.program_master_req == self_obj.program_master_req:
 						return False
 		return True
-#EOF 7 1 2015
+		
+# Table for Program req.module
+
 	_name ='program.req.module'
 	_description ="Requirement Tab"
 	_columns = {
@@ -847,12 +873,13 @@ class program_requirments(osv.osv):
 	'musthave':fields.boolean('Must Have'),
 	'verification':fields.boolean('Verification'),
 	'module_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module'),
-	#'module_name': fields.related('module_id','name',type="char",relation="cs.module",string="Module Name"),
-	#'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code"),
 	}
 	
-	_constraints = [(_check_unique_label, 'Error: Label Already Exists', ['program_master_req'])]
+	_constraints = [(_check_unique_label, 'Error: Label Already Exists', ['Label'])]
 program_requirments()
+
+#Class Program Master Requirements
+###############
 
 class program_master_req(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
@@ -873,9 +900,11 @@ class program_master_req(osv.osv):
 	'musthave':fields.boolean('Must Have'),
 	'verification':fields.boolean('Verification'),
 	}
-	_constraints = [(_check_unique_name, 'Error: Requirement Label Already Exists', ['name'])]
+	_constraints = [(_check_unique_name, 'Error: Requirement Label Already Exists', ['Requirement'])]
 program_master_req()
 
+#Class Program Show Do
+###############
 class program_show_do(osv.osv):
 
 	def on_change_master_show_do(self, cr, uid, ids, master_show_do):
@@ -897,9 +926,11 @@ class program_show_do(osv.osv):
 	'supp_doc_req':fields.boolean('Supporting Document Required'),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
 	}
-	_constraints = [(_check_unique_prog_show_do, 'Error: Item Already Exists', ['master_show_do'])]
+	_constraints = [(_check_unique_prog_show_do, 'Error: Item Already Exists', ['Show and Do'])]
 program_show_do()
 
+#Class Program Master Show Do
+###############
 class master_show_do(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -919,6 +950,9 @@ class master_show_do(osv.osv):
 	}
 	_constraints = [(_check_unique_name, 'Error: Item Already Exists', ['name'])]
 master_show_do()
+
+#Class Program Master Subsidy
+###############
 
 class master_subsidy(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
@@ -941,7 +975,8 @@ class master_subsidy(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: Description Already Exists', ['name'])]
 master_subsidy()
 
-
+#Class Program Subsidy
+###############
 class program_subsidy(osv.osv):
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
@@ -977,11 +1012,11 @@ class program_subsidy(osv.osv):
 	'ver_req':fields.boolean('Verification Required'),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
 	}
-	_constraints = [(_check_unique_prog_subs, 'Error: Subsidy Already Exists', ['master_subsidy'])]
+	_constraints = [(_check_unique_prog_subs, 'Error: Subsidy Already Exists', ['Subsidy'])]
 program_subsidy()
 
-
-
+#Class Program Alerts
+###############
 class program_alerts(osv.osv):
 	def _check_unique_prog_alert(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1014,15 +1049,24 @@ class program_alerts(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
-	def on_change_alert_time(self, cr, uid, ids, time):
-		if time < 0:
-			raise osv.except_osv(_('Error!'),_("Time - Cannot be negative value"))
-		return time
-			
-	def on_change_value_per(self, cr, uid, ids, value_per):
-		if value_per < 0:
-			raise osv.except_osv(_('Error!'),_("Value in % - Cannot be negative value"))
-		return value_per
+
+#Validate Program Alert Time
+	def _validate_p_alert_time(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.time < 0:
+				return False
+		return True
+
+#Validate Program Alert Value		
+	def _validate_p_value(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.value_per < 0:
+				return False
+		return True
+		
+#Table For Program Alerts
 	_name ='program.alert.module'
 	_description ="Program Alert Tab"
 	_columns = {
@@ -1036,10 +1080,11 @@ class program_alerts(osv.osv):
 	'action':fields.char('Action',size=100),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
 	}
-	_constraints = [(_check_unique_prog_alert, 'Error: Alert Already Exists', ['program_alert_list'])]
+	_constraints = [(_check_unique_prog_alert, 'Error: Alert Already Exists', ['Alerts']),(_validate_p_alert_time, 'Error: Alert Time Cannot be Negative', ['Alerts']),(_validate_p_value, 'Error: Alert Value Cannot be Negative', ['Alerts'])]
 program_alerts	()
 
-
+#Class Program Master Alerts
+###############
 class master_program_alerts(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1064,6 +1109,8 @@ class master_program_alerts(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: This Alert Already Exists', ['name'])]
 master_program_alerts()
 
+#Class Program History
+###############
 class program_history(osv.osv):
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
@@ -1089,9 +1136,19 @@ class program_history(osv.osv):
 	}
 program_history	()
 
+####################
+#EOF PROGRAMS
+####################
 
+####################
+#MODULES
+####################
+
+#Class CS Module
+###############
 class cs_module(osv.osv):
 
+#History
     def create(self,cr, uid, values, context=None):
         if 'pre_test' in values and values['pre_test']:
             if len(values['pre_test_line']) == 0:
@@ -1204,6 +1261,7 @@ class cs_module(osv.osv):
         module_id = super(cs_module, self).write(cr, uid, ids,values, context=context)
         return module_id
 
+#Calculates Module Attributes
     def _calculate_modalities_in_use(self, cr, uid, ids, field_names, args,  context=None):
        if not ids: return {}
        res = {}
@@ -1223,7 +1281,8 @@ class cs_module(osv.osv):
        res[line.id] = modailit_in_use
           
        return res 
-    
+
+#Module Status
     def _status_display(self, cr, uid, ids, field_names, args,  context=None):
        if not ids: return {}
        res = {}
@@ -1239,30 +1298,39 @@ class cs_module(osv.osv):
        for line in self.browse(cr, uid, ids, context=context):
           res[line.id] = line['module_status']
        return res
-
+	   
+#Module Fee
     def on_change_module_fee_gst(self, cr, uid, ids, module_fee_gst):
        return {'value': {'module_fee': module_fee_gst}}
-   
-    def on_change_module_fee(self, cr, uid, ids, module_fee):
-       if module_fee < 0:
-         raise osv.except_osv(_('Error!'),_("Fee - Cannot be negative value"))
-       return {'value': {'module_fee_gst': module_fee}}
+ 
+#Validate Module Fee
+    def _check_neg_fee(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.module_fee < 0:
+                return False
+        return True
 
+#Module Duration
     def on_change_module_duration_inside(self, cr, uid, ids, total_duration):
        return {'value': {'module_duration': total_duration}}
-   
-    def on_change_module_duration(self, cr, uid, ids, module_duration):
-       if module_duration < 0:
-         raise osv.except_osv(_('Error!'),_("Duration - Cannot be negative value"))
-       return {'value': {'total_duration': module_duration}}
-   
+
+#Validate Module Duration
+    def _check_neg_duration(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.module_duration < 0:
+                return False
+        return True
+
     def on_change_req_line(self, cr, uid, ids, module_duration):
        return {'value': {'req_line': req_dropdown}}
-   
-    
+	   
+#Module Desc 
     def on_change_module_desc(self, cr, uid, ids, description):
        return {'value': {'synopsis': description}}
-   
+
+#Module Synopsis 
     def on_change_module_synopsis(self, cr, uid, ids, synopsis):
        return {'value': {'description': synopsis}}
 
@@ -1275,7 +1343,8 @@ class cs_module(osv.osv):
         	r['s_no'] = seq_number
         
         return res
-    
+
+#Validate Module Name
     def _check_unique_name(self, cr, uid, ids, context=None):
         sr_ids = self.search(cr, 1 ,[], context=context)
         lst = [
@@ -1286,7 +1355,8 @@ class cs_module(osv.osv):
             if self_obj.name and self_obj.name.lower() in  lst:
                return False
         return True
-   
+		
+#Validate Module Code
     def _check_unique_code(self, cr, uid, ids, context=None):
         sr_ids = self.search(cr, 1 ,[], context=context)
         lst = [
@@ -1298,6 +1368,7 @@ class cs_module(osv.osv):
                return False
         return True
 
+#To show Status in  Popup
     def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
         res = super(cs_module,self).fields_view_get(cr, user, view_id, view_type, context, toolbar=toolbar, submenu=submenu)
         doc = etree.XML(res['arch'])
@@ -1312,17 +1383,23 @@ class cs_module(osv.osv):
         res['arch'] = etree.tostring(doc)
         return res
 
-	# Zeya 7-1-15						
-    def on_change_max_num_ppl_class(self, cr, uid, ids, max_num_ppl_class):
-       if max_num_ppl_class < 0:
-         raise osv.except_osv(_('Error!'),_("Max Number of People - Cannot be negative value"))
-       return max_num_ppl_class
-	# EOF
-    def on_change_cvalue(self, cr, uid, ids, module_credit_value):
-       if module_credit_value < 0:
-         raise osv.except_osv(_('Error!'),_("Credit value - Cannot be negative value"))
-       return module_credit_value
-		
+#Validate Max no. of People				
+    def _check_neg_no_ppl(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.max_num_ppl_class < 0:
+                return False
+        return True
+
+#Validate Credit Value
+    def _check_neg_credit_value(self, cr, uid, ids, context=None):
+        sr_ids = self.search(cr, 1 ,[], context=context)
+        for self_obj in self.browse(cr, uid, ids, context=context):
+            if self_obj.module_credit_value < 0:
+                return False
+        return True
+
+#Table For cs Modules		
     _name = "cs.module"
     _description = "Modules"
     _columns = {
@@ -1400,9 +1477,12 @@ class cs_module(osv.osv):
 	   'orientation': 'No',
     }
     _order='name'
-    _constraints = [(_check_unique_name, 'Error: Module Name Already Exists', ['name']),(_check_unique_code, 'Error: Module Code Already Exists', ['module_code'])]
+    _constraints = [(_check_unique_name, 'Error: Module Name Already Exists', ['Module Name']),(_check_unique_code, 'Error: Module Code Already Exists', ['Module Code']),(_check_neg_duration, 'Error: Duration Cannot be negative value', ['Duration']),(_check_neg_fee, 'Error: Fee Cannot be negative value', ['Fee']),(_check_neg_credit_value, 'Error: Credit Value Cannot be negative', ['Credit']),(_check_neg_no_ppl, 'Error: No. of People Cannot be negative value', ['People'])]
+
 cs_module()
 
+#Class Module Requirements
+###############
 class requirments(osv.osv):
 	def _check_unique_req(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1466,9 +1546,11 @@ class requirments(osv.osv):
 	'module_name': fields.related('mod_id','name',type="char",relation="cs.module",string="Module Name"),
 	'module_code': fields.related('mod_id','module_code',type="char",relation="cs.module",string="Module Code"),
 	}
-	_constraints = [(_check_unique_req, 'Error: Requirement Already Exists', ['master_req'])]
+	_constraints = [(_check_unique_req, 'Error: Requirement Already Exists', ['Requirement'])]
 requirments()
 
+#Class Module Master Requirements
+###############
 class master_req(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1491,6 +1573,8 @@ class master_req(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: Requirement Label Already Exists', ['name'])]
 master_req()
 
+#Class Module Master Equipment
+###############
 class master_equip(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1510,6 +1594,8 @@ class master_equip(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: This Equipment Already Exists', ['name'])]
 master_equip()   
 
+#Class Module Master Test
+###############
 class master_tests(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1529,32 +1615,8 @@ class master_tests(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: This Description Already Exists', ['name'])]
 master_tests()
 
-class master_alerts(osv.osv):
-	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-	_name ='master.module.alerts'
-	_description ="People and Facilites Tab"
-	_columns = {
-	'name':fields.char('Test Descripton',size=20),
-	'time':fields.char('Time',size=3),
-	'befor_after':fields.boolean('Before/After'),
-	'min_max':fields.boolean('Min/Max Value'),
-	'value_per':fields.integer('Value in %',size=3),
-	'action':fields.char('Action',size=100)
-	}
-	_constraints = [(_check_unique_name, 'Error: This Alert Description Already Exists', ['name'])]
-master_alerts()
-
-
-
+#Class Module MOI
+###############
 class peoplefac(osv.osv):
 	def _check_unique_equp(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1571,9 +1633,11 @@ class peoplefac(osv.osv):
 	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['equip_list'])]
+	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['Equipment'])]
 peoplefac()
 
+#Class Module Pre Test
+###############
 class pre_test(osv.osv):
 	def _check_unique_pre_test(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1600,10 +1664,16 @@ class pre_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
-	def on_change_order_priority(self, cr, uid, ids, order_priority):
-		if order_priority < 0:
-			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
-		return order_priority
+		
+#Validate Order of Preority
+	def _check_neg_order_priority(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.order_priority < 0:
+				return False
+		return True
+
+#Table for Test in Modules
 	_name ='pre.test.module'
 	_description ="Pre Test Table"
 	_columns = {
@@ -1612,10 +1682,13 @@ class pre_test(osv.osv):
 	'test_list':fields.many2one('master.tests', 'Test Description', ondelete='cascade', help='Description', required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_pre_test, 'Error: Pre Test Already Exists', ['test_list']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['order_priority'])]
+	_constraints = [(_check_unique_pre_test, 'Error: Test Already Exists', ['Test']),
+     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
 pre_test()
 
+#Class Module In Class
+###############
 class in_class_test(osv.osv):
 	def unlink(self, cr, uid, ids, context=None):
 		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
@@ -1655,9 +1728,11 @@ class in_class_test(osv.osv):
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
 	_constraints = [(_check_unique_in_class_test, 'Error: In Class Test Already Exists', ['test_list']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['order_priority'])]
+     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order'])]
 in_class_test()
 
+#Class Module Post Test
+###############
 class post_test(osv.osv):
 	def unlink(self, cr, uid, ids, context=None):
 		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
@@ -1698,10 +1773,37 @@ class post_test(osv.osv):
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
 	_constraints = [(_check_unique_post_test, 'Error: Post Test Already Exists', ['test_list']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['order_priority'])]
+     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order'])]
 post_test()
 
+#Class Module Master Alerts
+###############
+class master_alerts(osv.osv):
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+	_name ='master.module.alerts'
+	_description ="People and Facilites Tab"
+	_columns = {
+	'name':fields.char('Test Descripton',size=20),
+	'time':fields.char('Time',size=3),
+	'befor_after':fields.boolean('Before/After'),
+	'min_max':fields.boolean('Min/Max Value'),
+	'value_per':fields.integer('Value in %',size=3),
+	'action':fields.char('Action',size=100)
+	}
+	_constraints = [(_check_unique_name, 'Error: This Alert Description Already Exists', ['name'])]
+master_alerts()
 
+#Class Module Alert
+###############
 class alerts(osv.osv):
 	def _check_unique_alert(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1720,16 +1822,22 @@ class alerts(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
-		
-	def on_change_alert_time(self, cr, uid, ids, time):
-		if time < 0:
-			raise osv.except_osv(_('Error!'),_("Time - Cannot be negative value"))
-		return time
 
-	def on_change_value_per(self, cr, uid, ids, value_per):
-		if value_per < 0:
-			raise osv.except_osv(_('Error!'),_("Value in % - Cannot be negative value"))
-		return value_per
+#Validate Module Alert Time
+	def _validate_m_alert_time(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.time < 0:
+				return False
+		return True
+
+#Validate Module Alert Value		
+	def _validate_m_value(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.value_per < 0:
+				return False
+		return True
 				
 	def on_change_master_module_alerts(self, cr, uid, ids, module_req,mod_id):
 		if not module_req: return {}
@@ -1758,9 +1866,11 @@ class alerts(osv.osv):
 	'action':fields.char('Action',size=100),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module'),
 	}
-	_constraints = [(_check_unique_alert, 'Error: Alert Already Exists', ['alert_list'])]
+	_constraints = [(_check_unique_alert, 'Error: Alert Already Exists', ['Alerts']),(_validate_m_alert_time, 'Error: Alert Time Cannot be Negative', ['Alerts']),(_validate_m_value, 'Error: Alert Value Cannot be Negative', ['Alerts'])]
 alerts()
 
+#Class Module History
+###############
 class history(osv.osv):
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
@@ -1787,249 +1897,8 @@ class history(osv.osv):
 	}
 history	()
 
-class trainers(osv.osv):
-	_name ='trainers.module'
-	_description ="Trainers Tab"
-	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'name':fields.char('Name',size=25),
-	'trainers_status':fields.char('Status'),
-	'date_joined':fields.integer('Date Joined',size=10),
-	}
-trainers	()
+####################
+#EOF MODULES
+####################
 
-class avaliable(osv.osv):
-	_name ='trainers.assignment.avaliable'
-	_description ="Assignment Available Tab"
-	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'class':fields.char('Class',size=25),
-	'class_code_avaliable':fields.char('Class Code',size=25),
-	'start_date_avaliable':fields.date('Start Date'),
-	'confirm':fields.char('Confirm?',size=10),
-	}
-avaliable	()
-
-class current(osv.osv):
-	_name ='trainers.assignment.current'
-	_description ="Assignment Current Tab"
-	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'class':fields.char('Class',size=25),
-	'class_code_current':fields.char('Class Code',size=25),
-	'start_date_current':fields.date('Start Date'),
-	'end_date_current':fields.date('End Date'),
-	}
-current	()
-
-class mod_group1(osv.osv):
-	def _check_unique_modgrp(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.module_id == self_obj.module_id:
-						return False
-		return True
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(mod_group1, self).read(cr, uid,ids, fields, context, load)
-		seq_number =1
-		for r in res:
-			seq_number = seq_number+0.1
-			r['s_no'] = seq_number
-		
-		return res
-	_name ='test.module.group1'
-	_description ="Pre Test Table"
-	_columns = {
-	's_no':fields.float('S.No',size=2, required=True, readonly=1),
-	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module'),
-	}
-	
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
-		_constraints = [(_check_unique_modgrp, 'Error: Module Already Exists', ['module_id'])]
-mod_group1()
-
-class mod_group2(osv.osv):
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(mod_group2, self).read(cr, uid,ids, fields, context, load)
-		seq_number =2
-		for r in res:
-			seq_number = seq_number+0.1
-			r['s_no'] = seq_number
-		
-		return res
-	_name ='test.module.group2'
-	_description ="Pre Test Table"
-	_columns = {
-	's_no':fields.float('S.No',size=2, readonly=1),
-	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-	}
-	
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
-mod_group2()
-
-class mod_group3(osv.osv):
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(mod_group3, self).read(cr, uid,ids, fields, context, load)
-		seq_number =3
-		for r in res:
-			seq_number = seq_number+0.1
-			r['s_no'] = seq_number
-		
-		return res
-	_name ='test.module.group3'
-	_description ="Pre Test Table"
-	_columns = {
-	's_no':fields.float('S.No',size=1, readonly=1),
-	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-	}
-	
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
-mod_group3()
-
-class mod_group4(osv.osv):
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(mod_group4, self).read(cr, uid,ids, fields, context, load)
-		seq_number =4
-		for r in res:
-			seq_number = seq_number+0.1
-			r['s_no'] = seq_number
-		
-		return res
-	_name ='test.module.group4'
-	_description ="Pre Test Table"
-	_columns = {
-	's_no':fields.float('S.No',size=1, readonly=1),
-	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-	}
-	
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration}}
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('program.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
-mod_group4()
-
-
+######################################### ASZ Technologies asztechnologies.com ##################################

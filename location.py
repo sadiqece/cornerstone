@@ -53,7 +53,7 @@ class location(osv.osv):
 			if self_obj.location_code and self_obj.location_code.lower() in  lst:
 				return False
 		return True
-		
+	
 	def on_change_location_type(self, cr, uid, ids, location_type):
 		val = {}
 		val['location_type_permanent'] = False
@@ -65,16 +65,21 @@ class location(osv.osv):
 			
 		return {'value': val}
 
+#Validation for Postal Code			
+	def _check_postal_code(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.location_postal_code < 0:
+				return False
+		return True
 
-	def on_change_postal_code(self, cr, uid, ids, location_postal_code):
-		if location_postal_code < 0:
-			raise osv.except_osv(_('Error!'),_("Postal Code - Cannot be negative value"))
-		return location_postal_code	
-		
-	def on_change_contact_no(self, cr, uid, ids, location_contact_no):
-		if location_contact_no < 0:
-			raise osv.except_osv(_('Error!'),_("Contact No. - Cannot be negative value"))
-		return location_contact_no	
+#Validation for Contact No.			
+	def _check_contact_no(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.location_contact_no < 0:
+				return False
+		return True		
 
 
 		
@@ -97,8 +102,9 @@ class location(osv.osv):
 	_defaults = {
 		'location_type': 'Permanent'
 	}
-	_constraints = [(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_check_unique_code, 'Error: Location Code Already Exists', ['location_code'])]
-location()
+	_constraints = [(_check_postal_code, 'Error: Postal Code Cannot be Negative value', ['Postal Code']),(_check_contact_no, 'Error: Contact No Cannot be Negative value', ['Contact no.']),
+	(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
+location() 
 
 
 class room(osv.osv):
@@ -148,15 +154,23 @@ class room(osv.osv):
 		value_ids = self.pool.get('location').search(cr, uid, [('location_id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])
 		
-	def on_change_room_max_cap(self, cr, uid, ids, room_max_cap):
-		if room_max_cap < 0:
-			raise osv.except_osv(_('Error!'),_("Maximum Capacity - Cannot be negative value"))
-		return room_max_cap
+#Validation for Room Capacity			
+
+	def _check_room_max_cap(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.room_max_cap < 0:
+				return False
+		return True		
 		
-	def on_change_room_floor_area(self, cr, uid, ids, room_floor_area):
-		if room_floor_area < 0:
-			raise osv.except_osv(_('Error!'),_("Floor Area (sqm) - Cannot be negative value"))
-		return room_floor_area
+#Validation for Room Area		
+		
+	def _check_room_floor_area(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.room_floor_area < 0:
+				return False
+		return True	
 		
 		
 	_name = "room"
@@ -214,7 +228,8 @@ class room(osv.osv):
 		location_obj = self.pool.get('location').browse(cr, uid, location_id)
 		return {'value': {'name':location_obj.name,'location_code':location_obj.location_code}}
 	
-	_constraints = [(_check_unique_name, 'Error: Room Name Already Exists', ['name']),(_check_unique_code, 'Error: Room Code Already Exists', ['room_number'])]
+	_constraints = [(_check_room_max_cap, 'Error: Maximum Capacity Cannot be Negative value', ['Maximum Capacity']),(_check_room_floor_area, 'Error: Floor Area (Sqm) Cannot be Negative value', ['Floor Area(Sqm)']),
+	(_check_unique_name, 'Error: Room Name Already Exists', ['Name']),(_check_unique_code, 'Error: Room Number Already Exists', ['Room Number'])]
 room()
 
 class location_room_line(osv.osv):
@@ -326,6 +341,6 @@ class equip(osv.osv):
 		'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True, required=True),
 		'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_equip, 'Error: Equipment Already Exists', ['equip_list'])]
+	_constraints = [(_check_unique_equip, 'Error: Equipment Already Exists', ['Equipment'])]
 equip()
 

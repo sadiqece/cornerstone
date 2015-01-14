@@ -202,14 +202,7 @@ class project_value_line(osv.osv):
 	def _check_min_max_srange(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.s_range1 < 0 or self_obj.s_range1 < self_obj.e_range1:
-				return False
-		return True
-		
-	def _check_min_max_erange(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.s_range1 < 0 or self_obj.s_range1 < self_obj.e_range1:
+			if self_obj.s_range1 < 0 or self_obj.e_range1 < 0 or self_obj.s_range1 > self_obj.e_range1:
 				return False
 		return True
 		
@@ -222,7 +215,7 @@ class project_value_line(osv.osv):
 		'value1': fields.integer('Value',size=3, required=True),
 		'project_value_lineid': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
 	}
-	_constraints = [(_check_unique_order, 'Error: Pre Test Already Exists', ['s_range1']),(_check_min_max_srange, 'Error: Start and End Range values not are correct', ['Start of Range']),(_check_min_max_erange, 'Error: Start and End Range values not are correct', ['End of Range'])]
+	_constraints = [(_check_unique_order, 'Error: Pre Test Already Exists', ['s_range1']),(_check_min_max_srange, 'Error: Start and End Range values not are correct', ['Range'])]
 project_value_line
 
 class people_bu(osv.osv):

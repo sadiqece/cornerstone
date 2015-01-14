@@ -25,8 +25,8 @@
 					<field name='location_type_temporary' invisible="1"/>
 					<field name = "location_type" on_change="on_change_location_type(location_type)"/>
 					<field name = "location_address"/>
-					<field name = "location_postal_code" on_change="on_change_postal_code(location_postal_code)"/>
-					<field name = "location_contact_no" on_change="on_change_contact_no(location_contact_no)"/>
+					<field name = "location_postal_code"/>
+					<field name = "location_contact_no" />
 		        </group>
 				<div attrs="{'invisible': [('location_type_permanent', '=' , False)]}">
 				<notebook colspan="5" col="10">
@@ -118,8 +118,8 @@
 						<field name = "room_setup" readonly="context.get('ctx', False)"/>
 					</group>
 					<group>
-						<field name = "room_floor_area" readonly="context.get('ctx', False)" on_change="on_change_room_floor_area(room_floor_area)"/>
-						<field name = "room_max_cap" readonly="context.get('ctx', False)" on_change="on_change_room_max_cap(room_max_cap)"/>
+						<field name = "room_floor_area" readonly="context.get('ctx', False)"/>
+						<field name = "room_max_cap" readonly="context.get('ctx', False)"/>
 					</group>
 		        </group>
 				<notebook colspan="5" col="10">
