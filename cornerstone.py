@@ -1002,6 +1002,14 @@ class program_subsidy(osv.osv):
 		if per_fee_mod < 0:
 			raise osv.except_osv(_('Error!'),_("Module Fee - Cannot be negative value"))
 		return per_fee_mod
+		
+#Validate Subsidy Negative
+	def validate_neg_fee_mod(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.per_fee_mod < 0:
+				return False
+		return True
 	_name ='subsidy.module'
 	_description ="People and Facilites Tab"
 	_columns = {
@@ -1012,7 +1020,7 @@ class program_subsidy(osv.osv):
 	'ver_req':fields.boolean('Verification Required'),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
 	}
-	_constraints = [(_check_unique_prog_subs, 'Error: Subsidy Already Exists', ['Subsidy'])]
+	_constraints = [(_check_unique_prog_subs, 'Error: Subsidy Already Exists', ['Subsidy']),(validate_neg_fee_mod, 'Error: % of Module Fee Cannot be Negative', ['Subsidy'])]
 program_subsidy()
 
 #Class Program Alerts
@@ -1707,6 +1715,7 @@ class in_class_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.test_list == self_obj.test_list:
 						return False
 		return True
+
 	def _check_unique_order(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -1715,10 +1724,14 @@ class in_class_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
-	def on_change_order_priority(self, cr, uid, ids, order_priority):
-		if order_priority < 0:
-			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
-		return order_priority
+		
+#Validate Order of Preority
+	def _check_neg_order_priority(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.order_priority < 0:
+				return False
+		return True
 	_name ='in.class.test.module'
 	_description ="In Calss Table"
 	_columns = {
@@ -1728,7 +1741,8 @@ class in_class_test(osv.osv):
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
 	_constraints = [(_check_unique_in_class_test, 'Error: In Class Test Already Exists', ['test_list']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order'])]
+     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
 in_class_test()
 
 #Class Module Post Test
@@ -1760,10 +1774,13 @@ class post_test(osv.osv):
 					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
 						return False
 		return True
-	def on_change_order_priority(self, cr, uid, ids, order_priority):
-		if order_priority < 0:
-			raise osv.except_osv(_('Error!'),_("Order of Priority - Cannot be negative value"))
-		return order_priority
+#Validate Order of Preority
+	def _check_neg_order_priority(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.order_priority < 0:
+				return False
+		return True
 	_name ='post.test.module'
 	_description ="Post Test Table"
 	_columns = {
@@ -1773,7 +1790,8 @@ class post_test(osv.osv):
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
 	_constraints = [(_check_unique_post_test, 'Error: Post Test Already Exists', ['test_list']),
-     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order'])]
+     (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
 post_test()
 
 #Class Module Master Alerts

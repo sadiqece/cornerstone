@@ -32,7 +32,7 @@
 					<field name='unit_line' nolabel='1'>
 							<tree string='List' editable="bottom">
 								<!-- Zeya 7-1-15 -->
-								<field name='order_priority'  on_change="on_change_orderprior(order_priority)" readonly="context.get('ctx', False)"/>
+								<field name='order_priority'  readonly="context.get('ctx', False)"/>
 								<!-- EOF -->
 								<field name='unit'/>
 							</tree>

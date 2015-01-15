@@ -128,7 +128,7 @@ class commisions(osv.osv):
 		'context': ctx,
 		}
 		
-	_constraints = [(_check_unique_name, 'Error: Commission Name Already Exists', ['name']),(_check_unique_code, 'Error: Commission Code Already Exists', ['commision_code'])]
+	_constraints = [(_check_unique_name, 'Error: Commission Name Already Exists', ['Name']),(_check_unique_code, 'Error: Commission Code Already Exists', ['Commission Code'])]
 commisions
 
 class program_line(osv.osv):
@@ -143,34 +143,39 @@ class program_line(osv.osv):
 		
 		return res
 		
-	def _check_unique_name(self, cr, uid, ids, context=None):
+	def _check_unique_pname(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.program_code.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.program_code and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.program_code and self_obj.program_code.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.p_id == self_obj.p_id and x.program_id == self_obj.program_id:
+						return False
 		return True
 
 # Zeya 7-1-15		
-	def on_change_commvalue(self, cr, uid, ids, value):
-		if value < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return value		
+
+	def _check_commvalue(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.value < 0:
+				return False
+		return True
+
+		
 # EOF		
 
 	_name = "program.line"
 	_description = "Module Line"
 	_columns = {
-		's_no': fields.integer('S.No', size=100, readonly=1),
+	
+		's_no': fields.integer('S.No', size=3, readonly=1),
+		'p_id': fields.integer('S.No', size=3, readonly=1),
 		#'program_line_id': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
 		'program_id':fields.many2one('lis.program', 'Program Name', ondelete='cascade', help='Program', select=True, required=True),
 		'program_code': fields.related('program_id','program_code',type="char",relation="lis.program",string="Program Code", readonly=1),
 		'value': fields.integer('Value',size=6),
 	}
-	_constraints = [(_check_unique_name, 'Error: Program Label Already Exists', ['program_code'])]
+	_constraints = [(_check_commvalue, 'Error: Value Cannot be negative', ['Value'])]
 program_line
 
 class project_value_line(osv.osv):
@@ -185,10 +190,12 @@ class project_value_line(osv.osv):
 		
 		return res
 		
-	def on_change_value1(self, cr, uid, ids, value1):
-		if value1 < 0:
-			raise osv.except_osv(_('Error!'),_("Value - Cannot be negative value"))
-		return value1
+	def _check_value1(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.value1 < 0:
+				return False
+		return True
 		
 	def _check_unique_order(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -215,7 +222,8 @@ class project_value_line(osv.osv):
 		'value1': fields.integer('Value',size=3, required=True),
 		'project_value_lineid': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
 	}
-	_constraints = [(_check_unique_order, 'Error: Pre Test Already Exists', ['s_range1']),(_check_min_max_srange, 'Error: Start and End Range values not are correct', ['Range'])]
+	_constraints = [(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_unique_order, 'Error: Pre Test Already Exists', ['s_range1']),
+	(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
 project_value_line
 
 class people_bu(osv.osv):
@@ -235,7 +243,7 @@ class people_bu(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.sr_no == self_obj.sr_no and x.p_line_id == self_obj.p_line_id:
+					if x.business_id == self_obj.business_id and x.p_line_id == self_obj.p_line_id:
 						return False
 		return True
 		
@@ -257,7 +265,7 @@ class people_bu(osv.osv):
 	_defaults = { 
 	   'date_added': fields.date.context_today,
 	  }
-	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['p_line_id'])]
+	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['Staff'])]
 people_bu
 
 class people_bu_1(osv.osv):
@@ -282,7 +290,7 @@ class people_bu_1(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.sr_no == self_obj.sr_no and x.p_line_id == self_obj.p_line_id:
+					if x.bu_1 == self_obj.bu_1 and x.p_line_id == self_obj.p_line_id:
 						return False
 		return True
 		
@@ -298,6 +306,6 @@ class people_bu_1(osv.osv):
 	_defaults = { 
 	   'date_added_1': fields.date.context_today,
 	  }
-	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['p_line_id'])]
+	_constraints = [(_check_unique_name, 'Error: Staff already exist', ['Staff'])]
 people_bu_1
 

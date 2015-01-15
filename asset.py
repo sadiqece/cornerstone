@@ -53,7 +53,7 @@ class asset(osv.osv):
 		'asset_code': fields.char('Asset Code', size=20),
 		'asset_line': fields.one2many('asset.line', 'asset_line_id','Asset Lines', select=True, required=True),
 	}
-	_constraints = [(_check_unique_name, 'Error: Asset Name Already Exists', ['name']),(_check_unique_code, 'Error: Asset Code Already Exists', ['asset_code'])]
+	_constraints = [(_check_unique_name, 'Error: Asset Name Already Exists', ['Name']),(_check_unique_code, 'Error: Asset Code Already Exists', ['Asset Code'])]
 asset
 
 class master_brand(osv.osv):
@@ -77,7 +77,7 @@ class master_brand(osv.osv):
 	#'brand_id':fields.integer('ID', size=3, readonly=1),
 	'name':fields.char('Brand',size=20),
 	}
-	_constraints = [(_check_unique_bname, 'Error: Brand name Already Exists', ['name'])]
+	_constraints = [(_check_unique_bname, 'Error: Brand name Already Exists', ['Name'])]
 #EOF	
 	
 master_brand()
@@ -117,14 +117,14 @@ class asset_line(osv.osv):
 				if d > 0:
 					res['value']['date_issue'] = ''
 					#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-					res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date/Time, Invalid Date/Time not Allowed.')}})
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 					return res
 				elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
 					if c < 0:
 						res['value']['date_issue'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date/Time, Invalid Date/Time not Allowed.')}})
+						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
 				return issue
 				
@@ -136,14 +136,14 @@ class asset_line(osv.osv):
 			if d > 0:
 				res['value']['date_stopped'] = ''
 				#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date/Time, Invalid Date/Time not Allowed.')}})
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 				return res
 			elif stop and issue:
 					c = self.months_between2(str(stop), str(issue))
 					if c < 0:
 						res['value']['date_stopped'] = ''
 						#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
-						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date/Time, Invalid Date/Time not Allowed.')}})
+						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
 			return issue
 				
@@ -184,5 +184,5 @@ class asset_line(osv.osv):
 		'date_stopped': fields.date('Date Stopped Issuing', required=True),
 		'asset_line_id': fields.many2one('asset', 'Asset', ondelete='cascade', help='Test', select=True),
 	}
-	_constraints = [(_check_unique_brand, 'Error: Brand Already Exists', ['brand'])]
+	_constraints = [(_check_unique_brand, 'Error: Brand Already Exists', ['Brand'])]
 asset_line ()

@@ -567,7 +567,7 @@
                       <tree string="Cost Order Lines" editable="bottom" class="grey_border">
                         <field name="s_no" />
                         <field name="master_subsidy" on_change="on_change_master_subsidy(master_subsidy)" />
-                        <field name="per_fee_mod" on_change="on_change_per_fee_mod(per_fee_mod)" />
+                        <field name="per_fee_mod" />
                         <field name="ver_req" />
                       </tree>
                     </field>
@@ -886,7 +886,7 @@
                     <div attrs="{'invisible': [('in_class_test', '=' , False)]}">
                       <field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="In Class Order Lines" editable="bottom">
-                          <field name="order_priority" on_change="on_change_order_priority(order_priority)" />
+                          <field name="order_priority"  />
                           <field name="test_list" />
                         </tree>
                       </field>
@@ -899,7 +899,7 @@
                     <div attrs="{'invisible': [('post_test', '=' , False)]}">
                       <field name="post_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="Post Order Lines" editable="bottom">
-                          <field name="order_priority" on_change="on_change_order_priority(order_priority)" />
+                          <field name="order_priority"  />
                           <field name="test_list" />
                         </tree>
                       </field>

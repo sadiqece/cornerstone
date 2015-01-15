@@ -50,7 +50,7 @@
 												<field name = "s_no"/>
 												<field name="program_id"/>
 												<field name="program_code"/>
-												<field name="value" on_change="on_change_commvalue(value)"/>
+												<field name="value" />
 											</tree>
 										</field>
 									</div>
@@ -88,7 +88,7 @@
 													<field name = "sr_no"/>
 													<field name = "s_range1"/>
 													<field name = "e_range1"/>
-													<field name = "value1" on_change="on_change_value1(value1)"/>
+													<field name = "value1" />
 												</tree>
 											</field>
 										</div>

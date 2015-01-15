@@ -142,11 +142,15 @@ class unit_line(osv.osv):
 		return True
 		
 
-# Zeya 7-1-15		
-	def on_change_orderprior(self, cr, uid, ids, order_priority):
-		if order_priority < 0:
-			raise osv.except_osv(_('Error!'),_("Order Of Priority - Cannot be negative value"))
-		return order_priority		
+# Zeya 7-1-15			
+
+	def _check_orderprior(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.order_priority < 0:
+				return False
+		return True
+		
 # EOF
 	
 	_name = "unit.line"
@@ -159,7 +163,7 @@ class unit_line(osv.osv):
 		'unit': fields.char('Unit', size=30, required=True),
 		'unit_line_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
 	}
-	_constraints = [(_check_unique_order_id, 'Error: Order of Priority should be unique', ['Order Of Priority']),(_check_unique_unit, 'Error: Unit should be unique', ['Unit'])]
+	_constraints = [(_check_orderprior, 'Error: Order of Priority Value Cannot be negative', ['Order Of Priority']),(_check_unique_order_id, 'Error: Order of Priority should be unique', ['Order Of Priority']),(_check_unique_unit, 'Error: Unit should be unique', ['Unit'])]
 unit_line
 
 class people_line(osv.osv):

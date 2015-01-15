@@ -93,13 +93,29 @@ class test(osv.osv):
 		modules_applied = self.pool.get('test.module.line').browse(cr, uid, module_id)
 		return {'value': {'module_code': modules_applied.module_code}}
 		
+#Validate for test fee		
+	def _check_test_fee(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.test_fee < 0:
+				return False
+		return True
+		
+#Validate Max of People	
+	def _check_test_max_Pax(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.test_max_Pax < 0:
+				return False
+		return True		
+		
 	_name = "test"
 	_description = "This table is for keeping test data"
 	_columns = {
 		's_no': fields.integer('S.No',size=3),
 		'name': fields.char('Test Name', size=100,required=True, select=True),
 		'test_code': fields.char('Test Code', size=20),
-		'test_fee': fields.float('Test Fee', size=4),
+		'test_fee': fields.integer('Test Fee', size=4),
 		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
 		'test_description': fields.text('Description'),
@@ -113,7 +129,8 @@ class test(osv.osv):
 	_defaults = {
 		'test_status': 'Active'
 	}
-	_constraints = [(_check_unique_name, 'Error: Test Name Already Exists', ['name']),(_check_unique_code, 'Error: Test Code Already Exists', ['test_code'])]
+	_constraints = [(_check_test_fee, 'Error: Test Fee Cannot be Negative', ['Test Fee']),(_check_test_max_Pax, 'Error: Max Pppl Cannot be Negative', ['Max People']),
+	(_check_unique_name, 'Error: Test Name Already Exists', ['Name']),(_check_unique_code, 'Error: Test Code Already Exists', ['Test Code'])]
 test()
 
 class test_mod_line(osv.osv):
@@ -165,7 +182,7 @@ class test_mod_line(osv.osv):
 		'inclass_test': fields.related('module_id','in_class_test',type="boolean",relation="cs.module",string="In Class Test", readonly=1),
 		'post_test': fields.related('module_id','post_test',type="boolean",relation="cs.module",string="Post Test", readonly=1),
 	}
-	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['module_id'])]
+	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['Module'])]
 	
 	def on_change_module_id(self, cr, uid, ids, module_id):
 		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
@@ -203,15 +220,14 @@ test_mod_line()
 
 
 class modalities(osv.osv):
-
-	def _check_unique_modalities(self, cr, uid, ids, context=None):
+		
+	def _check_level(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.modality_id == self_obj.modality_id and x.modal_list == self_obj.modal_list:
-						return False
-		return True
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.level < 0:
+				return False
+		return True		
+		
 		
 	_name ='modalities.module'
 	_description ="Modalities Tab"
@@ -219,13 +235,13 @@ class modalities(osv.osv):
 	'modality_id' : fields.integer('Id',size=20), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'modal_list':fields.many2one('master.modalities', 'Test Modality', ondelete='cascade', help='Description', select=True,required=True),
-	'level':fields.char('Minimum Level',size=3),
+	'level':fields.integer('Minimum Level',size=3),
 	'store_results':fields.boolean('Store Result'),
 	'store_level':fields.boolean('Store Level'),
 	'store_scores':fields.boolean('Store Scores'),
 	'store_outcome':fields.boolean('Store Outcome'),
 	}
-	_constraints = [(_check_unique_modalities, 'Error: Test Modality Already Exists', ['Test Modalities'])]
+	_constraints = [(_check_level, 'Error: Minimum Level Cannot be negative', ['Level'])]
 modalities	()
 
 class master_modalities(osv.osv):
