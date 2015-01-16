@@ -115,11 +115,17 @@ class holiday_line(osv.osv):
 			res['value']['date_start'] = ''
 			res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
 			return res
+		elif eofdate and start_date:
+			c = self.months_between2(str(eofdate), str(start_date))
+			if c < 0:
+				res['value']['date_start'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date.')}})
+				return res
 		return start_date
 				
 #Validate End Date : Past Date and Year Match
 	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year, context=None):
-		chng_year = datetime.datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+		chng_year = datetime.datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
 		if chng_year.year != year:	
 			raise osv.except_osv(_('Warning!'),_('Please enter correct Year.')%())
 			
@@ -129,6 +135,12 @@ class holiday_line(osv.osv):
 			res['value']['date_end'] = ''
 			res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
 			return res
+		elif eofdate and start_date:
+			c = self.months_between2(str(eofdate), str(start_date))
+			if c < 0:
+				res['value']['date_end'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
+				return res
 		return eofdate
 
 #Validate Start/End Date	
@@ -145,7 +157,7 @@ class holiday_line(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.s_no == self_obj.s_no and x.description == self_obj.description:
+					if x.holiday_line_id == self_obj.holiday_line_id and x.description == self_obj.description:
 						return False
 		return True
 		

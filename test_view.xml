@@ -32,6 +32,7 @@
                    <page string="Modules">
 						<field name='test_mod_line' nolabel='1'>
 									<tree string='List' editable="bottom">
+										<field name="s_no"/>
 										<field name='module_id' on_change="on_change_module_id(module_id)" />
 										<field name = "module_code" on_change="on_change_module_id(module_id)"/>
 										<field name = "pre_test" on_change="on_change_module_id(module_id)"/>
@@ -48,6 +49,7 @@
 						<field name='modality_line' nolabel='1'>
 									<tree string='List' editable="bottom">
 										<field name='modality_id' invisible="1" />
+										<field name="s_no"/>
 										<field name='modal_list' required='True' />
 										<field name = "level" readonly="context.get('ctx', False)"/>
 										<field name = "store_results"/>

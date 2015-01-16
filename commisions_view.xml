@@ -48,7 +48,7 @@
 										<field name='program_line' nolabel='1' readonly="context.get('ctx', False)">
 											<tree string="Req Order Lines" editable="bottom">
 												<field name = "s_no"/>
-												<field name="program_id"/>
+												<field name="program_id" widget="selection"/>
 												<field name="program_code"/>
 												<field name="value" />
 											</tree>
@@ -103,7 +103,7 @@
 											<field name='people_bu_1' nolabel='1' readonly="context.get('ctx', False)">
 												<tree string="Req Order Lines" editable="bottom">
 													<field name = "sr_no"/>
-													<field name="p_line_id" on_change="on_change_people1_id(p_line_id)" widget="selection"/>
+													<field name="p_line1_id" on_change="on_change_people1_id(p_line1_id)" widget="selection"/>
 													<field name="bu_1" />
 													<field name="date_added_1"/>
 												</tree>

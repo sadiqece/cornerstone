@@ -79,12 +79,12 @@ class commisions(osv.osv):
 		'pay_value': fields.selection((('In $ (By Programs)','In $ (By Programs)'),('In % (By Project Value)','In % (By Project Value)')),'Pay Out Value'),
 		'pay_value_1': fields.boolean('Pay Out Value In $ (By Programs)'),
 		'pay_value_2': fields.boolean('Pay Out Value In % In % (By Project Value)'),
-		'program_line': fields.one2many('program.line', 's_no', 'Program Lines'),
+		'program_line': fields.one2many('program.line', 'program_line_id', 'Program Lines'),
 		'bussiness_id':fields.many2one('business', 'Applied To', ondelete='cascade', help='Bussiness', select=True),
 		'date_added': fields.date('Date Added', readonly=1),
 		'project_value_line': fields.one2many('project.value.line', 'project_value_lineid', 'Project Lines'),
-		'people_bu': fields.one2many('people.bu', 'sr_no', 'People', select=True, required=True),
-		'people_bu_1': fields.one2many('people.bu.one', 'sr_no', 'People', select=True, required=True),
+		'people_bu': fields.one2many('people.bu', 'staff_line_id', 'People', select=True, required=True),
+		'people_bu_1': fields.one2many('people.bu.one', 'staff_line1_id', 'People', select=True, required=True),
 		'people_line': fields.one2many('people.line', 'people_business_id', 'People Lines', select=True, required=True),
 		'applied_to': fields.function(_calculate_total_mod, relation="people.bu.one",readonly=1,string='Applied To',type='integer'),
 		#'people_count': fields.function(_calculate_total_mod, relation="business",readonly=1,string='People Count',type='integer'),
@@ -142,15 +142,6 @@ class program_line(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
-		
-	def _check_unique_pname(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.p_id == self_obj.p_id and x.program_id == self_obj.program_id:
-						return False
-		return True
 
 # Zeya 7-1-15		
 
@@ -161,21 +152,27 @@ class program_line(osv.osv):
 				return False
 		return True
 
+	def _check_unique_module(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.program_line_id == self_obj.program_line_id and x.program_id == self_obj.program_id:
+						return False
+		return True
 		
 # EOF		
 
 	_name = "program.line"
 	_description = "Module Line"
 	_columns = {
-	
 		's_no': fields.integer('S.No', size=3, readonly=1),
-		'p_id': fields.integer('S.No', size=3, readonly=1),
-		#'program_line_id': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
+		'program_line_id': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
 		'program_id':fields.many2one('lis.program', 'Program Name', ondelete='cascade', help='Program', select=True, required=True),
 		'program_code': fields.related('program_id','program_code',type="char",relation="lis.program",string="Program Code", readonly=1),
 		'value': fields.integer('Value',size=6),
 	}
-	_constraints = [(_check_commvalue, 'Error: Value Cannot be negative', ['Value'])]
+	_constraints = [(_check_unique_module, 'Error: Program Already Exists', ['program_id']),(_check_commvalue, 'Error: Value Cannot be negative', ['Value'])]
 program_line
 
 class project_value_line(osv.osv):
@@ -243,7 +240,7 @@ class people_bu(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.business_id == self_obj.business_id and x.p_line_id == self_obj.p_line_id:
+					if x.staff_line_id == self_obj.staff_line_id and x.p_line_id == self_obj.p_line_id:
 						return False
 		return True
 		
@@ -257,7 +254,8 @@ class people_bu(osv.osv):
 	_description = "People"
 	_columns = {
 		'sr_no': fields.integer('S.No', size=100, readonly=1),
-		'p_line_id': fields.many2one('people.line', 'Staff', ondelete='cascade', help='Test', select=True, required=True),
+		'staff_line_id': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
+		'p_line_id': fields.many2one('people.line', 'Staff', ondelete='cascade', help='Business Unit', select=True, required=True),
 		'business_info': fields.related('p_line_id','people_business_id',type="many2one",relation="people.line", readonly=1),
 		'business_id': fields.char('BU', readonly=1),
 		'date_added': fields.date('Date Added', readonly=1),
@@ -290,7 +288,7 @@ class people_bu_1(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.bu_1 == self_obj.bu_1 and x.p_line_id == self_obj.p_line_id:
+					if x.staff_line1_id == self_obj.staff_line1_id and x.p_line1_id == self_obj.p_line1_id:
 						return False
 		return True
 		
@@ -298,8 +296,9 @@ class people_bu_1(osv.osv):
 	_description = "People"
 	_columns = {
 		'sr_no': fields.integer('S.No', size=100, readonly=1),
-		'p_line_id': fields.many2one('people.line', 'Staff', ondelete='cascade', help='Test', select=True, required=True),
-		'business_info': fields.related('p_line_id','people_business_id',type="many2one",relation="people.line", readonly=1),
+		'staff_line1_id': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
+		'p_line1_id': fields.many2one('people.line', 'Staff', ondelete='cascade', help='Test', select=True, required=True),
+		'business_info': fields.related('p_line1_id','people_business_id',type="many2one",relation="people.line", readonly=1),
 		'bu_1': fields.char('BU', readonly=1),
 		'date_added_1': fields.date('Date Added', readonly=1),
 	}

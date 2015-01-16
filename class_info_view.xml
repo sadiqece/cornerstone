@@ -47,8 +47,8 @@
 						</div>
 				</group>
 			    <group col="9">					
-					<field name = "module_id" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
-					<field name = "location_id" options="{'create': False, 'create_edit': False}"/>
+					<field name = "module_id" attrs="{'readonly':[('status','=','Edit')]}" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
+					<field name = "location_id" options="{'create': False, 'create_edit': False}" on_change="on_change_location_id(location_id)" />
 					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)" options="{'create': False, 'create_edit': False}"/>
 				</group>
 				<group>

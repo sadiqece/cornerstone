@@ -189,7 +189,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id" invisible="1" />
                         <field name="module_id" widget="selection" />
                       </tree>
@@ -236,7 +236,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_2" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id_2" invisible="1" />
                         <field name="module_id_2" widget="selection" />
                       </tree>
@@ -283,7 +283,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_3" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id_3" invisible="1" />
                         <field name="module_id_3" widget="selection" />
                       </tree>
@@ -331,7 +331,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_4" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id_4" invisible="1" />
                         <field name="module_id_4" widget="selection" />
                       </tree>
@@ -378,7 +378,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_5" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id_5" invisible="1" />
                         <field name="module_id_5" widget="selection" />
                       </tree>
@@ -425,7 +425,7 @@
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_6" nolabel="1">
-                      <tree string="List" editable="bottom">
+                      <tree string="List" editable="bottom" class="scrolly">
                         <field name="prog_mod_id_6" invisible="1" />
                         <field name="module_id_6" widget="selection" />
                       </tree>
@@ -627,7 +627,7 @@
                   <label string="History" readonly="context.get('ctx', False)" />
                 </h3>
                 <field name="program_history_line">
-                  <tree string="History Order Lines" create="false" delete="false" class="grey_border">
+                  <tree string="History Order Lines" create="false" delete="false" class="grey_borde">
                     <field name="s_no" />
                     <field name="date_created" />
                     <field name="created_by" />

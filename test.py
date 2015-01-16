@@ -134,6 +134,17 @@ class test(osv.osv):
 test()
 
 class test_mod_line(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(test_mod_line, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+
 	def _check_unique_module(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -175,6 +186,7 @@ class test_mod_line(osv.osv):
 	_name = "test.module.line"
 	_description = "Module Line"
 	_columns = {
+		's_no' : fields.integer('S.No',size=20,readonly=1),
 		'test_mod_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
@@ -220,6 +232,15 @@ test_mod_line()
 
 
 class modalities(osv.osv):
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(modalities, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
 		
 	def _check_level(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -228,6 +249,14 @@ class modalities(osv.osv):
 				return False
 		return True		
 		
+	def _check_unique_test(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.modality_id == self_obj.modality_id and x.modal_list == self_obj.modal_list:
+						return False
+		return True
 		
 	_name ='modalities.module'
 	_description ="Modalities Tab"
@@ -241,26 +270,25 @@ class modalities(osv.osv):
 	'store_scores':fields.boolean('Store Scores'),
 	'store_outcome':fields.boolean('Store Outcome'),
 	}
-	_constraints = [(_check_level, 'Error: Minimum Level Cannot be negative', ['Level'])]
+	_constraints = [(_check_level, 'Error: Minimum Level Cannot be negative', ['Level']),(_check_unique_test, 'Error: Test Modality Already Exists', ['Name'])]
 modalities	()
 
 class master_modalities(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.s_no == self_obj.s_no and x.name == self_obj.name:
+						return False
 		return True
 	_name ='master.modalities'
 	_description ="People and Facilites Tab"
 	_columns = {
+	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'name':fields.char('Test Descripton',size=20),
 	}
-	_constraints = [(_check_unique_name, 'Error: Test Modality Already Exists', ['name'])]
+	_constraints = [(_check_unique_name, 'Error: Test Modality Already Exists', ['Name'])]
 master_modalities()
 
 
