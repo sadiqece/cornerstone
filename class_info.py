@@ -367,7 +367,7 @@ class class_info(osv.osv):
 				date_array['end_date'] = changed_end_time 
 				
 				for j in range(1,8) :
-					if class_info_obj['start_date'+str(j)] != None :
+					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
 						date_array['start_date'+str(j)] = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + delta
 						date_array['end_date'+str(j)] = date_array['start_date'+str(j)] + timedelta(hours=duration)
 				
@@ -557,7 +557,7 @@ class class_info(osv.osv):
 				date_array['end_date'] = changed_end_time 
 				
 				for j in range(1,8) :
-					if class_info_obj['start_date'+str(j)] != None :
+					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
 						compare_time = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
 						if compare_time > changed_start_time :
 							date_array['start_date'+str(j)] = compare_time + delta
@@ -737,39 +737,44 @@ class class_info(osv.osv):
 							super(class_info, self).write(cr, uid, prog_module_line.id,{'duration': values['duration'],'history_line':values['history_line']}, context=context)
 		
 		
-	def write(self,cr, uid, ids, values, context=None):
-		apply = False;
-		apply_to_future = False;
-		location_obj = self.browse(cr, uid, ids[0])
-		parent_id = location_obj['parent_id']
-		parent_obj = self.browse(cr, uid, parent_id,context=context)
-		
-		if 'apply_all' not in values :
-			apply = location_obj['apply_all']
-		else :
-			apply = values['apply_all']
+	def write(self,cr, uid, ids, values, context=None,holidays=False):
+		_logger.info ("Holiday Value %s",holidays)
+	
+		if holidays ==  False :
+			apply = False;
+			apply_to_future = False;
+			location_obj = self.browse(cr, uid, ids[0])
+			parent_id = location_obj['parent_id']
+			parent_obj = self.browse(cr, uid, parent_id,context=context)
 			
-		if 'apply_to_future' not in values :
-			apply_to_future = location_obj['apply_to_future']
-		else :
-			apply_to_future = values['apply_to_future']
-		
-		
-		if apply == True :
-			self.apply_to_all(cr, uid, ids, values, context)
-		elif apply_to_future == True :
-			self.apply_to_future(cr, uid, ids, values, context)
+			if 'apply_all' not in values :
+				apply = location_obj['apply_all']
+			else :
+				apply = values['apply_all']
+				
+			if 'apply_to_future' not in values :
+				apply_to_future = location_obj['apply_to_future']
+			else :
+				apply_to_future = values['apply_to_future']
+			
+			
+			if apply == True :
+				self.apply_to_all(cr, uid, ids, values, context)
+			elif apply_to_future == True :
+				self.apply_to_future(cr, uid, ids, values, context)
+			else:
+				if 'delivery_mode' in values or 'binder_in_use' in values or 'tablet_in_use' in values or 'primary'in values or 'room_arr' in 	values :
+					super(class_info, self).write(cr, uid, parent_id,values, context=context)
+					if parent_id > 0:
+						prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
+						for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+							super(class_info, self).write(cr, uid, prog_module_line.id,values, context=context)
+				
+				
+			'''history logging'''
+			module_id = super(class_info, self).write(cr, uid, ids,values, context=context)
 		else:
-			if 'delivery_mode' in values or 'binder_in_use' in values or 'tablet_in_use' in values or 'primary'in values or 'room_arr' in 	values :
-				super(class_info, self).write(cr, uid, parent_id,values, context=context)
-				if parent_id > 0:
-					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						super(class_info, self).write(cr, uid, prog_module_line.id,values, context=context)
-			
-			
-		'''history logging'''
-		module_id = super(class_info, self).write(cr, uid, ids,values, context=context)
+			module_id = super(class_info, self).write(cr, uid, ids,values, context=context)
 		return module_id
 
 	def record_class_history (self, cr, uid, ids, values, context) :
