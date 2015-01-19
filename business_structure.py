@@ -179,18 +179,21 @@ class people_line(osv.osv):
 
 	def _check_unique_order_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.people_business_id == self_obj.people_business_id and x.name == self_obj.name:
-						return False
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
 		return True	
 		
 	_name = "people.line"
 	_description = "This table is for keeping location data"
 	_columns = {
 		's_no': fields.integer('S.No', size=100,readonly=1),
-		'name': fields.char('Name', size=20,required=True),
+		'p_line_id': fields.char('Id',size=20),
+		'name': fields.char('Name', size=20,required=True, select=True),
 		'title': fields.char('Title', size=20),
 		'people_business_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
 	}

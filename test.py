@@ -276,11 +276,13 @@ modalities	()
 class master_modalities(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.s_no == self_obj.s_no and x.name == self_obj.name:
-						return False
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
 		return True
 	_name ='master.modalities'
 	_description ="People and Facilites Tab"

@@ -8,59 +8,56 @@
 		<field name="name">edu.form</field>
 		<field name="model">edu.info</field>
 		<field name="arch" type="xml">
-			<form string="edu_info" version="7.0">
-			<sheet>
+		<form string="edu_info" version="7.0">
+		<sheet>
 		<group>	
-                <h3>  
-					<label string="Admin Panel" />
-                </h3>
-				<div>
-					<group>
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp edu_dashboard_1">
-									<div class="assigment_req">	
-										Assignment Requirment
-									</div>
-									<div class="number_24">	
-										24
-									</div>
-								</div>
-								</tree>
-					
-								<tree string=" Program Status Order Lines" create="false" delete="false">
-									<div class="openerp edu_dashboard_2">
-									<div class="confirmation_req">	
-										Class Outstanding
-									</div>
-									<div class="number_25">	
-										10
-									</div>
-									</div>
-								</tree>
-					
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp edu_dashboard_3">
-									<div class="class_outstanding">	
-										 Confirmation Required
-									</div>
-									<div class="number_10">	
-										24
-									</div>
-								</div>
-								</tree>
-					
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp edu_dashboard_4">
-									<div class="class_assigned">	
-										Class Assigned   
-									</div>
-									<div class="number_100">	
-										100
-									</div>
-								</div>
-							</tree>
-					</group>		
-				</div>	
+			<h3>  
+				<label string="Admin Panel" />
+			</h3>
+			<div>
+				<group>
+					<tree string="Program Status Order Lines" create="false" delete="false">
+						<div class="openerp edu_dashboard_1">
+						<div class="assigment_req">	
+							Assignment Requirment
+						</div>
+						<div class="number_24">	
+							24
+						</div>
+					</div>
+					</tree>
+					<tree string=" Program Status Order Lines" create="false" delete="false">
+						<div class="openerp edu_dashboard_2">
+						<div class="confirmation_req">	
+							Class Outstanding
+						</div>
+						<div class="number_25">	
+							10
+						</div>
+						</div>
+					</tree>
+					<tree string="Program Status Order Lines" create="false" delete="false">
+						<div class="openerp edu_dashboard_3">
+						<div class="class_outstanding">	
+							 Confirmation Required
+						</div>
+						<div class="number_10">	
+							24
+						</div>
+					</div>
+					</tree>
+					<tree string="Program Status Order Lines" create="false" delete="false">
+						<div class="openerp edu_dashboard_4">
+							<div class="class_assigned">	
+								Class Assigned   
+							</div>
+							<div class="number_100">	
+								100
+							</div>
+						</div>
+					</tree>
+				</group>		
+			</div>	
 		</group>		
 				<notebook colspan="5" col="10">
 				<page string="Assignment Required">				

@@ -157,7 +157,7 @@ class holiday_line(osv.osv):
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.holiday_line_id == self_obj.holiday_line_id and x.description == self_obj.description:
+					if x.s_no == self_obj.s_no and x.description == self_obj.description:
 						return False
 		return True
 		
@@ -180,6 +180,83 @@ class holiday_line(osv.osv):
 					if x.s_no == self_obj.s_no and x.date_end == self_obj.date_end:
 						return False
 		return True
+		
+#Sadiq - Check Class and Test Schedule for Holidays and Closures
+	def create(self,cr, uid, values, context=None):
+		id = super(holiday_line, self).create(cr, uid, values, context=context)
+		t1start = datetime.datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
+		t1end = datetime.datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S")
+		
+		class_obj =self.pool.get("class.info")
+		class_obj_ids = class_obj.search(cr,uid,[])
+		sess_issue = 'None'
+		for u in class_obj.browse(cr,uid,class_obj_ids) :
+			t2start = datetime.datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S")
+			t2end = datetime.datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S")
+			if (t1start <= t2start <= t2end <= t1end):
+				sess_issue = values['description']
+				continue
+			elif (t1start <= t2start <= t1end):
+				sess_issue = values['description']
+				continue
+			elif (t1start <= t2end <= t1end):
+				sess_issue = values['description']
+				continue
+			elif (t2start <= t1start <= t1end <= t2end):
+				sess_issue = values['description']
+				continue
+			else:
+				overlap = False
+			
+			if sess_issue != 'None':
+				class_obj.write(cr, uid, [u.id],{'sess_issues':sess_issue}, context,True)
+				sess_issue = 'None'
+		return id
+	def write(self,cr, uid, ids, values, context=None):
+		
+		if 'date_start' in values :
+			t1start = datetime.datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
+		else:
+			t1start = datetime.datetime.strptime(self.browse(cr,uid,ids[0])['date_start'], "%Y-%m-%d %H:%M:%S") 
+			
+		if 'date_end' in values :
+			t1end = datetime.datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S") 
+		else:
+			t1end = datetime.datetime.strptime(self.browse(cr,uid,ids[0])['date_end'], "%Y-%m-%d %H:%M:%S") 
+		
+		if 'description' in values:
+			description = values['description']
+		else:
+			description = self.browse(cr,uid,ids[0])['description']
+		
+		class_obj =self.pool.get("class.info")
+		class_obj_ids = class_obj.search(cr,uid,[])
+		sess_issue = 'None'
+		for u in class_obj.browse(cr,uid,class_obj_ids) :
+			t2start = datetime.datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S")
+			t2end = datetime.datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S")
+			if (t1start <= t2start <= t2end <= t1end):
+				sess_issue = description
+				continue
+			elif (t1start <= t2start <= t1end):
+				sess_issue = description
+				continue
+			elif (t1start <= t2end <= t1end):
+				sess_issue = description
+				continue
+			elif (t2start <= t1start <= t1end <= t2end):
+				sess_issue = description
+				continue
+			else:
+				overlap = False
+			
+			if sess_issue != 'None':
+				class_obj.write(cr, uid, [u.id],{'sess_issues':sess_issue}, context,holidays= True)
+				sess_issue = 'None'
+	
+		id = super(holiday_line, self).write(cr, uid, ids,values, context=context)
+		return id
+			
 			
 #Table For Holiday And Closure
 	_name = "holiday.line"

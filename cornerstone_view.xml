@@ -150,8 +150,8 @@
                   <field name="no_module_box6" invisible="1" />
                 </group>
                 <!-- ============ Module group block 1 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box1', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box1', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_1" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_1" attrs="{'required':[('no_of_mod_gp','&gt;=','1')]}" />
@@ -197,8 +197,8 @@
                   </div>
                 </div>
                 <!-- ============ Module group block 2 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box2', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box2', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_2" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_2" attrs="{'required':[('no_of_mod_gp','&gt;=','2')]}" />
@@ -244,8 +244,8 @@
                   </div>
                 </div>
                 <!-- ============ Module group block 3 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box3', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box3', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_3" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_3" attrs="{'required':[('no_of_mod_gp','&gt;=','3')]}" />
@@ -292,8 +292,8 @@
                 </div>
                 <div class="clear" />
                 <!-- ============ Module group block 3 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box4', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box4', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_4" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_4" attrs="{'required':[('no_of_mod_gp','&gt;=','4')]}" />
@@ -339,8 +339,8 @@
                   </div>
                 </div>
                 <!-- ============ Module group block 5 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box5', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box5', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_5" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_5" attrs="{'required':[('no_of_mod_gp','&gt;=','5')]}" />
@@ -386,8 +386,8 @@
                   </div>
                 </div>
                  <!-- ============ Module group block 6 ============= -->
-                <div class="col-3 grey_border" attrs="{'invisible': [('no_module_box6', '=' , False)]}">
-                  <div class="box">
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box6', '=' , False)]}">
+                  <div class="box header">
                     <label for="mod_gp_name_6" class="oe_edit_only" />
                     <h3>
                       <field name="mod_gp_name_6" attrs="{'required':[('no_of_mod_gp','&gt;=','6')]}" />
@@ -610,7 +610,9 @@
                 </group>
                 <group col="6">
                   <div>
+					 <h3>
                     <label for="program_alert_line_2" string="Alerts for attached Modules" />
+					</h3>
                     <field name="program_alert_line_2" nolabel="1" create="false" delete="false" style="height:150px">
                       <tree string="Req Order Lines" class="grey_border">
                         <field name="name" />

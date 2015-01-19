@@ -172,7 +172,7 @@ class program_line(osv.osv):
 		'program_code': fields.related('program_id','program_code',type="char",relation="lis.program",string="Program Code", readonly=1),
 		'value': fields.integer('Value',size=6),
 	}
-	_constraints = [(_check_unique_module, 'Error: Program Already Exists', ['program_id']),(_check_commvalue, 'Error: Value Cannot be negative', ['Value'])]
+	_constraints = [(_check_unique_module, 'Error: Program Already Exists', ['Program Name']),(_check_commvalue, 'Error: Value Cannot be negative', ['Value'])]
 program_line
 
 class project_value_line(osv.osv):
@@ -194,15 +194,6 @@ class project_value_line(osv.osv):
 				return False
 		return True
 		
-	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.sr_no == self_obj.sr_no and x.s_range1 == self_obj.s_range1:
-						return False
-		return True
-		
 	def _check_min_max_srange(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
@@ -219,8 +210,12 @@ class project_value_line(osv.osv):
 		'value1': fields.integer('Value',size=3, required=True),
 		'project_value_lineid': fields.many2one('commisions', 'Commissions', ondelete='cascade', help='Commissions', select=True),
 	}
-	_constraints = [(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_unique_order, 'Error: Pre Test Already Exists', ['s_range1']),
-	(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
+	_defaults = { 
+	   's_range1': 0,
+	   'e_range1': 0,
+	   'value1': 0,
+	  }
+	_constraints = [(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
 project_value_line
 
 class people_bu(osv.osv):

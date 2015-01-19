@@ -227,6 +227,17 @@ class class_info(osv.osv):
 	def create(self,cr, uid, values, context=None):
 		global class_create
 		class_create = True
+		
+		'''validate sessions now'''
+		include_arr_list = 0
+		for i in range(1,8):
+			if values['include_'+str(i)] == True:
+				include_arr_list = include_arr_list + 1
+				
+		if include_arr_list > values['total_sessions'] :
+			raise osv.except_osv(_('Error!'),_("Selected Days are greater than Number of sessions"))
+			return
+		
 		no_of_sess = 0
 		parent_id =0
 		include_array = []
@@ -242,7 +253,7 @@ class class_info(osv.osv):
 		holiday = self.pool.get('holiday')
 		holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
 		holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
-		_logger.info('Installing chart of apply_to_all %s %s', holiday_obj_id , holiday_obj)
+	
 		holiday_list = []
 		holiday_line = self.pool.get('holiday.line')
 		if len(holiday_obj) > 0 :
@@ -345,7 +356,6 @@ class class_info(osv.osv):
 	def apply_to_all(self,cr, uid, ids, values, context=None):
 			class_info_obj = self.browse(cr, uid, ids[0])
 			parent_id = class_info_obj['parent_id']
-			
 			self.record_class_history(cr, uid, ids, values, context)
 			
 			if 'start_date' in values :
@@ -354,23 +364,29 @@ class class_info(osv.osv):
 				   duration = values['duration']
 				else :
 					duration = class_info_obj['duration']
-		
-				new_time = values['start_date']
-				old_time = class_info_obj['start_date']
-					
-				delta = datetime.strptime(new_time,"%Y-%m-%d %H:%M:%S") - datetime.strptime(old_time,"%Y-%m-%d %H:%M:%S")
-				changed_start_time = datetime.strptime(old_time,"%Y-%m-%d %H:%M:%S") + delta
 			
-				changed_end_time = changed_start_time + timedelta(hours=duration)
+				user = self.pool.get('res.users').browse(cr, uid, uid)
+				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+			
+				new_date_time = datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+				new_date_time_utc = pytz.utc.localize(new_date_time).astimezone(tz)
+				new_time = str(new_date_time_utc.time())
+				local =pytz.timezone(user.tz)
+	
 				date_array = {}
-				date_array['start_date'] = changed_start_time 
-				date_array['end_date'] = changed_end_time 
-				
+				date_array['start_date'] = new_date_time 
+				date_array['end_date'] = date_array['start_date']  + timedelta(hours=duration)
+	
 				for j in range(1,8) :
 					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
-						date_array['start_date'+str(j)] = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + delta
-						date_array['end_date'+str(j)] = date_array['start_date'+str(j)] + timedelta(hours=duration)
-				
+						local_value = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
+						local_date_time_utc = pytz.utc.localize(local_value).astimezone(tz)
+						changed_date_time = datetime.strptime(str(local_date_time_utc.date()) +" "+new_time,"%Y-%m-%d %H:%M:%S")
+						local_dt = local.localize(changed_date_time, is_dst=None)
+						utc_dt = local_dt.astimezone (pytz.utc)
+						date_array['start_date'+str(j)] =utc_dt.strftime ("%Y-%m-%d %H:%M:%S")
+						date_array['end_date'+str(j)] = str(datetime.strptime(date_array['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=duration))
+						
 			
 				holiday = self.pool.get('holiday')
 				holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
@@ -414,17 +430,19 @@ class class_info(osv.osv):
 				else:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
 					prog_mod_ids.append(parent_id)
-					
-				_logger.info("Logger Id %s",prog_mod_ids)
+		
 				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
 					if prog_module_line.id != class_info_obj.id :
-						changed_st_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S") + delta
-						changed_ed_time = changed_st_time + timedelta(hours=prog_module_line['duration'])
-						date_array['start_date'] = changed_st_time
-						date_array['end_date'] = changed_ed_time 
+						local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+						local_date_time_utc = pytz.utc.localize(local_value).astimezone(tz)
+						changed_date_time = datetime.strptime(str(local_date_time_utc.date()) +" "+new_time,"%Y-%m-%d %H:%M:%S")
+						local_dt = local.localize(changed_date_time, is_dst=None)
+						utc_dt = local_dt.astimezone (pytz.utc)
+						date_array['start_date'] =utc_dt.strftime ("%Y-%m-%d %H:%M:%S")
+						date_array['end_date'] = str(datetime.strptime(date_array['start_date'],"%Y-%m-%d %H:%M:%S") + timedelta(hours=duration))
 						
-						t1start  = date_array['start_date']
-						t1end = date_array['end_date']
+						t1start  = datetime.strptime(date_array['start_date'],"%Y-%m-%d %H:%M:%S")
+						t1end = datetime.strptime(date_array['end_date'],"%Y-%m-%d %H:%M:%S")
 						overlap = False
 						date_array['sess_issues'] = 'None'
 						for u in holiday_list :
@@ -442,15 +460,18 @@ class class_info(osv.osv):
 							elif (t2start <= t1start <= t1end <= t2end):
 								date_array['sess_issues'] = u.split(";")[2]
 								continue
-							else:
-								overlap = False
 						date_array['history_line'] = values['history_line']
 						super(class_info, self).write(cr, uid, prog_module_line.id,date_array, context=context)
 							
 			if 'room_id' in values :
 				room_obj = self.pool.get('room').browse(cr, uid, values['room_id'])
-				room_array = {'room1': room_obj.name, 'room2': room_obj.name, 'room3': room_obj.name, 'room4': room_obj.name, 'room5': room_obj.name, 'room6':room_obj.name, 'room7': room_obj.name}
-				room_array['room_id'] = values['room_id']
+				values['room1'] = room_obj.name
+				values['room2'] = room_obj.name
+				values['room3'] = room_obj.name
+				values['room4'] = room_obj.name
+				values['room5'] = room_obj.name
+				values['room6'] = room_obj.name
+				values['room7'] = room_obj.name
 				'''check room conflicts'''
 				room_conflict_ids = self.search(cr,uid,[('room_id',"=",values['room_id'])])
 				holiday_list =[]
@@ -460,29 +481,34 @@ class class_info(osv.osv):
 				t1start  = datetime.strptime(str(class_info_obj['start_date']),"%Y-%m-%d %H:%M:%S")
 				t1end = datetime.strptime(str(class_info_obj['end_date']),"%Y-%m-%d %H:%M:%S")
 				overlap = False
-				room_array['sess_issues'] = 'None'
+				values['sess_issues'] = 'None'
 				for u in holiday_list :
 					t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
 					t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
 					if (t1start <= t2start <= t2end <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t1start <= t2start <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t1start <= t2end <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t2start <= t1start <= t1end <= t2end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					else:
 						overlap = False
-				room_array['history_line'] = values['history_line']
-				super(class_info, self).write(cr, uid, parent_id,room_array, context=context)
+				values['history_line'] = values['history_line']
+				super(class_info, self).write(cr, uid, parent_id,values, context=context)
+				
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					if prog_module_line.id != parent_id:
 						room_array = {'room1': room_obj.name, 'room2': room_obj.name, 'room3': room_obj.name, 'room4': room_obj.name, 'room5': room_obj.name, 'room6': room_obj.name, 'room7': room_obj.name}
 						room_array['room_id'] = values['room_id']
 						
@@ -515,28 +541,45 @@ class class_info(osv.osv):
 				super(class_info, self).write(cr, uid, parent_id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						super(class_info, self).write(cr, uid, prog_module_line.id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+				
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					super(class_info, self).write(cr, uid, prog_module_line.id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
 						
 			if 'module_id' in values :
 				super(class_info, self).write(cr, uid, parent_id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						super(class_info, self).write(cr, uid, prog_module_line.id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					super(class_info, self).write(cr, uid, prog_module_line.id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
 			
 			if 'duration' in values :
-				super(class_info, self).write(cr, uid, parent_id,{'duration': values['duration'],'history_line':values['history_line']}, context=context)
+				data_array = {}
+				data_array['duration'] = values['duration']
+				data_array['end_date'] = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+				for j in range(1,8) :
+					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
+						data_array['end_date'+str(j)] = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+				data_array['history_line'] = values['history_line']
+				super(class_info, self).write(cr, uid, parent_id,data_array, context=context)
+			
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						super(class_info, self).write(cr, uid, prog_module_line.id,{'duration': values['duration'],'history_line':values['history_line']}, context=context)
-	
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])	
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					if prog_module_line['start_date'] != None and prog_module_line['start_date'] !=  False:
+						data_array['end_date'] = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+						super(class_info, self).write(cr, uid, prog_module_line.id,data_array, context=context)
 	
 	def apply_to_future(self,cr, uid, ids, values, context=None):
 			class_info_obj = self.browse(cr, uid, ids[0])
 			parent_id = class_info_obj['parent_id']
-			
 			self.record_class_history(cr, uid, ids, values, context)
 			
 			if 'start_date' in values :
@@ -545,24 +588,30 @@ class class_info(osv.osv):
 				   duration = values['duration']
 				else :
 					duration = class_info_obj['duration']
-		
-				new_time = values['start_date']
-				old_time = class_info_obj['start_date']
-					
-				delta = datetime.strptime(new_time,"%Y-%m-%d %H:%M:%S") - datetime.strptime(old_time,"%Y-%m-%d %H:%M:%S")
-				changed_start_time = datetime.strptime(old_time,"%Y-%m-%d %H:%M:%S") + delta
-				changed_end_time = changed_start_time + timedelta(hours=duration)
+			
+				user = self.pool.get('res.users').browse(cr, uid, uid)
+				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+			
+				new_date_time = datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+				new_date_time_utc = pytz.utc.localize(new_date_time).astimezone(tz)
+				new_time = str(new_date_time_utc.time())
+				local =pytz.timezone(user.tz)
+	
 				date_array = {}
-				date_array['start_date'] = changed_start_time 
-				date_array['end_date'] = changed_end_time 
-				
+				date_array['start_date'] = new_date_time 
+				date_array['end_date'] = date_array['start_date']  + timedelta(hours=duration)
+	
 				for j in range(1,8) :
 					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
-						compare_time = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
-						if compare_time > changed_start_time :
-							date_array['start_date'+str(j)] = compare_time + delta
-							date_array['end_date'+str(j)] = date_array['start_date'+str(j)] + timedelta(hours=duration)
-				
+						local_value = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
+						if local_value > new_date_time :
+							local_date_time_utc = pytz.utc.localize(local_value).astimezone(tz)
+							changed_date_time = datetime.strptime(str(local_date_time_utc.date()) +" "+new_time,"%Y-%m-%d %H:%M:%S")
+							local_dt = local.localize(changed_date_time, is_dst=None)
+							utc_dt = local_dt.astimezone (pytz.utc)
+							date_array['start_date'+str(j)] =utc_dt.strftime ("%Y-%m-%d %H:%M:%S")
+							date_array['end_date'+str(j)] = str(datetime.strptime(date_array['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=duration))
+						
 			
 				holiday = self.pool.get('holiday')
 				holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
@@ -599,50 +648,56 @@ class class_info(osv.osv):
 						overlap = False
 				
 				date_array['history_line'] = values['history_line']
-				
 				super(class_info, self).write(cr, uid, ids,date_array, context=context)
-			
+					
 				if parent_id == 0 :
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
 				else:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
 					prog_mod_ids.append(parent_id)
-					
+		
 				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-					compare_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
-					if compare_time > changed_start_time and prog_module_line.id != class_info_obj.id:
-						changed_st_time = compare_time + delta
-						changed_ed_time = changed_st_time + timedelta(hours=prog_module_line['duration'])
-						date_array['start_date'] = changed_st_time
-						date_array['end_date'] = changed_ed_time 
-						
-						t1start  = date_array['start_date']
-						t1end = date_array['end_date']
-						overlap = False
-						date_array['sess_issues'] = 'None'
-						for u in holiday_list :
-							t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
-							t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
-							if (t1start <= t2start <= t2end <= t1end):
-								date_array['sess_issues'] = u.split(";")[2]
-								continue
-							elif (t1start <= t2start <= t1end):
-								date_array['sess_issues'] = u.split(";")[2]
-								continue
-							elif (t1start <= t2end <= t1end):
-								date_array['sess_issues'] = u.split(";")[2]
-								continue
-							elif (t2start <= t1start <= t1end <= t2end):
-								date_array['sess_issues'] = u.split(";")[2]
-								continue
-							else:
-								overlap = False
-						date_array['history_line'] = values['history_line']
-						super(class_info, self).write(cr, uid, prog_module_line.id,date_array, context=context)
+					if prog_module_line.id != class_info_obj.id :
+						local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+						if local_value > new_date_time :
+							local_date_time_utc = pytz.utc.localize(local_value).astimezone(tz)
+							changed_date_time = datetime.strptime(str(local_date_time_utc.date()) +" "+new_time,"%Y-%m-%d %H:%M:%S")
+							local_dt = local.localize(changed_date_time, is_dst=None)
+							utc_dt = local_dt.astimezone (pytz.utc)
+							date_array['start_date'] =utc_dt.strftime ("%Y-%m-%d %H:%M:%S")
+							date_array['end_date'] = str(datetime.strptime(date_array['start_date'],"%Y-%m-%d %H:%M:%S") + timedelta(hours=duration))
+							
+							t1start  = datetime.strptime(date_array['start_date'],"%Y-%m-%d %H:%M:%S")
+							t1end = datetime.strptime(date_array['end_date'],"%Y-%m-%d %H:%M:%S")
+							overlap = False
+							date_array['sess_issues'] = 'None'
+							for u in holiday_list :
+								t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
+								t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
+								if (t1start <= t2start <= t2end <= t1end):
+									date_array['sess_issues'] = u.split(";")[2]
+									continue
+								elif (t1start <= t2start <= t1end):
+									date_array['sess_issues'] = u.split(";")[2]
+									continue
+								elif (t1start <= t2end <= t1end):
+									date_array['sess_issues'] = u.split(";")[2]
+									continue
+								elif (t2start <= t1start <= t1end <= t2end):
+									date_array['sess_issues'] = u.split(";")[2]
+									continue
+							date_array['history_line'] = values['history_line']
+							super(class_info, self).write(cr, uid, prog_module_line.id,date_array, context=context)
+							
 			if 'room_id' in values :
 				room_obj = self.pool.get('room').browse(cr, uid, values['room_id'])
-				room_array = {'room1': room_obj.name, 'room2': room_obj.name, 'room3': room_obj.name, 'room4': room_obj.name, 'room5': room_obj.name, 'room6':room_obj.name, 'room7': room_obj.name}
-				room_array['room_id'] = values['room_id']
+				new_date_time = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
+				for j in range(1,8) :
+					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
+						local_value = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
+						if local_value > new_date_time :
+							values['room'+str(j)] = room_obj.name
+
 				'''check room conflicts'''
 				room_conflict_ids = self.search(cr,uid,[('room_id',"=",values['room_id'])])
 				holiday_list =[]
@@ -652,34 +707,39 @@ class class_info(osv.osv):
 				t1start  = datetime.strptime(str(class_info_obj['start_date']),"%Y-%m-%d %H:%M:%S")
 				t1end = datetime.strptime(str(class_info_obj['end_date']),"%Y-%m-%d %H:%M:%S")
 				overlap = False
-				room_array['sess_issues'] = 'None'
+				values['sess_issues'] = 'None'
 				for u in holiday_list :
 					t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
 					t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
 					if (t1start <= t2start <= t2end <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t1start <= t2start <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t1start <= t2end <= t1end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					elif (t2start <= t1start <= t1end <= t2end):
-						room_array['sess_issues'] = u.split(";")[2]
+						values['sess_issues'] = u.split(";")[2]
 						continue
 					else:
 						overlap = False
-				room_array['history_line'] = values['history_line']
-				super(class_info, self).write(cr, uid, parent_id,room_array, context=context)
+				values['history_line'] = values['history_line']
+				super(class_info, self).write(cr, uid, parent_id,values, context=context)
+				
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						room_array = {'room1': room_obj.name, 'room2': room_obj.name, 'room3': room_obj.name, 'room4': room_obj.name, 'room5': room_obj.name, 'room6': room_obj.name, 'room7': room_obj.name}
-						room_array['room_id'] = values['room_id']
-						log_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
-						compare_time = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
-						if log_time > compare_time :
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					if prog_module_line.id != parent_id:
+						local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+						if local_value > t1start :
+							room_array = {'room1': room_obj.name, 'room2': room_obj.name, 'room3': room_obj.name, 'room4': room_obj.name, 'room5': room_obj.name, 'room6': room_obj.name, 'room7': room_obj.name}
+							room_array['room_id'] = values['room_id']
+							
 							t1start  = datetime.strptime(str(prog_module_line['start_date']),"%Y-%m-%d %H:%M:%S")
 							t1end = datetime.strptime(str(prog_module_line['end_date']),"%Y-%m-%d %H:%M:%S")
 							overlap = False
@@ -701,45 +761,61 @@ class class_info(osv.osv):
 									continue
 								else:
 									overlap = False
-
 							room_array['history_line'] = values['history_line']
 							super(class_info, self).write(cr, uid, prog_module_line.id,room_array, context=context)
-						
+							
 						
 			if 'location_id' in values :
 				super(class_info, self).write(cr, uid, parent_id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						log_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
-						compare_time = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
-						if log_time > compare_time :
-							super(class_info, self).write(cr, uid, prog_module_line.id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+				
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+					t1start  = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
+					if local_value > t1start :
+						super(class_info, self).write(cr, uid, prog_module_line.id,{'location_id': values['location_id'],'history_line':values['history_line']}, context=context)
 						
 			if 'module_id' in values :
 				super(class_info, self).write(cr, uid, parent_id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						log_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
-						compare_time = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
-						if log_time > compare_time :
-							super(class_info, self).write(cr, uid, prog_module_line.id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
-							
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+					t1start  = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
+					if local_value > t1start :
+						super(class_info, self).write(cr, uid, prog_module_line.id,{'module_id': values['module_id'],'history_line':values['history_line']}, context=context)
+			
 			if 'duration' in values :
-				super(class_info, self).write(cr, uid, parent_id,{'duration': values['duration'],'history_line':values['history_line']}, context=context)
+				data_array = {}
+				data_array['duration'] = values['duration']
+				data_array['end_date'] = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+				for j in range(1,8) :
+					if class_info_obj['start_date'+str(j)] != None and class_info_obj['start_date'+str(j)] !=  False:
+						data_array['end_date'+str(j)] = datetime.strptime(class_info_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+				data_array['history_line'] = values['history_line']
+				super(class_info, self).write(cr, uid, parent_id,data_array, context=context)
+			
 				if parent_id > 0:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
-					for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-						log_time = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
-						compare_time = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
-						if log_time > compare_time :
-							super(class_info, self).write(cr, uid, prog_module_line.id,{'duration': values['duration'],'history_line':values['history_line']}, context=context)
+				else:
+					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])	
+					
+				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+					if prog_module_line['start_date'] != None and prog_module_line['start_date'] !=  False:
+						local_value = datetime.strptime(prog_module_line['start_date'],"%Y-%m-%d %H:%M:%S")
+						t1start  = datetime.strptime(class_info_obj['start_date'],"%Y-%m-%d %H:%M:%S")
+						if local_value > t1start :
+							data_array['end_date'] = local_value + timedelta(hours=values['duration'])
+							super(class_info, self).write(cr, uid, prog_module_line.id,data_array, context=context)
 		
 		
 	def write(self,cr, uid, ids, values, context=None,holidays=False):
-		_logger.info ("Holiday Value %s",holidays)
-	
 		if holidays ==  False :
 			apply = False;
 			apply_to_future = False;
@@ -769,9 +845,101 @@ class class_info(osv.osv):
 						prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
 						for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
 							super(class_info, self).write(cr, uid, prog_module_line.id,values, context=context)
+				elif 'start_date' in values :
+					t1start  = datetime.strptime(str(values['start_date']),"%Y-%m-%d %H:%M:%S")
+					if 'duration' in values :
+						duration = values['duration'] 
+					else :
+						duration = location_obj['duration']
+						
+					values['end_date'] = t1start + timedelta(hours=duration)
+					t1end = values['end_date']
+				
+					holiday = self.pool.get('holiday')
+					holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
+					holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+		
+					holiday_list = []
+					holiday_line = self.pool.get('holiday.line')
+					holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+					for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+						t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+						t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+						if (t1start <= t2start <= t2end <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t1start <= t2start <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t1start <= t2end <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t2start <= t1start <= t1end <= t2end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
 				
 				
-			'''history logging'''
+					for j in range(1,8) :
+						if location_obj['start_date'+str(j)] != None and location_obj['start_date'+str(j)] !=  False:
+							compare_time = datetime.strptime(location_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S")
+							if compare_time == datetime.strptime(location_obj['start_date'],"%Y-%m-%d %H:%M:%S") :
+								_logger.info("Error Inf %s",compare_time)
+								values['start_date'+str(j)] = values['start_date']
+								values['end_date'+str(j)] = datetime.strptime(values['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=location_obj['duration'])
+								super(class_info, self).write(cr, uid, ids,values, context=context)
+								if parent_id > 0:
+									prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
+									prog_mod_ids.append(parent_id)
+								else :
+									prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+									
+								for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+									if prog_module_line.id != ids[0] :
+										super(class_info, self).write(cr, uid, prog_module_line.id,{'start_date'+str(j):values['start_date'+str(j)],'end_date'+str(j):values['end_date'+str(j)]}, context=context)
+										
+				elif 'duration' in values :
+					t1start = datetime.strptime(location_obj['start_date'],"%Y-%m-%d %H:%M:%S")
+					values['end_date'] = t1start + timedelta(hours=values['duration'])
+					t1end	= values['end_date'] 
+					holiday = self.pool.get('holiday')
+					holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
+					holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+					holiday_list = []
+					holiday_line = self.pool.get('holiday.line')
+					holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+					for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+						t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+						t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+						if (t1start <= t2start <= t2end <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t1start <= t2start <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t1start <= t2end <= t1end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+						elif (t2start <= t1start <= t1end <= t2end):
+							values['sess_issues'] = holiday_line_obj['description']
+							continue
+					
+					for j in range(1,8) :
+						if location_obj['end_date'+str(j)] != None and location_obj['end_date'+str(j)] !=  False:
+							compare_time = datetime.strptime(location_obj['end_date'+str(j)],"%Y-%m-%d %H:%M:%S")
+							if compare_time == datetime.strptime(location_obj['end_date'],"%Y-%m-%d %H:%M:%S") :
+								values['end_date'+str(j)] =  datetime.strptime(location_obj['start_date'+str(j)],"%Y-%m-%d %H:%M:%S") + timedelta(hours=values['duration'])
+								super(class_info, self).write(cr, uid, ids,values, context=context)
+								
+								if parent_id > 0:
+									prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
+									prog_mod_ids.append(parent_id)
+								else :
+									prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
+									
+								for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+									if prog_module_line.id != ids[0] :
+										super(class_info, self).write(cr, uid, prog_module_line.id,{'end_date'+str(j):values['end_date'+str(j)]}, context=context)
+				
 			module_id = super(class_info, self).write(cr, uid, ids,values, context=context)
 		else:
 			module_id = super(class_info, self).write(cr, uid, ids,values, context=context)
@@ -910,13 +1078,11 @@ class class_info(osv.osv):
 				value[inr_1] = ''
 				value[inr] = ''
 				value['day_'+str(i)] = ''
-				if apply_include == True :
-					value['include_'+str(i)] = False
+				value['include_'+str(i)] = False
 			value['start_date1'] = start_date
 			value['end_date1'] = end.strftime("%Y-%m-%d %H:%M:%S")
 			value['day_1'] = pytz.utc.localize(start).astimezone(tz).strftime("%A")[:3]
-			if apply_include== True :
-				value['include_1'] = True
+			value['include_1'] = True
 			for i in range(2,ran+1): 
 				start_date = datetime.strptime(str(start_date),"%Y-%m-%d %H:%M:%S") + relativedelta(days=1)
 				end = datetime.strptime(str(end),"%Y-%m-%d %H:%M:%S") + relativedelta(days=1)
@@ -925,8 +1091,7 @@ class class_info(osv.osv):
 				value[inr] = start_date.strftime("%Y-%m-%d %H:%M:%S")
 				value[inr_1] = end.strftime("%Y-%m-%d %H:%M:%S")
 				value['day_'+str(i)] = pytz.utc.localize(start_date).astimezone(tz).strftime("%A")[:3]
-				if apply_include == True :
-					value['include_'+str(i)] = True
+				value['include_'+str(i)] = True
 			return {'value': value}
 		else:
 			if not start_date:

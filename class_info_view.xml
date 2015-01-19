@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-<!-- ===================== This is class calendar form layout =============================-->
+<!-- ===================== This is location form layout =============================-->
 <record id="class_form" model="ir.ui.view">
     <field name="name">class.form</field>
     <field name="model">class.info</field>
@@ -298,11 +298,11 @@
 									<button  name="move_learner"  string="Move" type="object" class="oe_edit_only"/>
 									<button name="close_class"  string="Close Class" type="object" class="oe_edit_only" />
 								</group>
-						<field name='learner_line' nolabel='1' readonly="context.get('ctx', False)">
+						<field name='learner_line' nolabel='1'>
 								
 									<tree string='List' editable="bottom">
 										<field name='learner_mod_id' invisible="1" />
-										<field name='learner_id' on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]" options="{'limit': 10, 'create': False, 'create_edit': False ,'no_open': True }"/>
+										<field name='learner_id' options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]"/>
 										<field name = "learner_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>
@@ -370,8 +370,6 @@
    </field>
 </record>
 
-	<!-- ========================= Class Calendar List View ============================= -->
-
 		 <record id="class_tree" model="ir.ui.view">
             <field name="name">class.tree</field>
             <field name="model">class.info</field>
@@ -395,8 +393,7 @@
             </field>
         </record>
 	
-	<!-- ========================= Event calendar view ============================= -->
-	
+	          	<!-- Event calendar view -->
         <record model="ir.ui.view" id="event_calendar_view1">
             <field name="name">class.calendar</field>
             <field name="model">class.info</field>
@@ -415,25 +412,20 @@
             </field>
         </record> 
 
-	<!-- ========================= Class Calendar Action Layout ============================= -->	
-		
 		<record model="ir.actions.act_window" id="action_class">
             <field name="name">Class</field>
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">class.info</field>
             <field name="view_type">form</field>
-			<field name="limit">10</field>
+			<field name="view_id" ref="class_form"/>
             <field name="view_mode">calendar,tree,form</field>
-			<field name="view_id" ref="class_tree"/>
 			<field name="search_view_id" ref="view_class_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new Class Calendar.
+                Click to define a new location.
               </p>
             </field>
         </record>
-		
-	<!-- ===================== Move Form View =============================-->
 		
 		<record id="move_form" model="ir.ui.view">
 			<field name="name">Move Learner</field>
@@ -461,9 +453,7 @@
 				</form>
 		   </field>
 		</record>
-	
-	<!-- ========================= Menu ============================= -->	
-	
+		
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
 
 </data> 
