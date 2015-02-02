@@ -12,7 +12,7 @@
 			<sheet>
 				<group>
 					<group class="oe_title" style="width:350px;">
-							<field name = "test_def_id"  on_change="on_change_test_definition(test_def_id,context)" />
+							<field name = "test_def_id"  options="{'create': False, 'create_edit': False}" on_change="on_change_test_definition(test_def_id,context)"  />
 							<field name = "status"  invisible="1"/>
 			        </group>
 					<div>
@@ -107,7 +107,12 @@
 							<field name='learner_line' nolabel='1'  context="{'class_id': class_info,'test_code':test_code_compliance}">
 								<tree string='List' editable="bottom">
 									<field name='learner_mod_id' invisible ="1" />
-									<field name='learner_id'  options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id,context)" domain="[('module_line.module_id','=',parent.module_id)]"/>
+									<field name='learner_id'  options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id,context)" 
+									domain = "['|',('learner_mod_line.module_id','=',parent.module_id),										('learner_mod_line_2.module_id_2','=',parent.module_id),'|',
+										('learner_mod_line_3.module_id_3','=',parent.module_id),'|',
+										('learner_mod_line_4.module_id_4','=',parent.module_id),'|',
+										('learner_mod_line_5.module_id_5','=',parent.module_id),'|',
+										('learner_mod_line_6.module_id_6','=',parent.module_id)]" /> 
 									<field name='learner_nric'/>
 									<field name='class_code'/>
 									<field name='compliance_code'/>
@@ -125,9 +130,7 @@
 									<tree string='List' create="false" delete="false">
 										<field name='learner_id' />
 										<field name='learner_nric'/>
-										<field name='compr'/>
-										<field name='conv'/>
-										<button  name="view_scores"  string="View Scores" type="object"/>
+										<button  name="view_scores"  string="View Scores" type="object" icon="view_scores"/>
 									</tree>
 							</field>
 						</page>
@@ -147,6 +150,10 @@
 					<sheet>
 					<group>
 					<field name='learner_id' readonly="1"/>
+					</group>
+					<group col="2">
+						<field name='compr' string="Comprehensive"/>
+						<field name='conv' string="Conventional"/>
 					</group>
 					<group col="2">
 						<group col ="2">
@@ -263,6 +270,7 @@
             <field name="res_model">test.info</field>
             <field name="view_type">form</field>
             <field name="view_mode">calendar,tree,form</field>
+			<field name="view_id" ref="test_listing_page_tree"/>
 			<field name="search_view_id" ref="view_test_listing_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">

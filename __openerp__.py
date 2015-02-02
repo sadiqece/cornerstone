@@ -18,9 +18,9 @@
 		'commisions_view.xml',
 		'class_info_view.xml',
 		'test_scheduling_view.xml',
-		'enrollment_view.xml',
+		'learner_view.xml',
 		'class_status_dashboard.xml',
-		'educator_view.xml'
+		'trainer_enrollment.xml'
     ],
 'js': [
         'static/src/js/form.js',

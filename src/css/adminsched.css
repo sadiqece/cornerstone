@@ -1,0 +1,48 @@
+/* ZEYA 6/12/2014  */
+
+	AdminSched {
+    display: table;
+    width: 200%;
+	height:50%;
+  #  border: thin solid black;
+    border-spacing: 200px;
+}
+	title {
+#	border: 1px solid black;
+    display: table-caption;
+    font-size: 100%;
+	font-weight: bold;
+    text-align: center;
+    padding: 5px;
+	background-color:#E6E6E6;
+}
+	cols {
+    display: table-column-group;
+}
+	cols MyColumn12, cols MyColumn22, cols MyColumn32 , cols MyColumn42, cols MyColumn52, cols MyColumn62, cols MyColumn72  {
+    display: table-column;
+}
+	headings {
+    display: table-header-group;
+	background-color:#E6E6E6;
+}
+	records {
+    display: table-row-group;
+}
+	record {
+    display: table-row;   
+}
+	record > * {
+    display: table-cell;
+    padding: 5px;
+}
+	footers {
+    display: table-footer-group;
+}
+	footers > record > *, headings > record > * {
+    text-align: center;
+    font-weight: bold;
+}
+	records > record > * {
+    font-size: 120%;
+}

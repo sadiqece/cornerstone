@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+    <!-- ========================= Enrollment List View ============================= -->
+    <record id="enroll_tree" model="ir.ui.view">
+      <field name="name">Enrollment</field>
+      <field name="model">learner.info</field>
+      <field name="arch" type="xml">
+        <tree string="Learner">
+          <field name="name" />
+          <field name="learnerfull_name" />
+          <field name="learner_nric" />
+          <button name="views_enroll" string="View Learner" icon="view_mod" type="object"/>
+        </tree>
+      </field>
+    </record>
+    <record id="view_enrollment_filter" model="ir.ui.view">
+      <field name="name">Enrollment</field>
+      <field name="model">learner.info</field>
+      <field name="arch" type="xml">
+        <search string="Learner">
+          <field name="name" string="Learner Name" />
+          <field name="learnerfull_name" string="Learner Full Name" />
+        </search>
+      </field>
+    </record>
+    <!-- ========================= Enrollment Action Layout ============================= -->
+    <record model="ir.actions.act_window" id="action_enrollment">
+      <field name="name">Learner Enrollment</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">learner.info</field>
+      <field name="view_type">form</field>
+      <field name="limit">10</field>
+	  <field name="view_id" ref="enroll_tree"/>
+      <field name="view_mode">tree,form</field>
+      <field name="search_view_id" ref="view_enrollment_filter" />
+    </record>
+    <!-- ===================== Enrollment Form View =============================-->
+    <record id="enroll_form" model="ir.ui.view">
+      <field name="name">Enrollment</field>
+      <field name="model">learner.info</field>
+      <field name="arch" type="xml">
+        <form string="enroll_info" version="7.0">
+          <sheet>
+            <field name="image_medium" widget="image" class="oe_left oe_avatar" />
+            <div class="col-2">
+              <label for="name" class="oe_edit_only" />
+              <h1>
+                <field name="name"/>
+              </h1>
+            </div>
+            <!-- Color Boxes -->
+            <div class="col-3">
+              <group>
+                <div class="openerp oe_form_readonly schedule_status_box_9 ">
+                  <div class="no_learners_9">Checklist Items</div>
+                  <div class="learner_box_9">
+					<field name = "actual_number" />
+				  </div>
+                </div>
+                <div class="openerp oe_form_readonly schedule_status_box_10">
+                  <div class="no_learners_10">Status</div>
+                  <div class="learner_box_10">Blocked</div>
+                </div>
+              </group>
+            </div>
+            <div class="clear" />
+            <div class="col-3">
+              <label for="learnerfull_name" />
+              <field name="learnerfull_name" />
+            </div>
+            <div class="col-3">
+              <label for="learner_nric" />
+              <field name="learner_nric" />
+            </div>
+            <div class="col-3">
+              <label for="program_learner" />
+              <field name="program_learner" on_change="load_module_groups(program_learner)" options="{'create': False, 'create_edit': False}" />
+            </div>
+            <!-- Learner Enrollment Tabs -->
+            <notebook colspan="5" col="10">
+              <!-- Module Tab -->
+              <page string="Module">
+                <h3>
+                  <label string="Module" readonly="context.get('ctx', False)" />
+                </h3>
+                <!-- Module group blocks -->
+                <group>
+                  <field name="no_module_box1" invisible="1" />
+                  <field name="no_module_box2" invisible="1" />
+                  <field name="no_module_box3" invisible="1" />
+                  <field name="no_module_box4" invisible="1" />
+                  <field name="no_module_box5" invisible="1" />
+                  <field name="no_module_box6" invisible="1" />
+                  <!-- -->
+                  <field name="set_group_as_sel_1" invisible="1" />
+                  <field name="set_group_as_sel_2" invisible="1" />
+                  <field name="set_group_as_sel_3" invisible="1" />
+                  <field name="set_group_as_sel_4" invisible="1" />
+                  <field name="set_group_as_sel_5" invisible="1" />
+                  <field name="set_group_as_sel_6" invisible="1" />
+                </group>
+                <!-- Module group block 1 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box1', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_1" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_1', '=' , False)]}">
+                    <label for="select_mod_gp_1" />
+                    <field name="select_mod_gp_1" />
+                  </h4>
+                  <field name="set_module_select_1" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_1', '=' , False)]}">
+                    <label for="min_no_modules_1" />
+                    <span>
+                      <field name="min_no_modules_1" />
+                    </span>
+                    <label for="max_no_modules_1" />
+                    <span>
+                      <field name="max_no_modules_1" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id" invisible="1" />
+                        <field name="module_id" widget="selection" />
+                        <field name="set_module_select_1" invisible="1" />
+                        <field name="select_mod_1" attrs="{'invisible': [('set_module_select_1', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <!-- Module group block 2 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box2', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_2" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_2', '=' , False)]}">
+                    <label for="select_mod_gp_2" />
+                    <field name="select_mod_gp_2" />
+                  </h4>
+                  <field name="set_module_select_2" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_2', '=' , False)]}" class="border_box">
+                    <label for="min_no_modules_2" />
+                    <span>
+                      <field name="min_no_modules_2" />
+                    </span>
+                    <label for="max_no_modules_2" />
+                    <span>
+                      <field name="max_no_modules_2" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line_2" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id_2" invisible="1" />
+                        <field name="module_id_2" widget="selection" />
+                        <field name="set_module_select_2" invisible="1" />
+                        <field name="select_mod_2" attrs="{'invisible': [('set_module_select_2', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <!--	 Module group block 3 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box3', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_3" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_3', '=' , False)]}">
+                    <label for="select_mod_gp_3" />
+                    <field name="select_mod_gp_3" />
+                  </h4>
+                  <field name="set_module_select_3" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_3', '=' , False)]}" class="border_box">
+                    <label for="min_no_modules_3" />
+                    <span>
+                      <field name="min_no_modules_3" />
+                    </span>
+                    <label for="max_no_modules_3" />
+                    <span>
+                      <field name="max_no_modules_3" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line_3" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id_3" invisible="1" />
+                        <field name="module_id_3" widget="selection" />
+                        <field name="set_module_select_3" invisible="1" />
+                        <field name="select_mod_3" attrs="{'invisible': [('set_module_select_3', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <div class="clear" />
+                <!-- Module group block 4 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box4', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_4" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_4', '=' , False)]}">
+                    <label for="select_mod_gp_4" />
+                    <field name="select_mod_gp_4" />
+                  </h4>
+                  <field name="set_module_select_4" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_4', '=' , False)]}" class="border_box">
+                    <label for="min_no_modules_4" />
+                    <span>
+                      <field name="min_no_modules_4" />
+                    </span>
+                    <label for="max_no_modules_4" />
+                    <span>
+                      <field name="max_no_modules_4" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line_4" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id_4" invisible="1" />
+                        <field name="module_id_4" widget="selection" />
+                        <field name="set_module_select_4" invisible="1" />
+                        <field name="select_mod_4" attrs="{'invisible': [('set_module_select_4', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <!-- Module group block 5 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box5', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_5" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_5', '=' , False)]}">
+                    <label for="select_mod_gp_5" />
+                    <field name="select_mod_gp_5" />
+                  </h4>
+                  <field name="set_module_select_5" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_5', '=' , False)]}" class="border_box">
+                    <label for="min_no_modules_5" />
+                    <span>
+                      <field name="min_no_modules_5" />
+                    </span>
+                    <label for="max_no_modules_5" />
+                    <span>
+                      <field name="max_no_modules_5" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line_5" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id_5" invisible="1" />
+                        <field name="module_id_5" widget="selection" />
+                        <field name="set_module_select_5" invisible="1" />
+                        <field name="select_mod_5" attrs="{'invisible': [('set_module_select_5', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <!-- Module group block 6 -->
+                <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box6', '=' , False)]}">
+                  <div class="box header">
+                    <h3>
+                      <field name="mod_gp_name_6" />
+                    </h3>
+                  </div>
+                  <h4 attrs="{'invisible': [('set_group_as_sel_6', '=' , False)]}">
+                    <label for="select_mod_gp_6" />
+                    <field name="select_mod_gp_6" />
+                  </h4>
+                  <field name="set_module_select_6" invisible="1" />
+                  <div attrs="{'invisible': [('set_module_select_6', '=' , False)]}" class="border_box">
+                    <label for="min_no_modules_6" />
+                    <span>
+                      <field name="min_no_modules_6" />
+                    </span>
+                    <label for="max_no_modules_6" />
+                    <span>
+                      <field name="max_no_modules_6" />
+                    </span>
+                  </div>
+                  <div class="box">
+                    <field name="learner_mod_line_6" nolabel="1">
+                      <tree string="List" editable="bottom" create="false" delete="false">
+                        <field name="prog_mod_id_6" invisible="1" />
+                        <field name="module_id_6" widget="selection" />
+                        <field name="set_module_select_6" invisible="1" />
+                        <field name="select_mod_6" attrs="{'invisible': [('set_module_select_6', '=' , False)]}" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <!-- EOF Module group blocks -->
+                <div class="clear" />
+              </page>
+              <!-- Checklist Tab -->
+              <page string="Checklist">
+                <h3>
+                  <label string="Checklist" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="checklist_tab" nolabel="1">
+                  <tree string="List" editable="bottom" create="false" delete="false">
+                    <field name="checklist_id" invisible="1" />
+                    <field name="s_no" />
+                    <field name="item" />
+                    <field name="confirmation" />
+                    <field name="upload_docs" />
+                    <!--button name="import_file" string="Upload" type="object" /-->
+                  </tree>
+                </field>
+              </page>
+              <!-- Schedule Tab -->
+              <page string="Schedule">
+                <h3>
+                  <label string="Schedule" readonly="context.get('ctx', False)" />
+                </h3>
+                <div class="col-3">
+                  <label string="Select Center" />
+                  <field name="select_center" on_change="onchange_populate_schedule2(select_center,select_module, sch_date)" options="{'create': False, 'create_edit': False}" />
+                  <label string="Select Module" />
+                  <field name="select_module" on_change="onchange_populate_schedule2(select_center,select_module, sch_date)" options="{'create': False, 'create_edit': False}" />
+				  <label string="Select Date" />
+                    <field name="sch_date" on_change="onchange_populate_schedule2(select_center,select_module, sch_date)"/>
+                </div>
+                <div class="col-75">
+                  <div class="col-2" style="float:right;">
+                    <group>
+                      <div class="openerp oe_form_readonly schedule_status_box_9 ">
+                        <div class="no_learners_9">No. of Learner</div>
+                        <div class="learner_box_9">5</div>
+                      </div>
+                      <div class="openerp oe_form_readonly schedule_status_box_10">
+                        <div class="no_learners_10">Status</div>
+                        <div class="learner_box_10">Blocked</div>
+                      </div>
+                    </group>
+                  </div>
+                  <div class="clear" />
+                  <div class="col-3">
+                    <label string="Class Code" />
+                    <field name="class_code" />
+                  </div>
+                  <div class="col-3">
+                    <label string="Start Date" />
+                    <div class="clear" />
+                    <field name="start_date" />
+                  </div>
+                  <div class="col-3">
+                    <label string="End Date" />
+                    <div class="clear" />
+                    <field name="end_date" />
+                  </div>
+                  <div>
+                    <h2>
+                      <label string="Sessions Info" readonly="context.get('ctx', False)" />
+                    </h2>
+                    <field name="schedule_line" nolabel="1">
+                      <tree string="List" create="false" delete="false">
+                        <field name="session_no" />
+                        <field name="week_no" />
+                        <field name="date_schd" />
+                      </tree>
+                    </field>
+                  </div>
+                </div>
+                <div class="clear" />
+              </page>
+              <!-- Personal Details Tab -->
+              <page string="Personal Details">
+                <div class="col-2">
+                  <h3>
+                    <label string="Personal Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="nationality" style="width:280px;" />
+                    <field name="marital_status" style="width:280px;" />
+                    <field name="race" style="width:280px;" />
+                    <field name="gender" style="width:280px;" />
+                    <field name="birth_date" />
+                  </group>
+                </div>
+                <div class="col-2">
+                  <h3>
+                    <label string="Educational Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="high_qualification" style="width:280px;" />
+                    <field name="language_proficiency" />
+                  </group>
+                </div>
+                <div class="clear" />
+                <div class="col-2">
+                  <h3>
+                    <label string="Work Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="emp_staus" style="width:280px;" />
+                    <field name="company_name" string="Company" style="width:280px;" />
+                    <field name="desig_detail" style="width:280px;" editable="bottom" />
+                    <field name="sal_range" style="width:280px;" />
+                    <field name="sponsor_ship" style="width:280px;" />
+                  </group>
+                </div>
+                <div class="col-2">
+                  <h3>
+                    <label string="Contact Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="email_id" />
+                    <field name="addr_1" style="width:280px;" />
+                    <field name="mobile_no" style="width:280px;" />
+                    <field name="landline_no" style="width:280px;" />
+                    <field name="office_no" style="width:280px;" />
+                  </group>
+                </div>
+                <div class="clear" />
+              </page>
+              <!-- Payment Tab -->
+              <page string="Payment">
+                <span>Payment Tab</span>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <!-- ========================= Learner Form View (11 Tabs)============================= -->
+    <record id="learner_form" model="ir.ui.view">
+      <field name="name">learner.form</field>
+      <field name="model">learner.info</field>
+      <field name="arch" type="xml">
+        <form string="learner_info" version="7.0">
+          <sheet>
+            <field name="image_medium" widget="image" class="oe_left oe_avatar" />
+            <div class="col-3">
+              <label for="name" class="oe_edit_only" />
+              <h1>
+                <field name="name" on_change="onchange_class_hist(name,name,name)"/>
+              </h1>
+            </div>
+            <div class="clear" />
+            <div class="col-3">
+              <label for="learnerfull_name" />
+              <field name="learnerfull_name" />
+            </div>
+            <div class="col-3">
+              <label for="learner_nric" />
+              <field name="learner_nric" />
+            </div>
+            <div class="col-3">
+              <label for="learner_status" />
+              <field name="learner_status" />
+            </div>
+            <div class="clear" />
+            <!-- Color Boxes -->
+            <div class="col-2">
+              <group>
+                <div class="openerp oe_form_readonly schedule_status_box_5 ">
+                  <div class="no_learners_5">Outstanding Items</div>
+                  <div class="learner_box_5">
+					<field name = "actual_number" />
+				  </div>
+                </div>
+                <div class="openerp oe_form_readonly schedule_status_box_6">
+                  <div class="no_learners_6">Attendance</div>
+                  <div class="learner_box_6">76</div>
+                </div>
+              </group>
+            </div>
+            <div class="col-2">
+              <group>
+                <div class="openerp oe_form_readonly schedule_status_box_7">
+                  <div class="no_learners_7">Call Status</div>
+                  <div class="learner_box_7">DON'T
+								CALL</div>
+                </div>
+                <div class="openerp oe_form_readonly schedule_status_box_8">
+                  <div class="no_learners_8">Status</div>
+                  <div class="learner_box_8">Blocked</div>
+                </div>
+              </group>
+            </div>
+            <div class="clear" />
+            <div class="col-2">
+              <h3>
+                <label string="Current Information:" />
+              </h3>
+              <label string="Program Name" />
+              <field name="program_learner" string="Program" readonly="True" options="{'create': False, 'create_edit': False}"/>
+              <label string="Module Name" />
+              <field name="select_module" string="Module" options="{'create': False, 'create_edit': False}"/>
+            </div>
+            <div class="col-2">
+              <h3>
+                <label string="Class Detail:" />
+              </h3>
+              <div class="col-3">
+                <label string="Class Code" />
+                <field name="class_code" />
+              </div>
+              <div class="col-3">
+                <label string="Start Date" />
+                <div class="clear" />
+                <field name="start_date" />
+              </div>
+              <div class="col-3">
+                <label string="End Date" />
+                <div class="clear" />
+                <field name="end_date" />
+              </div>
+            </div>
+            <div class="clear" />
+            <!-- 11 Tabs -->
+            <notebook colspan="5" col="10">
+              <!-- Outstanding Tab -->
+              <page string="Outstanding">
+                <h3>
+                  <label string="Outstanding" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="checklist_tab" nolabel="1">
+                  <tree string="List" editable="bottom" create="false" delete="false">
+                    <field name="checklist_id" invisible="1" />
+                    <field name="s_no" />
+                    <field name="item" />
+                    <field name="confirmation" />
+                    <field name="upload_docs" />
+                    <!--button name="import_file" string="Upload" type="object" /-->
+                  </tree>
+                </field>
+              </page>
+              <!-- Personal Details Tab -->
+              <page string="Personal Details">
+                <div class="col-2">
+                  <h3>
+                    <label string="Personal Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="nationality" style="width:280px;" />
+                    <field name="marital_status" style="width:280px;" />
+                    <field name="race" style="width:280px;" />
+                    <field name="gender" style="width:280px;" />
+                    <field name="birth_date" />
+                  </group>
+                </div>
+                <div class="col-2">
+                  <h3>
+                    <label string="Educational Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="high_qualification" style="width:280px;" />
+                    <field name="language_proficiency" />
+                  </group>
+                </div>
+                <div class="clear" />
+                <div class="col-2">
+                  <h3>
+                    <label string="Work Details" readonly="context.get('ctx', False)" />
+                  </h3>
+                  <group>
+                    <field name="emp_staus" style="width:280px;" />
+                    <field name="company_name" string="Company" style="width:280px;" />
+                    <field name="desig_detail" style="width:280px;" editable="bottom" />
+                    <field name="sal_range" style="width:280px;" />
+                    <field name="sponsor_ship" style="width:280px;" />
+                  </group>
+                </div>
+                <div class="col-2">
+                  <h2>
+                    <label string="Contact Details" readonly="context.get('ctx', False)" />
+                  </h2>
+                  <group>
+                    <field name="email_id" />
+                    <field name="addr_1" style="width:280px;" />
+                    <field name="mobile_no" style="width:280px;" />
+                    <field name="landline_no" style="width:280px;" />
+                    <field name="office_no" style="width:280px;" />
+                  </group>
+                </div>
+                <div class="clear" />
+              </page>
+              <!-- Action Tab -->
+              <page string="Action">
+                <h3>
+                  <label string="Action" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="action_learn_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+                    <field name="s_no" />
+                    <field name="action_learner" style="width:280px;" />
+                    <field name="remarks_learner" style="width:280px;" />
+                    <field name="support_docs_learner" style="width:280px;" />
+                    <field name="upload_learner" style="width:280px;" />
+                    <!--	<button name="_get_attachments" string="Import" type="object" icon="upld_doc"  class="oe_highlight" />  -->
+                    <field name="date_action" />
+                    <field name="action_taken_learner" style="width:280px;" />
+                  </tree>
+                </field>
+              </page>
+              <!-- Payment Tab -->
+              <page string="Payment History">
+                <h3>Payment History</h3>
+              </page>
+              <!-- Class History Tab -->
+              <page string="Class History">
+                <h3>
+                  <label string="Class History" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="class_history_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+                    <field name="s_no" />
+                    <field name="program_name" />
+                    <field name="module_name" />
+                    <field name="class_code" />
+                    <field name="start_date" />
+                    <field name="end_date" />
+                    <field name="empl_staus" />
+                    <field name="designa_detail" />
+                    <field name="sponsors_ship" />
+                  </tree>
+                </field>
+              </page>
+              <!-- Test History Tab -->
+              <page string="Test History">
+                <h3>
+                  <label string="Test History" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="test_history_line" nolabel="1">
+                  <tree string="List" create="false">
+                    <field name="test_type" />
+                    <field name="test_code" />
+                    <field name="test_date" />
+					<field name="test_status" />
+                  </tree>
+                </field>
+              </page>
+              <!-- Test Scores Tab -->
+              <page string="Test Scores">
+                <h3>
+                  <label string="Test Scores" readonly="context.get('ctx', False)" />
+                </h3>
+                <div class="scrollx_block">
+                  <field name="test_score_line" nolabel="1">
+                    <tree string="List" create="false">
+                      <field name="test_score_type" />
+                      <field name="test_sc_code" />
+                      <field name="test_sc_date" />
+                      <field name="test_compre" />
+                      <field name="test_conv" />
+                      <field name="r_level" />
+                      <field name="r_score" />
+                      <field name="l_level" />
+                      <field name="l_score" />
+                      <field name="s_level" />
+                      <field name="s_score" />
+                      <field name="w_level" />
+                      <field name="w_score" />
+                      <field name="w_outcomes" />
+                      <field name="n_level" />
+                      <field name="n_score" />
+                      <field name="w_outcome1" />
+                    </tree>
+                  </field>
+                </div>
+              </page>
+              <!-- Qualification Tab -->
+              <page string="Qualification &amp; Awards">
+                <h3>
+                  <label string="Qualification &amp; Awards" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="qualification_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+                    <field name="s_no" />
+                    <field name="qual_award_name" />
+                    <field name="prog_name" />
+                    <field name="module_name" />
+                    <field name="class_code" />
+                    <field name="date_award" />
+                  </tree>
+                </field>
+              </page>
+              <!-- Assets Tab -->
+              <page string="Assets">
+                <h3>Assets</h3>
+              </page>
+              <!-- Feedback Tab -->
+              <page string="Feedback">
+                <h2>
+                  <label string="Feedback" readonly="context.get('ctx', False)" />
+                </h2>
+                <field name="feedback_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+                    <field name="s_no" />
+                    <field name="feedback_type" />
+                    <field name="description" />
+                    <field name="date_of_feedback" />
+                    <field name="entered_by" />
+                  </tree>
+                </field>
+              </page>
+              <!-- Remarks Tab -->
+              <page string="Remarks">
+                <h3>
+                  <label string="Remarks" readonly="context.get('ctx', False)" />
+                </h3>
+                <field name="remarks_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+                    <field name="s_no" />
+                    <field name="descriptions" />
+                    <field name="date_of_remarks" />
+                    <field name="enter_by" />
+                  </tree>
+                </field>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <!-- ========================= Menu ============================= -->
+    <menuitem name="Sales" id="menu_sales" parent="menu_lis_lab" />
+    <menuitem name="Learner Enrolment" id="sale_learner" parent="menu_sales" action="action_enrollment" />
+  </data>
+</openerp>

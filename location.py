@@ -182,7 +182,7 @@ class room(osv.osv):
 		'room_number': fields.char('Room Number', size=20),
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, readonly=1),
 		'location_name': fields.function(_load_loc_line, relation="location_room_line",readonly=1,type='one2many', string='Module'),
-		'room_setup':fields.selection((('Cluster','Cluster'),('Class Room','Class Room'),('Theater','Theater'),('Test Only Room','Test Only Room')),'Setup'),
+		'room_setup':fields.selection((('Cluster','Cluster'),('Class Room','Class Room'),('Theater','Theater'),('Test Only Room','Test Only Room')),'Setup', required=True),
 		'room_floor_area':fields.integer('Floor Area (sqm)', size=5,required=True, select=True),
 		'room_max_cap':fields.integer('Maximum Capacity', size=7,required=True, select=True),
 		'room_equip': fields.one2many('room.equip', 'equip_id', 'Equipments', select=True, required=True),

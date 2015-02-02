@@ -4,6 +4,7 @@ from dateutil import parser
 from dateutil import rrule
 from dateutil.relativedelta import relativedelta
 from lxml import etree
+from collections import namedtuple
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
@@ -20,7 +21,7 @@ class test_info(osv.osv):
 
 	
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
+		_logger.info("Value in read %s",ids)
 		res = super(test_info, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
@@ -30,8 +31,10 @@ class test_info(osv.osv):
 		return res
 		
 	def default_get(self, cr, uid, fields, context=None):
+		_logger.info("Calleing Default %s",fields)
 		data = super(test_info, self).default_get(cr, uid, fields, context=context)
 		invoice_lines = []
+		_logger.info("Calleing Default %s",fields)
 		modality_ids = self.pool.get('test.master.modality').search(cr, uid, [],limit=5)
 		for p in self.pool.get('test.master.modality').browse(cr, uid, modality_ids):
 			invoice_lines.append((0,0,{'master_modality':p.id,}))
@@ -42,9 +45,10 @@ class test_info(osv.osv):
 		if not ids: return {}
 		res = {}
 		for line in self.browse(cr, uid, ids, context=context):
-			mod_line_ids = self.browse(cr, uid, ids[0], context=context).learner_line or []
-		total_mod = len(mod_line_ids)
-		res[line.id] = total_mod
+			mod_line_ids = line.learner_line or []
+			_logger.info("total id %s",mod_line_ids)
+			total_mod = len(mod_line_ids)
+			res[line.id] = total_mod
 		return res
 	
 
@@ -77,11 +81,53 @@ class test_info(osv.osv):
 		'status': fields.related('test_def_id','test_status',type="char",relation="test",string="Status", readonly=1,),
 		'capacity':fields.related('test_def_id','test_max_Pax',type="integer",relation="test",string="Capacity", readonly=1,),
 		'actual_number':fields.function(_calculate_total_learners, relation="test.info",readonly=1,string='No. Learners',type='integer'),
+		
 	}
-
+	
 
 	def create(self,cr, uid, values, context=None):
 	
+		if 'duration' in values and values['duration'] < 0:
+				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
+		
+		t1start= datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+		t1end = datetime.strptime(values['end_date'],"%Y-%m-%d %H:%M:%S")
+		
+		if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
+			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
+		
+		Range = namedtuple('Range', ['start', 'end'])
+		r1 = Range(start=t1start, end=t1end)
+	
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
+			latest_start = max(r1.start, r2.start)
+			earliest_end = min(r1.end, r2.end)
+			overlap = (earliest_end - latest_start)
+			if overlap.days == 0 and x.room_id.id == values['room_id']:
+				raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
+
+		holiday = self.pool.get('holiday')
+		holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
+		holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+		
+		holiday_list = []
+		holiday_line = self.pool.get('holiday.line')
+		holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+		for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+			t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+			t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+			if (t1start <= t2start <= t2end <= t1end):
+				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+			elif (t1start <= t2start <= t1end):
+				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+			elif (t1start <= t2end <= t1end):
+				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+			elif (t2start <= t1start <= t1end <= t2end):
+				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+	
+		
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
 			values['test_type_char']  = values['test_pre_type'] 
 		elif 'test_post_type' in values  and values['test_post_type'] != False :
@@ -105,6 +151,86 @@ class test_info(osv.osv):
 		return module_id
 
 	def write(self,cr, uid, ids, values, context=None):
+	
+		if 'duration' in values and values['duration'] < 0:
+			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
+			
+			
+		if 'room_id' in values :
+			Range = namedtuple('Range', ['start', 'end'])
+			test_obj = self.browse(cr,uid,ids[0])
+			if 'start_date' in values :
+				t1start = values['start_date']
+			else :
+				t1start = test_obj['start_date']
+			
+			if 'end_date' in values :
+				t1end = values['end_date']
+			else :
+				t1end = test_obj['end_date']
+				
+				
+			r1 = Range(start=t1start, end=t1end)
+	
+			sr_ids = self.search(cr, 1 ,[], context=context)
+			for x in self.browse(cr, uid, sr_ids, context=context):
+				r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
+				latest_start = max(r1.start, r2.start)
+				earliest_end = min(r1.end, r2.end)
+				overlap = (earliest_end - latest_start)
+				if overlap.days == 0 and x.room_id.id == values['room_id']:
+					raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
+			
+				
+		if 'start_date' in values :
+			t1start= datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+			if t1start < datetime.now() :
+				raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
+			
+			if 'duration' in values :
+				duration = values['duration']
+			else :
+				test_info_obj = self.browse(cr,uid,ids[0])
+				duration = test_info_obj['duration']
+			
+						
+			t1end = t1start + timedelta(hours=duration)
+			Range = namedtuple('Range', ['start', 'end'])
+		
+			r1 = Range(start=t1start, end=t1end)
+	
+			sr_ids = self.search(cr, 1 ,[], context=context)
+			for x in self.browse(cr, uid, sr_ids, context=context):
+				r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
+				latest_start = max(r1.start, r2.start)
+				earliest_end = min(r1.end, r2.end)
+				overlap = (earliest_end - latest_start)
+				if overlap.days == 0 and x.room_id.id == test_info_obj['room_id'].id:
+					raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
+			
+			
+			
+			
+			
+			holiday = self.pool.get('holiday')
+			holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
+			holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+			
+			holiday_list = []
+			holiday_line = self.pool.get('holiday.line')
+			holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+			for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+				t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+				t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+				if (t1start <= t2start <= t2end <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t1start <= t2start <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t1start <= t2end <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t2start <= t1start <= t1end <= t2end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+	
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
 			values['test_type_char']  = values['test_pre_type'] 
 		elif 'test_post_type' in values  and values['test_post_type'] != False :
@@ -148,9 +274,6 @@ class test_info(osv.osv):
 
 		module_id = super(test_info, self).write(cr, uid, ids,values, context=context)
 		return module_id
-
-	
-	
 	
 	def on_change_test_definition(self, cr, uid, ids, test,context):
 		code = ""
@@ -178,26 +301,25 @@ class test_info(osv.osv):
 		return {'value': value}
 
 	def on_change_module_id(self, cr, uid, ids, module_id,test_name,context):
-		test_obj = self.pool.get('test')
-		test_obj_id = test_obj.browse(cr, uid, test_name) 
-		type_id = -1
-		for y in test_obj_id.test_mod_line or [] :
-			if y.module_id.id  == module_id :
-				if y.pre_test and y.post_test :
-					type_id = 1
-				elif y.pre_test :
-					type_id = 2
-				elif y.post_test :
-					type_id = 3
+		if module_id != False :
+			test_obj = self.pool.get('test')
+			test_obj_id = test_obj.browse(cr, uid, test_name) 
+			type_id = -1
+			for y in test_obj_id.test_mod_line or [] :
+				if y.module_id.id  == module_id :
+					if y.pre_test and y.post_test :
+						type_id = 1
+					elif y.pre_test :
+						type_id = 2
+					elif y.post_test :
+						type_id = 3
 		
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		module_id
-		learners = [] 
-		learner_ids = self.pool.get('enroll.module.line').search(cr,uid,[('module_id','=',module_id)])
-		for j in self.pool.get('enroll.module.line').browse(cr,uid,learner_ids):
-			learners.append(j['learner_info_id'].id)
 		
-		return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration,'test_type_id':type_id,'test_type':False,'test_pre_type':False,'test_post_type':False,}}
+			module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
+			
+			return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration,'test_type_id':type_id,'test_type':False,'test_pre_type':False,'test_post_type':False,}}
+		else:
+			return{}
 
 	def on_change_location_id(self, cr, uid, ids, location_id):
 		return {'value': {'room_id': False}}
@@ -206,6 +328,16 @@ class test_info(osv.osv):
 test_info()
 
 class test_modality(osv.osv):
+	def _check_unique_test_modality(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.test_modality_id == self_obj.test_modality_id and x.master_modality == self_obj.master_modality:
+						return False
+		return True
+	
+	
 	_name ='test.modality'
 	_description ="Trainer Learner Tab"
 	_columns = {
@@ -214,6 +346,7 @@ class test_modality(osv.osv):
 	'active':fields.boolean('Active'),
 
 	}
+	_constraints = [(_check_unique_test_modality, 'Error: Item Already Exists', ['master_modality'])]
 	
 test_modality()
 
@@ -415,7 +548,24 @@ class test_scores(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-		
+	def write(self,cr, uid, ids, values, context=None):
+		if 'r_scores' in values and values['r_scores'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 'l_scores' in values and values['l_scores'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 's_scores' in values and values['s_scores'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 'w_scores' in values and values['w_scores'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 'n_scores' in values and values['n_scores'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 'compr' in values and values['compr'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		if 'conv' in values and values['conv'] < 0:
+			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+
+		id = super(test_scores, self).write(cr, uid, ids,values, context=context)
+		return id
 	_name ='test.scores'
 	_description ="Test Scores Tab"
 	_columns = {
@@ -423,20 +573,19 @@ class test_scores(osv.osv):
 	'test_scores_id': fields.many2one('test.info', 'Test', ondelete='cascade', help='Class', select=True),
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
 	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1,),
-	'compr':fields.char('Compr',size=25),
-	'conv':fields.char('Conv',size=25),
+	'compr':fields.integer('Compr',size=2),
+	'conv':fields.integer('Conv',size=2),
 	'r_level':fields.integer('Reading(Level)',size=1),
 	'r_scores':fields.integer('Readng(Scores)',size=2),
 	'l_level':fields.integer('Listening(Level)',size=1),
 	'l_scores':fields.integer('Listening(Scores)',size=2),
 	's_level':fields.integer('Speaking(Level)',size=1),
-	's_scores':fields.integer('Speaking(Soures)',size=2),
+	's_scores':fields.integer('Speaking(Scores)',size=2),
 	'w_level':fields.integer('Writing(Level)',size=1),
 	'w_scores':fields.integer('Writing(Scores)',size=2),
 	'w_outcome':fields.char('W(Outcomes)',size=20),
 	'n_level':fields.integer('Numeracy(Level)',size=1),
 	'n_scores':fields.integer('Numeracy(Scores)',size=2),
 	'n_outcome':fields.char('N(Outcomes)',size=20),
-	
 	}
 test_scores()

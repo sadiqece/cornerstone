@@ -605,6 +605,7 @@ class program(osv.osv):
         's_no': fields.char('S.No',size=20),
         'name': fields.char('Program Name', size=100,required=True, select=True),
         'program_code': fields.char('Program Code', size=20),
+		'qualification_module_id':fields.many2one('qualification.module', 'Qualification Module'),
 		'program_level': fields.selection((('Beginner','Beginner'),('Intermediate','Intermediate'),('Advanced','Advanced')),'Level'),
 	    'program_category':fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
 	    'program_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
@@ -651,7 +652,7 @@ class program(osv.osv):
 		'date4': fields.date('Date Created', readonly='True'),
 		'prog_req_line': fields.one2many('program.req.module','req_id','Requirments'),
 		#For Multiple Boxes in Module Tab
-		'no_of_mod_gp': fields.selection((('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6')),'Number of Module Groups'),
+		'no_of_mod_gp': fields.selection((('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6')),'Number of Module Groups', required=True),
 		'no_module_box1': fields.boolean('1'),
 		'no_module_box2': fields.boolean('2'),
 		'no_module_box3': fields.boolean('3'),

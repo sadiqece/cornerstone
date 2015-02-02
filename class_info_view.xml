@@ -48,8 +48,8 @@
 				</group>
 			    <group col="9">					
 					<field name = "module_id" attrs="{'readonly':[('status','=','Edit')]}" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
-					<field name = "location_id" options="{'create': False, 'create_edit': False}" on_change="on_change_location_id(location_id)" />
-					<field name = "room_id" domain="[('location_id','=',location_id)]" on_change="on_change_room_id(room_id)" options="{'create': False, 'create_edit': False}"/>
+					<field name = "location_id" on_change="on_change_location_id(location_id)" options="{'create': False, 'create_edit': False}"/>
+					<field name = "room_id" on_change="on_change_room_id(room_id)" domain="[('location_id','=',location_id)]" options="{'create': False, 'create_edit': False}"/>
 				</group>
 				<group>
 					<field name = "status" invisible="1"/>
@@ -237,16 +237,16 @@
 						<h2>
 							<label string="Trainer"  readonly="context.get('ctx', False)"/>
 						</h2>
-						<button id="broadcast_bt" string="Broadcast" type="action" />
+						<button id="broadcast_bt"  name="trainer_broadcast"  string="Broadcast" type="object" class="oe_edit_only" />
 					</group>
 						<group>
 						   <div>
-									<field name="trainer_line"  nolabel="1" readonly="context.get('ctx', False)">
+									<field name="trainers_line"  nolabel="1" readonly="context.get('ctx', False)">
 										<tree string="Broadcast" editable="bottom">
 											<field name = "s_no"/>
 											<field name = "trainer_id" options="{'create': False, 'create_edit': False}"/>
-											<field name = "confirmation"/>
-											<field name = "attendance"/>
+											<field name = "t_status" readonly="1"/>
+											<button id="confirm_bt"  name="trainer_confirm"  string="Confirm" type="object" attrs="{'invisible': [('t_status','!=', 'Accepted')]}" class="oe_highlight" icon="confirm_button_01"/>
 										</tree>
 									</field>
 							</div>
@@ -302,7 +302,13 @@
 								
 									<tree string='List' editable="bottom">
 										<field name='learner_mod_id' invisible="1" />
-										<field name='learner_id' options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id)" domain="[('module_line.module_id','=',parent.module_id)]"/>
+										<field name='learner_id' on_change="on_change_learner_id(learner_id)"
+										options="{'create': False, 'create_edit': False}"
+										domain = "['|',('learner_mod_line.module_id','=',parent.module_id),										('learner_mod_line_2.module_id_2','=',parent.module_id),'|',
+										('learner_mod_line_3.module_id_3','=',parent.module_id),'|',
+										('learner_mod_line_4.module_id_4','=',parent.module_id),'|',
+										('learner_mod_line_5.module_id_5','=',parent.module_id),'|',
+										('learner_mod_line_6.module_id_6','=',parent.module_id)]" /> 
 										<field name = "learner_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>
@@ -319,7 +325,7 @@
 						</h2>
 						<field name="learner_asset" readonly="context.get('ctx', False)">
 							<tree string="PF Order Lines" editable="bottom">
-								<field name = "learner_id" required='True' options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id)"/>
+								<field name = "learner_id" required='True' on_change="on_change_learner_id(learner_id)" options="{'create': False, 'create_edit': False}"/>
 								<field name = "learner_nric" required='True'/>
 								<field name = "binder_issue_date" />
 								<field name = "tablet_type" />
@@ -417,7 +423,8 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">class.info</field>
             <field name="view_type">form</field>
-			<field name="view_id" ref="class_form"/>
+			<field name="limit">10</field>
+			<field name="view_id" ref="class_tree"/>
             <field name="view_mode">calendar,tree,form</field>
 			<field name="search_view_id" ref="view_class_filter"/>
 		    <field name="help" type="html">

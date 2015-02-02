@@ -78,7 +78,7 @@
                 </ul>
             </form>
             <div class="oe_login_footer">
-                <a href="#" class="oe_login_manage_db">Manage Databases</a> 
+                <!--a href="#" class="oe_login_manage_db">Manage Databases</a-->
                 <a href="http://www.openerp.com" target="_blank"> <span></span></a>
             </div>
         </div>
@@ -422,9 +422,9 @@
         <span class="oe_topbar_name"/>
         <ul class="oe_dropdown_menu">
             <li><a href="#" data-menu="settings">Preferences</a></li>
-            <li><a href="#" data-menu="account">My OpenERP.com account</a></li>
+            <!--li><a href="#" data-menu="account">My OpenERP.com account</a></li>
             <li><a href="#" data-menu="about">About OpenERP</a></li>
-            <li><a href="#" data-menu="help">Help</a></li>
+            <li><a href="#" data-menu="help">Help</a></li-->
             <li><a href="#" data-menu="logout">Log out</a></li>
         </ul>
     </span>
@@ -833,6 +833,8 @@
             </div>
             <button t-if="widget.is_action_enabled('create')"
                 type="button" class="oe_button oe_form_button_create" accesskey="C">Create</button>
+			<!--button t-if="widget.is_action_enabled('delete')"
+                type="button" class="oe_list_record_delete" accesskey="D">Delete</button-->
         </span>
         <span class="oe_form_buttons_edit">
             <button type="button" class="oe_button oe_form_button_save oe_highlight" accesskey="S">Save</button>

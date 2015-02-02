@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
   <data>
-<!-- ==================================================
+    <!-- ==================================================
 ************************ PROGRAMS *********************
  ================================================== -->
- 
-<!-- ===================== Program List View ============================= -->
+    <!-- ===================== Program List View ============================= -->
     <record id="program_tree" model="ir.ui.view">
       <field name="name">Program</field>
       <field name="model">lis.program</field>
@@ -27,7 +26,7 @@
         </search>
       </field>
     </record>
-<!-- ========================= Program Action Layout ============================= -->
+    <!-- ========================= Program Action Layout ============================= -->
     <record id="action_program" model="ir.actions.act_window">
       <field name="name">Program</field>
       <field name="type">ir.actions.act_window</field>
@@ -38,7 +37,7 @@
       <field name="search_view_id" ref="view_program_filter" />
       <field name="view_id" ref="program_tree" />
     </record>
-<!-- ========================Program Form View=============================== -->
+    <!-- ========================Program Form View=============================== -->
     <record id="program_form" model="ir.ui.view">
       <field name="name">Program</field>
       <field name="model">lis.program</field>
@@ -134,7 +133,7 @@
             </group>
             <!-- ========================= Start Of Program Tabs ========================= -->
             <notebook colspan="5" col="10">
-			<!-- ============ Module Blocks ============ -->
+              <!-- ============ Module Blocks ============ -->
               <page string="Modules">
                 <!-- Dropdown to select no. of boxes -->
                 <h3>
@@ -185,7 +184,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 1 -->
+                  <!-- Modules For Group 1 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line" nolabel="1">
@@ -232,7 +231,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 2 -->
+                  <!-- Modules For Group 2 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_2" nolabel="1">
@@ -279,7 +278,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 3 -->
+                  <!-- Modules For Group 3 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_3" nolabel="1">
@@ -327,7 +326,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 4 -->
+                  <!-- Modules For Group 4 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_4" nolabel="1">
@@ -374,7 +373,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 5 -->
+                  <!-- Modules For Group 5 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_5" nolabel="1">
@@ -385,7 +384,7 @@
                     </field>
                   </div>
                 </div>
-                 <!-- ============ Module group block 6 ============= -->
+                <!-- ============ Module group block 6 ============= -->
                 <div class="col-3 dark_border" attrs="{'invisible': [('no_module_box6', '=' , False)]}">
                   <div class="box header">
                     <label for="mod_gp_name_6" class="oe_edit_only" />
@@ -421,7 +420,7 @@
                       </span>
                     </div>
                   </div>
-				  <!-- Modules For Group 6 -->
+                  <!-- Modules For Group 6 -->
                   <div class="box">
                     <h4>Modules in Group</h4>
                     <field name="program_mod_line_6" nolabel="1">
@@ -602,7 +601,7 @@
                         <field name="time" widget="float_time" />
                         <field name="befor_after" />
                         <field name="min_max" />
-                        <field name="value_per"/>
+                        <field name="value_per" />
                         <field name="action" />
                       </tree>
                     </field>
@@ -610,9 +609,9 @@
                 </group>
                 <group col="6">
                   <div>
-					 <h3>
-                    <label for="program_alert_line_2" string="Alerts for attached Modules" />
-					</h3>
+                    <h3>
+                      <label for="program_alert_line_2" string="Alerts for attached Modules" />
+                    </h3>
                     <field name="program_alert_line_2" nolabel="1" create="false" delete="false" style="height:150px">
                       <tree string="Req Order Lines" class="grey_border">
                         <field name="name" />
@@ -647,11 +646,9 @@
         </form>
       </field>
     </record>
-	
-<!-- ==================================================
+    <!-- ==================================================
 ************************ MODULES *********************
  ================================================== -->
- 
     <!-- ===================== Module List View =============================-->
     <record id="matser_req_form" model="ir.ui.view">
       <field name="name">Master Req</field>
@@ -731,25 +728,21 @@
       <field name="arch" type="xml">
         <form string="module" version="7.0">
           <sheet>
-            <group>
-              <div class="oe_title">
-                <label for="name" class="oe_edit_only" invisible="context.get('ctx', False)" />
-                <h1 style="width:320px;">
-                  <field name="name" class="oe_inline" readonly="context.get('ctx', False)" />
-                </h1>
-                <label for="module_code" class="oe_edit_only" style="width:300px;" invisible="context.get('ctx', False)" />
-                <h2>
-                  <field name="module_code" readonly="context.get('ctx', False)" />
-                </h2>
-                <label for="module_crscode" class="oe_edit_only" style="width:300px;" invisible="context.get('ctx', False)" />
-                <h2>
-                  <field name="module_crscode" readonly="context.get('ctx', False)" />
-                </h2>
-              </div>
+            <div class="col-2">
+              <label for="name" class="oe_edit_only" invisible="context.get('ctx', False)" />
+              <h1>
+                <field name="name" class="oe_inline" readonly="context.get('ctx', False)" />
+              </h1>
+              <label for="module_code" class="oe_edit_only" invisible="context.get('ctx', False)" />
+              <field name="module_code" readonly="context.get('ctx', False)" />
+              <label for="module_crscode" class="oe_edit_only" invisible="context.get('ctx', False)" />
+              <field name="module_crscode" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="col-2">
               <group col="4">
                 <div attrs="{'invisible': [('status_display', 'in' , ('Incomplete', 'InActive', 'False'))]}">
                   <group colspam="6" col="12">
-                    <tree string="Status Order Lines" create="false" delete="false" >
+                    <tree string="Status Order Lines" create="false" delete="false">
                       <div id="div_status2" class="openerp oe_form_readonly status_box">
                         <div class="status_box_label">Status</div>
                         <div class="status_box_status">
@@ -778,29 +771,56 @@
                   </group>
                 </div>
               </group>
-            </group>
-            <group>
+            </div>
+            <div class="clear" />
+            <div class="col-3">
+              <label for="module_certification" />
               <field name="module_certification" readonly="context.get('ctx', False)" />
-            </group>
-            <group col="8">
+            </div>
+            <div class="col-3">
+              <label for="module_duration" />
               <field name="module_duration" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="col-3">
+              <label for="module_fee" />
               <field name="module_fee" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="clear" />
+            <div class="col-3">
+              <label for="module_status" />
               <field name="module_status" widget="selection/" readonly="context.get('ctx', False)" />
-              <field name="module_credit_value" readonly="context.get('ctx', False)" string="Credit Value"/>
+            </div>
+            <div class="col-3">
+              <label for="module_credit_value" />
+              <field name="module_credit_value" readonly="context.get('ctx', False)" string="Credit Value" />
+            </div>
+            <div class="col-3">
+              <label for="module_level" />
               <field name="module_level" widget="selection/" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="clear" />
+            <div class="col-3">
+              <label for="module_category" />
               <field name="module_category" widget="selection/" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="col-3">
+              <label for="module_pathway" />
               <field name="module_pathway" widget="selection/" readonly="context.get('ctx', False)" />
+            </div>
+            <div class="col-3">
+              <label for="orientation" />
               <field name="orientation" widget="selection/" readonly="context.get('ctx', False)" />
-            </group>
+            </div>
+            <div class="clear" />
             <group col="8">
               <div colspan="4">
                 <label for="description" />
                 <field name="description" on_change="on_change_module_desc(description)" readonly="context.get('ctx', False)" />
               </div>
             </group>
-			<!-- ========================= Start Of Module Tabs ========================= -->
+            <!-- ========================= Start Of Module Tabs ========================= -->
             <notebook colspan="5" col="10">
-			<!-- ============ Mod Requirements ============ -->
+              <!-- ============ Mod Requirements ============ -->
               <page string="Requirements">
                 <h3>
                   <label string="Requirments" />
@@ -814,7 +834,7 @@
                   </tree>
                 </field>
               </page>
-			  <!-- ============ Mod Description ============ -->
+              <!-- ============ Mod Description ============ -->
               <page string="Description">
                 <h3>
                   <label string="Description" />
@@ -835,34 +855,34 @@
                   </div>
                 </group>
               </page>
-			  <!-- ============ Mod M O I ============ -->
+              <!-- ============ Mod M O I ============ -->
               <page string="M.O.I">
                 <h3>
                   <label string="Mode of Instruction" readonly="context.get('ctx', False)" />
                 </h3>
                 <group>
                   <div>
-				    <group>
+                    <group>
                       <field name="delivery_mode" string="Medium Of Instruction" readonly="context.get('ctx', False)" />
                       <field name="binder_in_use" readonly="context.get('ctx', False)" />
                       <field name="tablet_in_use" readonly="context.get('ctx', False)" />
                       <field name="primary" readonly="context.get('ctx', False)" />
-					</group>
+                    </group>
                   </div>
                   <div>
-				    <group>
+                    <group>
                       <field name="room_arr" readonly="context.get('ctx', False)" />
                       <field name="pf_line" readonly="context.get('ctx', False)">
                         <tree string="PF Order Lines" editable="bottom" class="grey_border">
                           <field name="equip_list" required="True" />
                         </tree>
                       </field>
-					</group>
+                    </group>
                   </div>
-				  <div class="clear"></div>
+                  <div class="clear" />
                 </group>
               </page>
-			  <!-- ============ Mod Test/Assessments ============ -->
+              <!-- ============ Mod Test/Assessments ============ -->
               <page string="Test/Assessments">
                 <h3>
                   <label string="Test / Assessments" />
@@ -888,7 +908,7 @@
                     <div attrs="{'invisible': [('in_class_test', '=' , False)]}">
                       <field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="In Class Order Lines" editable="bottom">
-                          <field name="order_priority"  />
+                          <field name="order_priority" />
                           <field name="test_list" />
                         </tree>
                       </field>
@@ -901,7 +921,7 @@
                     <div attrs="{'invisible': [('post_test', '=' , False)]}">
                       <field name="post_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="Post Order Lines" editable="bottom">
-                          <field name="order_priority"  />
+                          <field name="order_priority" />
                           <field name="test_list" />
                         </tree>
                       </field>
@@ -909,7 +929,7 @@
                   </div>
                 </group>
               </page>
-			  <!-- ============ Mod Alerts ============ -->
+              <!-- ============ Mod Alerts ============ -->
               <page string="Alerts">
                 <h3>
                   <label string="Alerts" />
@@ -918,7 +938,7 @@
                   <tree string="Alert Order Lines" editable="bottom" class="grey_border">
                     <field name="s_no" />
                     <field name="alert_list" on_change="on_change_master_module_alerts(alert_list,mod_id)" />
-                    <field name="time" widget="float_time"/>
+                    <field name="time" widget="float_time" />
                     <field name="befor_after" />
                     <field name="min_max" />
                     <field name="value_per" />
@@ -927,7 +947,7 @@
                   </tree>
                 </field>
               </page>
-			  <!-- ============ Mod History ============ -->
+              <!-- ============ Mod History ============ -->
               <page string="History">
                 <h3>
                   <label string="History" />
@@ -950,7 +970,6 @@
         </form>
       </field>
     </record>
-	
     <!-- ========================= Module Action Layout ============================= -->
     <record id="module_tree" model="ir.ui.view">
       <field name="name">module.tree</field>
@@ -992,7 +1011,6 @@
         <p class="oe_view_nocontent_create">Click to define a new module.</p>
       </field>
     </record>
-	
     <!-- ===========================Menu Settings=========================== -->
     <menuitem name="Corner Stone" id="menu_lis_lab" />
     <menuitem name="Offerings" id="menu_sub" parent="menu_lis_lab" />

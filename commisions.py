@@ -200,6 +200,36 @@ class project_value_line(osv.osv):
 			if self_obj.s_range1 < 0 or self_obj.e_range1 < 0 or self_obj.s_range1 > self_obj.e_range1:
 				return False
 		return True
+# 19-1-15	
+
+	def _check_unique_s_range(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.project_value_lineid == self_obj.project_value_lineid and x.s_range1 == self_obj.s_range1:
+						return False
+		return True		
+
+	def _check_unique_e_range(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.project_value_lineid == self_obj.project_value_lineid and x.e_range1 == self_obj.e_range1:
+						return False
+		return True	
+
+# Zeya 19-1-15
+	'''def ranges_between(self, s_range1, e_range1):
+		 latest_start = max(r1.s_range1, r2.s_range1)
+		 earliest_end = min(r1.e_range1, r2.e_range1)
+		 overlap = (earliest_e_range1 - latest_s_range1).val + 1
+		 overlap
+		return r.val
+'''
+
+
 		
 	_name = "project.value.line"
 	_description = "Project Line"
@@ -215,7 +245,46 @@ class project_value_line(osv.osv):
 	   'e_range1': 0,
 	   'value1': 0,
 	  }
-	_constraints = [(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
+	_constraints = [(_check_unique_s_range, 'Error: Start Range Value Already Exist', ['Start of Range']),(_check_unique_e_range, 'Error: End Range Value Already Exist', ['End of Range']),
+	(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
+
+	def onchange_range(self, cr, uid, ids, sr, er, context=None):
+		res = {'value':{}}
+		'''for line in self.browse(cr, uid, ids, ):
+			#raise osv.except_osv(_('Warning!'),_('not %s')%(line.count))
+			if sr >= line.s_range1 and sr <= line.e_range1:
+				res['value']['s_range1'] = ''
+				#raise osv.except_osv(_('Warning!'),_('not %s %s')%(line.s_range1, line.e_range1))
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Range already exist.')}})
+				return res
+			#history_line_id = self.browse(cr, uid, ids[0], context=context).history_line or []
+			return 1'''
+		#ids = self.pool.get('project.value.line').search(cr, uid, [('s_range1', '>=', sr) and ('e_range1', '<=', sr) ], context=context)
+		sql="select s_range1, e_range1 from project_value_line"
+		cr.execute(sql);
+		rec = cr.fetchall()
+		for i in rec:
+			#ids2 = self.pool.get('project.value.line').search(cr, uid, [('e_range1', '<=', sr) ], context=context)
+			#if ids2:
+			#raise osv.except_osv(_('Warning!'),_('not %s %s %s')%(i[0] , i[1], sr))
+			if sr >= i[0] and sr <= i[1]:
+				res['value']['s_range1'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Range already exist.')}})
+				return res
+			elif er >= i[0] and er <= i[1]:
+				res['value']['e_range1'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Range already exist.')}})
+				return res
+		return 1
+		'''p_obj = self.pool.get('project.value.line') 
+		value_ids = p_obj.search(cr, uid, None, context=context)
+		val2 ={}
+		sub_lines = []
+		for line in p_obj.browse(cr, uid, value_ids, context=context):
+			raise osv.except_osv(_('Warning!'),_('ccc %s %s')%(line.s_range1, line.e_range1))
+			#sub_lines.append({'outs_item':prog_line['master_show_do'].id, 'outs_confirmation':prog_line['supp_doc_req']})
+		return 1'''
+		
 project_value_line
 
 class people_bu(osv.osv):
@@ -244,7 +313,7 @@ class people_bu(osv.osv):
 		_logger.info("Business name %s %s", business_obj, p_line_id) 
 		return {'value': {'business_id': business_obj.people_business_id.name}}
 		
-		
+
 	_name = "people.bu"
 	_description = "People"
 	_columns = {

@@ -59,13 +59,23 @@ class class_info(osv.osv):
 		value_ids = self.search(cr, uid, [('id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])	
 		
+	def _property_expense_preset_expenses2(self, cr, uid, ids, expenses, arg, context):
+		trainer_ids =[]
+		for trainer_obj in  self.browse(cr, uid, ids).trainers_line or [] :
+			if trainer_obj.t_status == "Confirmed" :
+				trainer_ids.append(trainer_obj.id)
+		return dict([(id, trainer_ids) for id in ids])
+	
+	
+	
+	
 	def _calculate_total_learners(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
 		for line in self.browse(cr, uid, ids, context=context):
-			mod_line_ids = self.browse(cr, uid, ids[0], context=context).learner_line or []
-		total_mod = len(mod_line_ids)
-		res[line.id] = total_mod
+			mod_line_ids = line.learner_line or []
+			total_mod = len(mod_line_ids)
+			res[line.id] = total_mod
 		return res
 
 	def move_learner(self, cr, uid, ids, context=None): 
@@ -118,7 +128,6 @@ class class_info(osv.osv):
 		
 		if new_class[0].parent_id == 0 :
 			for x in self.browse(cr, uid, sr_ids, context=context) : 
-				_logger.info('Unique Name %s %s %s',new_class[0].parent_id,new_class[0].id,sr_ids)
 				if new_class[0].parent_id == 0 and new_class[0].id != x.id and new_class[0].name.lower() == x.name.lower() :
 					return False
 		else :
@@ -127,6 +136,33 @@ class class_info(osv.osv):
 					return False
 		return True
    
+	def trainer_broadcast(self, cr, uid, ids, context=None): 
+		learner_move_array = []
+		self_obj  = self.browse(cr, uid, ids[0], context=context)
+		trainers = []
+		for le_obj in self_obj.trainers_line:
+			if le_obj.t_status == None or le_obj.t_status == False :
+				learner_move_array.append(le_obj.trainer_id.id)
+				trainers.append(le_obj.id)
+		
+		_logger.info("Values in looop %s",trainers)
+				
+		for er in trainers:
+			self.pool.get('trainers.line').update_status(cr, uid, er,{'t_status':'Awaiting Response'}, context=context)
+				
+		if len(learner_move_array) > 0 :
+			sub_lines = []
+			values = {}
+			sub_lines.append( (0,0, {'class':self_obj['id'],'class_code_avaliable':self_obj['class_code'],
+				'start_date_avaliable':self_obj['start_date'],'status':'Awaiting'}) )
+			values.update({'assignment_avaliable': sub_lines})
+			trainer_obj = self.pool.get("trainer.profile.info")
+			for x in trainer_obj.browse(cr, uid, learner_move_array, context=context):
+				trainer_obj.write(cr, uid, x.id,values, context=context)
+		
+		
+	
+	
 	def _check_unique_code(self, cr, uid, ids, context=None):
 		new_class = self.browse(cr, uid, ids, context=context)
 		sr_ids = self.search(cr, 1, [('parent_id', '=', 0)])
@@ -159,8 +195,8 @@ class class_info(osv.osv):
 		'total_hrs': fields.integer('Total Hours', readonly=1),
 		'total_sessions': fields.integer('Total Sessions', readonly=1),
 		'total_weeks': fields.integer('Total Weeks', readonly=1),
-		'sess_info_line': fields.function(_property_expense_preset_expenses,type='one2many',obj="class.info",method=True,string='Expenses'),
-		'sess_info_line1': fields.function(_property_expense_preset_expenses1,type='one2many',obj="class.info",method=True,string='Expenses'),
+		'sess_info_line': fields.function(_property_expense_preset_expenses,type='one2many',obj="class.info",method=True,string='Session'),
+		'sess_info_line1': fields.function(_property_expense_preset_expenses1,type='one2many',obj="class.info",method=True,string='Session'),
 		'include_1':fields.boolean('Include'),
 		'include_2':fields.boolean('Include'),
 		'include_3':fields.boolean('Include'),
@@ -196,8 +232,8 @@ class class_info(osv.osv):
 		'room5': fields.char('Rooms', readonly=1),
 		'room6': fields.char('Rooms', readonly=1),
 		'room7': fields.char('Rooms', readonly=1),
-		'trainer_line': fields.one2many('trainers.line', 'trainer_line_id', 'Broadcast'),
-		'trainer_history': fields.one2many('trainers.history', 's_no', 'Trainer Assigment History'),
+		'trainers_line': fields.one2many('trainers.line', 'trainers_line_id', 'Broadcast'),
+		'trainer_history': fields.one2many('trainers.history', 'trainers_hist_id', 'Broadcast'),
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 		'learner_line': fields.one2many('learner.line', 'learner_mod_id', 'Order Lines', select=True, required=True),
 		'binder_in_use':fields.boolean('Binder'),
@@ -227,6 +263,12 @@ class class_info(osv.osv):
 	def create(self,cr, uid, values, context=None):
 		global class_create
 		class_create = True
+		
+		if 'duration' in values and values['duration'] < 0:
+			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
+				
+		if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
+			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
 		
 		'''validate sessions now'''
 		include_arr_list = 0
@@ -369,6 +411,9 @@ class class_info(osv.osv):
 				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 			
 				new_date_time = datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+				if new_date_time  < datetime.now() :
+					raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
+
 				new_date_time_utc = pytz.utc.localize(new_date_time).astimezone(tz)
 				new_time = str(new_date_time_utc.time())
 				local =pytz.timezone(user.tz)
@@ -593,6 +638,8 @@ class class_info(osv.osv):
 				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 			
 				new_date_time = datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
+				if new_date_time  < datetime.now() :
+					raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
 				new_date_time_utc = pytz.utc.localize(new_date_time).astimezone(tz)
 				new_time = str(new_date_time_utc.time())
 				local =pytz.timezone(user.tz)
@@ -817,6 +864,9 @@ class class_info(osv.osv):
 		
 	def write(self,cr, uid, ids, values, context=None,holidays=False):
 		if holidays ==  False :
+			if 'duration' in values and values['duration'] < 0:
+				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
+			
 			apply = False;
 			apply_to_future = False;
 			location_obj = self.browse(cr, uid, ids[0])
@@ -847,6 +897,8 @@ class class_info(osv.osv):
 							super(class_info, self).write(cr, uid, prog_module_line.id,values, context=context)
 				elif 'start_date' in values :
 					t1start  = datetime.strptime(str(values['start_date']),"%Y-%m-%d %H:%M:%S")
+					if t1start  < datetime.now() :
+						raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
 					if 'duration' in values :
 						duration = values['duration'] 
 					else :
@@ -962,7 +1014,7 @@ class class_info(osv.osv):
 						'module_id': 'Module','start_date': 'Start Date','duration':'Duration(Hrs)',
 						'include_1':'Include Day 1','include_2':'Include Day 2','include_3':'Include Day 3',
 						'include_4':'Include Day 4','include_5':'Include Day 5','include_6':'Include Day 6',
-						'include_7':'Include Day 7','trainer_line':'Trainer','trainer_history':  'Trainer Assigment History',
+						'include_7':'Include Day 7','trainers_line':'Trainer','trainer_history':  'Trainer Assigment History',
 						'delivery_mode': 'Delivery Mode','learner_line': 'Learner Lines','binder_in_use':'Binder',
 						'tablet_in_use':'Tablet','primary': 'Primary','moi_eq_line': 'Equipment List','room_arr': 'Room Arrangment',
 						'learner_asset': 'Asset','non_std_items': 'Non Standard Items','trainer_po_listing': 'PO Listing',
@@ -1317,7 +1369,10 @@ class learner_mod_line(osv.osv):
 				
 				super(learner_mod_line, self).write(cr, uid, prog_module_line.id,values, context=context)
 		return id
-  
+		
+	def on_change_learner_id(self, cr, uid, ids, learner_id):
+		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
+		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
 	
 	_name = "learner.line"
 	_description = "Learner Line"
@@ -1333,13 +1388,7 @@ class learner_mod_line(osv.osv):
 		'move':fields.boolean('Move'),
 	}
 	_constraints = [(_check_unique_learner, 'Error: Learner Already Exists', ['learner_id'])]
-	
-	def on_change_learner_id(self, cr, uid, ids, learner_id):
-		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
-		return {'value': {'learner_nric': module_obj.learner_nric}}
-
-	
-	
+		
 learner_mod_line()
 
 class session_info(osv.osv):
@@ -1354,28 +1403,29 @@ class session_info(osv.osv):
 	}
 session_info()
 
-class trainer_line(osv.osv):
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(trainer_line, self).read(cr, uid,ids, fields, context, load)
-		seq_number =0 
-		for r in res:
-			seq_number = seq_number+1
-			r['s_no'] = seq_number
-		
-		return res
+class trainers_line(osv.osv):
+	
 	def _check_unique_trainer(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
+		_logger.info("Unoqu sr_ids %s",sr_ids)
 		for x in self.browse(cr, uid, sr_ids, context=context):
+			_logger.info("Unoqu Name %s",x)
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.trainer_line_id == self_obj.trainer_line_id and x.trainer_id == self_obj.trainer_id:
+					if x.trainers_line_id == self_obj.trainers_line_id and x.trainer_id == self_obj.trainer_id:
 						return False
 		return True
+	def update_status(self,cr, uid, ids, values, context=None):
+		super(trainers_line, self).write(cr, uid, ids,values, context=context)
 	
 	def create(self,cr, uid, values, context=None):
-		id = super(trainer_line, self).create(cr, uid, values, context=context)
-		class_id = values['trainer_line_id']
+		global class_create
+		if class_create == True :
+			id = super(trainers_line, self).create(cr, uid, values, context=context)
+			return id
+		_logger.info("create %s",values)
+		id = super(trainers_line, self).create(cr, uid, values, context=context)
+		class_id = values['trainers_line_id']
 		class_info_obj = self.pool.get('class.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
 		parent_id = class_info_obj_id['parent_id']
@@ -1390,15 +1440,15 @@ class trainer_line(osv.osv):
 		for prog_module_line in prog_mod_ids:
 			if prog_module_line != class_id:
 				new_array = values
-				new_array['trainer_line_id'] = prog_module_line
-				super(trainer_line, self).create(cr, uid, new_array, context=context)
+				new_array['trainers_line_id'] = prog_module_line
+				super(trainers_line, self).create(cr, uid, new_array, context=context)
 				
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
-		id = super(trainer_line, self).write(cr, uid, ids,values, context=context)
+		id = super(trainers_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
-		class_id = values_obj['trainer_line_id']
+		class_id = values_obj['trainers_line_id']
 		
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
@@ -1409,22 +1459,61 @@ class trainer_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		
-		line_ids = self.search(cr,uid,[('trainer_line_id','in',prog_mod_ids)])
+		line_ids = self.search(cr,uid,[('trainers_line_id','in',prog_mod_ids)])
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
-				super(trainer_line, self).write(cr, uid, prog_module_line.id,values, context=context)
+				super(trainers_line, self).write(cr, uid, prog_module_line.id,values, context=context)
 		return id
+		
+	def trainer_confirm(self, cr, uid, ids, context=None): 
+		super(trainers_line, self).write(cr, uid, ids[0],{'t_status':'Confirmed'}, context=context)
+		self_obj  = self.browse(cr, uid, ids[0], context=context)
+		trainer_obj = self_obj['trainer_id']
+		prog_mod_ids = []
+		for le_obj in trainer_obj.assignment_avaliable:
+			if le_obj.trainer_avail_id == trainer_obj.id :
+				self.pool.get("trainers.assignment.avaliable").write(cr, uid, le_obj.id,{'status':'Confirmed'}, context=context)
+		
+		class_info_obj = self.pool.get('class.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,self_obj['trainers_line_id'].id)
+		parent_id = class_info_obj_id['parent_id']
+		if parent_id > 0:
+			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
+			ids = class_info_obj.search(cr, uid, [('id', '=', parent_id)])
+			prog_mod_ids.append(ids[0])
+		else:
+			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', class_info_obj_id.id)])
+			prog_mod_ids.append(class_info_obj_id.id)
+		
+		sub_lines = []
+		values = {}
+		sub_lines.append( (0,0, {'trainer':trainer_obj.name,'session_assigned':class_info_obj_id.sess_no,
+			'date_of_assignment':class_info_obj_id.start_date,'single_session':True}) )
+		values.update({'trainer_history': sub_lines})
+		_logger.info("Clas Info Id %s",prog_mod_ids)
+		for prog_module_line in class_info_obj.browse(cr,uid,prog_mod_ids):
+			_logger.info("Clas Info Indide %s",prog_module_line)
+			self.pool.get("class.info").write(cr, uid, prog_module_line.id,values, context=context,holidays=True)
+				
+		
+		
+	def _calculate_total_session(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = 5
+		return res
+		
 	_name ='trainers.line'
 	_description ="Trainer Line Tab"
 	_columns = {
 	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'trainer_line_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
+	'trainers_line_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 	'trainer_id':fields.many2one('trainer.profile.info', 'Trainer', ondelete='cascade', help='Trainer', select=True, required=True),
-	'attendance':fields.boolean('Attendance'),
-	'confirmation':fields.boolean('Confirmation')
+	't_status':fields.char('Status'),
 	}
-	_constraints = [(_check_unique_trainer, 'Error: Trainer Already Exists', ['trainer_id'])]
-trainer_line()
+	_constraints = [(_check_unique_trainer, 'Error: Trainer Already Exists', ['trainers_line_id'])]
+trainers_line()
 
 class trainer_hist(osv.osv):
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
@@ -1439,7 +1528,8 @@ class trainer_hist(osv.osv):
 	_name ='trainers.history'
 	_description ="Trainer History Tab"
 	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
+	's_no' : fields.integer('S. No',size=20,readonly=1),
+	'trainers_hist_id' : fields.integer('Id'),
 	'trainer':fields.char('Trainer',size=25),
 	'session_assigned':fields.char('Session Assigned',size=25),
 	'date_of_assignment':fields.char('Date of Assignment',size=25),
@@ -1510,9 +1600,18 @@ class_moi()
 
 class learner_asset(osv.osv):
 
+	def _check_unique_learner(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.learner_asset_id == self_obj.learner_asset_id and x.learner_id == self_obj.learner_id:
+						return False
+		return True
+		
 	def on_change_learner_id(self, cr, uid, ids, learner_id):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
-		return {'value': {'learner_nric': module_obj.learner_nric}}
+		return {'value': {'name': module_obj.name,'learner_nric': module_obj.learner_nric}}
 		
 	def create(self,cr, uid, values, context=None):
 		id = super(learner_asset, self).create(cr, uid, values, context=context)
@@ -1569,6 +1668,7 @@ class learner_asset(osv.osv):
 	'blended_serial_number': fields.char('Blended Serial Number',size=20),
 	'blended_issue_date': fields.date('Blended Issue Date'),
 	}
+	_constraints = [(_check_unique_learner, 'Error: Learner Already Exists', ['learner_id'])]
 learner_asset()
 
 class po_listing(osv.osv):

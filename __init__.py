@@ -28,8 +28,10 @@ import business_structure
 import commisions
 import class_info
 import test_scheduling
-import enrollment
+import content_index_learner
+import learner
 import class_status_dashboard
-import educator
+import trainer_enrollment
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

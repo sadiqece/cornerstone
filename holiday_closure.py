@@ -2,10 +2,15 @@ import datetime
 from dateutil import relativedelta
 from openerp import addons
 import logging
+import time
 from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
+from datetime import datetime
+from collections import namedtuple
+import pytz
+
 
 _logger = logging.getLogger(__name__)
 
@@ -38,7 +43,7 @@ class holidays(osv.osv):
 	def populate_year(self, cursor, user_id, context=None):
 		val = {}
 		i = 0
-		for year_dropdown in range(2012, (datetime.datetime.now().year + 10)):
+		for year_dropdown in range(2012, (datetime.now().year + 10)):
 			val[i] = ('choice'+str(i), str(year_dropdown))
 			i = i+1
 		return val
@@ -92,56 +97,78 @@ class holiday_line(osv.osv):
 
 #Validate Date For Past		
 	def months_between1(self, date1, date2):
-		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
-		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d")
-		r = relativedelta.relativedelta(date12, date11)
+		#current_date = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT),
+		#print "\n\n====current_date===", current_date
+		#date11 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
+		#date12 = datetime.strptime(date2, '%Y-%m-%d')
+		r = relativedelta.relativedelta(date1, date2)
 		return r.days
 		
 	def months_between2(self, date1, date2):
-		date11 = datetime.datetime.strptime(date1, "%Y-%m-%d %H:%M:%S")
-		date12 = datetime.datetime.strptime(date2[:19], "%Y-%m-%d")
+		date11 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
+		date12 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S')
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 
 #Validate Start Date: Past Date and Year Match
-	def onchange_start_date_past(self, cr, uid, ids, start_date, eofdate, year, context=None):
-		chng_year = datetime.datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-		if chng_year.year != year:	
-			raise osv.except_osv(_('Warning!'),_('Please enter correct Year.')%())
-
-		d = self.months_between1(start_date, str(datetime.datetime.now().date())) 
+	def onchange_start_date_past(self, cr, uid, ids, start_date, eofdate, year2, context=None):
 		res = {'value':{}}
-		if d > 0:
-			res['value']['date_start'] = ''
-			res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
-			return res
-		elif eofdate and start_date:
-			c = self.months_between2(str(eofdate), str(start_date))
-			if c < 0:
+			
+		chng_year = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+		today = time.strftime('%Y-%m-%d %H:%M:%S')
+		current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')
+		if chng_year.year and year2:
+			if str(chng_year.year) != str(year2):
 				res['value']['date_start'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date.')}})
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
 				return res
-		return start_date
+			d = self.months_between1(chng_year, current_date) 
+			if d < 0:
+				res['value']['date_start'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
+				return res
+			'''elif eofdate and start_date:
+				c = self.months_between2(str(start_date), str(eofdate))
+				#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s')%(c))
+				if c < 0:
+					res['value']['date_start'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date.')}})
+					return res'''
+			return start_date
 				
 #Validate End Date : Past Date and Year Match
-	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year, context=None):
-		chng_year = datetime.datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
-		if chng_year.year != year:	
-			raise osv.except_osv(_('Warning!'),_('Please enter correct Year.')%())
-			
-		d = self.months_between1(eofdate, str(datetime.datetime.now().date()))
+	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year2, context=None):
 		res = {'value':{}}
-		if d > 0:
+		#chng_year = datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
+		chng_year = datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
+		today = time.strftime('%Y-%m-%d %H:%M:%S')
+		current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')				
+		if not start_date and eofdate:
 			res['value']['date_end'] = ''
-			res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
+			res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter start date first.')}})
 			return res
-		elif eofdate and start_date:
-			c = self.months_between2(str(eofdate), str(start_date))
-			if c < 0:
+
+		if chng_year.year and year2:
+			if str(chng_year.year) != str(year2):
 				res['value']['date_end'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
 				return res
-		return eofdate
+			
+			#d = self.months_between1(eofdate, str(datetime.now().date()))
+			d = self.months_between1(chng_year, current_date) 
+			#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s %s')%(d, eofdate))
+			if d < 0:
+				res['value']['date_end'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
+				return res
+			'''elif eofdate and start_date:
+				c = self.months_between2(str(eofdate), str(start_date))
+				d = self.months_between1(start_date, str(datetime.now().date())) 
+				if c < 0:
+					res['value']['date_end'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
+					return res'''
+			return eofdate
 
 #Validate Start/End Date	
 	def _date_start_end_validate(self, cr, uid, ids, context=None):
@@ -184,76 +211,52 @@ class holiday_line(osv.osv):
 #Sadiq - Check Class and Test Schedule for Holidays and Closures
 	def create(self,cr, uid, values, context=None):
 		id = super(holiday_line, self).create(cr, uid, values, context=context)
-		t1start = datetime.datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
-		t1end = datetime.datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S")
+	
+		Range = namedtuple('Range', ['start', 'end'])
+		r1 = Range(start=datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S"))
 		
 		class_obj =self.pool.get("class.info")
 		class_obj_ids = class_obj.search(cr,uid,[])
 		sess_issue = 'None'
 		for u in class_obj.browse(cr,uid,class_obj_ids) :
-			t2start = datetime.datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S")
-			t2end = datetime.datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S")
-			if (t1start <= t2start <= t2end <= t1end):
-				sess_issue = values['description']
-				continue
-			elif (t1start <= t2start <= t1end):
-				sess_issue = values['description']
-				continue
-			elif (t1start <= t2end <= t1end):
-				sess_issue = values['description']
-				continue
-			elif (t2start <= t1start <= t1end <= t2end):
-				sess_issue = values['description']
-				continue
-			else:
-				overlap = False
-			
-			if sess_issue != 'None':
-				class_obj.write(cr, uid, [u.id],{'sess_issues':sess_issue}, context,True)
-				sess_issue = 'None'
+			r2 = Range(start=datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S"))
+			latest_start = max(r1.start, r2.start)
+			earliest_end = min(r1.end, r2.end)
+			overlap = (earliest_end - latest_start)
+			if overlap.days == 0:
+				class_obj.write(cr, uid, [u.id],{'sess_issues':values['description']}, context,holidays= True)
+		
 		return id
 	def write(self,cr, uid, ids, values, context=None):
 		
 		if 'date_start' in values :
-			t1start = datetime.datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
+			t1start = datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
 		else:
-			t1start = datetime.datetime.strptime(self.browse(cr,uid,ids[0])['date_start'], "%Y-%m-%d %H:%M:%S") 
+			t1start = datetime.strptime(self.browse(cr,uid,ids[0])['date_start'], "%Y-%m-%d %H:%M:%S") 
 			
 		if 'date_end' in values :
-			t1end = datetime.datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S") 
+			t1end = datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S") 
 		else:
-			t1end = datetime.datetime.strptime(self.browse(cr,uid,ids[0])['date_end'], "%Y-%m-%d %H:%M:%S") 
+			t1end = datetime.strptime(self.browse(cr,uid,ids[0])['date_end'], "%Y-%m-%d %H:%M:%S") 
 		
 		if 'description' in values:
 			description = values['description']
 		else:
 			description = self.browse(cr,uid,ids[0])['description']
+			
+		Range = namedtuple('Range', ['start', 'end'])
+		r1 = Range(start = t1start, end=t1end)
 		
 		class_obj =self.pool.get("class.info")
 		class_obj_ids = class_obj.search(cr,uid,[])
-		sess_issue = 'None'
 		for u in class_obj.browse(cr,uid,class_obj_ids) :
-			t2start = datetime.datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S")
-			t2end = datetime.datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S")
-			if (t1start <= t2start <= t2end <= t1end):
-				sess_issue = description
-				continue
-			elif (t1start <= t2start <= t1end):
-				sess_issue = description
-				continue
-			elif (t1start <= t2end <= t1end):
-				sess_issue = description
-				continue
-			elif (t2start <= t1start <= t1end <= t2end):
-				sess_issue = description
-				continue
-			else:
-				overlap = False
-			
-			if sess_issue != 'None':
-				class_obj.write(cr, uid, [u.id],{'sess_issues':sess_issue}, context,holidays= True)
-				sess_issue = 'None'
-	
+			r2 = Range(start=datetime.strptime(u['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(u['end_date'], "%Y-%m-%d %H:%M:%S"))
+			latest_start = max(r1.start, r2.start)
+			earliest_end = min(r1.end, r2.end)
+			overlap = (earliest_end - latest_start)
+			if overlap.days == 0:
+				class_obj.write(cr, uid, [u.id],{'sess_issues':description}, context,holidays= True)
+		
 		id = super(holiday_line, self).write(cr, uid, ids,values, context=context)
 		return id
 			
