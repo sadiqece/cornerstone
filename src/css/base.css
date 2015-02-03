@@ -1265,7 +1265,7 @@
   text-decoration: none;
 }
 .openerp .oe_view_manager table.oe_view_manager_header .oe_button_group .active {
-  background: #5cb85c;
+  background: #449D44;
 }
 .openerp .oe_view_manager table.oe_view_manager_header .oe_button_group .active a {
   color: white;
@@ -3015,7 +3015,7 @@ div.ui-widget-overlay {
 }
 /*  SUPREETH 13 10 2014 */
 .openerp .oe_form_readonly .status_box {
-    background-color: #5CB85C;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3051,7 +3051,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 15 10 2014 */
 .openerp .oe_form_readonly .status_box_1 {
-    background-color: #d9534f;
+    background-color: #E74C3C;
 	width:105px;
 	height:80px;
 	padding:10px;
@@ -3092,7 +3092,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 20 10 2014 */
 .openerp .oe_form_readonly .prog_status_box {
-    background-color: #5CB85C;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3127,7 +3127,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 20 10 2014 */
 .openerp .oe_form_readonly .prog_status_box_1 {
-    background-color: #d9534f;
+    background-color: #E74C3C;
 	width:105px;
 	height:80px;
 	padding:10px;
@@ -3204,7 +3204,7 @@ div.ui-widget-overlay {
 }
 
 .view_red {
-    background-color: #d9534f;
+    background-color: #E74C3C;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3213,7 +3213,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 27 11 2014 */
 .openerp .oe_form_readonly .schedule_status_box {
-    background-color: #d9534f;
+    background-color: #E74C3C;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3242,7 +3242,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 27 11 2014 */
 .openerp .oe_form_readonly .schedule_status_box_1 {
-    background-color: #5CB85C;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3356,7 +3356,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 04 12 2014 */
 .openerp .oe_form_readonly .test_schedule_status_box_1 {
-	background-color: #5CB85C;
+	background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3408,7 +3408,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 05 12 2014 */
 .openerp  .edu_dashboard_1 {
-    background-color: #2C3E50;
+    background-color: #968A87;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3489,7 +3489,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 05 12 2014 */
 .openerp  .edu_dashboard_4 {
-    background-color: #27AE60;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3516,7 +3516,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_1 {
-    background-color: #2C3E50;
+    background-color: #968A87;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3600,7 +3600,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_4 {
-    background-color: #c0392b;
+    background-color: #E74C3C;
     float: right;
     height: 80px;
     margin-right: 361px;
@@ -3687,7 +3687,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_7 {
-    background-color: #27AE60;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3714,7 +3714,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_8 {
-    background-color: #2C3E50;
+    background-color: #968A87;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3801,7 +3801,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 06 12 2014 */
 .openerp  .class_status_dashboard_11 {
-    background-color: #27AE60;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -3894,7 +3894,7 @@ div.ui-widget-overlay {
 	margin: 0 auto;
 }
 .red{
-	background-color: #d9534f;
+	background-color: #E74C3C;
 }
 .green{
 	background-color: #2ECC71;
@@ -3924,7 +3924,7 @@ div.ui-widget-overlay {
 /*  SUPREETH 05 12 2014 */
 
 .openerp .edu_dashboard_1 {
-    background-color: #2c3e50;
+    background-color: #968A87;
     float: right;
     height: 80px;
     margin-right: 132px;
@@ -4009,7 +4009,7 @@ div.ui-widget-overlay {
 
 /*  SUPREETH 05 12 2014 */
 .openerp  .edu_dashboard_4 {
-	background-color: #27ae60;
+	background-color: #449D44;
     float: right;
     height: 80px;
     margin-right: 223px;
@@ -4198,13 +4198,13 @@ label {
 }
 .dhx_cal_tab.active{
     border-radius:0!important;  
-  background-color:#5CB85C!important;
+  background-color:#449D44!important;
   color:#ffffff; 
   background-image: none!important;
   margin: 0px 0px 3px 0px;
 }
 .dhx_cal_today_button{
-    background-color:#5CB85C;
+    background-color:#449D44;
     color:#ffffff; 
     background-image: none!important;
     border-radius:0;
@@ -4214,7 +4214,7 @@ label {
   font-size: 12px;
 }
 .dhx_now .dhx_month_head{
-    color: #5cb85c;
+    color: #449D44;
     font-size: 14px;
     font-weight: bold;
 }
@@ -4245,6 +4245,12 @@ label {
   margin: 10px 1%;  
   display: block;
   float: left; 
+}
+.col-40{
+  width: 40%;
+  margin: 10px 1%;  
+  display: block;
+  float: left;
 }
 .col-3{
   width: 31%;
@@ -4307,7 +4313,7 @@ overflow-x:scroll;
 
 /*  SUPREETH 28 01 2015 FOR Learner Enrollment */
 .openerp .oe_form_readonly .schedule_status_box_9 {
-    background-color: #449D44;
+    background-color: #9F4687;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -4361,7 +4367,7 @@ overflow-x:scroll;
 
 /*  SUPREETH 28 01 2015 FOR Learner */
 .openerp .oe_form_readonly .schedule_status_box_5 {
-    background-color: #C0392B;
+    background-color: #9F4687;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -4388,7 +4394,7 @@ overflow-x:scroll;
 
 /*  SUPREETH 28 01 2015 FOR Learner */
 .openerp .oe_form_readonly .schedule_status_box_6 {
-    background-color: #27AE60;
+    background-color: #03C9A9;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -4441,15 +4447,15 @@ overflow-x:scroll;
 }
 
 /*  SUPREETH 28 01 2015 FOR Learner */
-.openerp .oe_form_readonly .schedule_status_box_8 {
-    background-color: #2C3E50;
+.openerp .oe_form_readonly .schedule_status_box_7 {
+    background-color: #E74C3C;
 	width:100px;
 	height:80px;
 	padding:10px;
 	margin: 0 auto;
 }
 
-.no_learners_8 {
+.no_learners_7 {
     color: #ffffff;
     font-size: 12px;
 	text-align: center;
@@ -4458,7 +4464,7 @@ overflow-x:scroll;
 	margin-bottom:5px;
 }
 
-.learner_box_8 {
+.learner_box_7 {
     color: #ffffff;
     font-size: 21px;
     font-weight: 100;
@@ -4467,9 +4473,120 @@ overflow-x:scroll;
 	display:block;
 }
 
+/* ===================================================== Learner Status 02-02-15========================================== */
+
+.openerp .oe_form_readonly .learner_status_box {
+    background-color: #449D44;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.learner_status_box_label {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.learner_status_box_status {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+.learner_status_box_date {
+    color: white;
+	color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/* ============================================================== */
+
+.openerp .oe_form_readonly .learner_status_box_1 {
+    background-color: #E74C3C;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.learner_status_box_label_1 {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.learner_status_box_status_1 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+.learner_status_box_date_1 {
+    color: white;
+	color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+/* =================================== */
+
+.openerp .oe_form_readonly .learner_status_box_2 {
+    background-color: #968A87;
+	width:100px;
+	height:80px;
+	padding:10px;
+	float:right;
+}
+
+.learner_status_box_label_2 {
+    color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+	margin-bottom:5px;
+}
+
+.learner_status_box_status_2 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 100;
+    text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
+.learner_status_box_date_2 {
+    color: white;
+	color: #ffffff;
+    font-size: 12px;
+	text-align: center;
+	line-height:1.4;
+	display:block;
+}
+
 /*  SUPREETH 21 01 2015 FOR Trainer */
 .openerp .oe_form_readonly .trainer_status_box {
-    background-color: #5CB85C;
+    background-color: #449D44;
 	width:100px;
 	height:80px;
 	padding:10px;
@@ -4505,7 +4622,7 @@ overflow-x:scroll;
 
 /*  SUPREETH 21 01 2015 FOR Trainer*/
 .openerp .oe_form_readonly .trainer_status_box_1 {
-    background-color: #d9534f;
+    background-color: #E74C3C;
 	width:105px;
 	height:80px;
 	padding:10px;
@@ -4538,4 +4655,3 @@ overflow-x:scroll;
 	line-height:1.4;
 	display:block;
 }
-

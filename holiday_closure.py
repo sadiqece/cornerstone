@@ -135,7 +135,10 @@ class holiday_line(osv.osv):
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date.')}})
 					return res'''
 			return start_date
-				
+		else:
+			return False
+
+			
 #Validate End Date : Past Date and Year Match
 	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year2, context=None):
 		res = {'value':{}}
@@ -169,6 +172,9 @@ class holiday_line(osv.osv):
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
 					return res'''
 			return eofdate
+		else:
+			return False	
+		
 
 #Validate Start/End Date	
 	def _date_start_end_validate(self, cr, uid, ids, context=None):

@@ -127,12 +127,12 @@
 				</h3>
 				<field name="assigned_line" nolabel="1">
 					<tree string="List" editable="bottom">
-						<field name="all_trainer" on_change="onchange_trainer_hist(all_trainer, mod_sched )" />
-						<field name="class_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" />
-						<field name="mod_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" />
+						<field name="all_trainer" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
+						<field name="class_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
+						<field name="mod_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
 						<field name="scheduled_date" />
 					</tree>
-				</field>				
+				</field>					
 			</page>
               <!-- Settings Tab -->
               <page string="Settings">
@@ -268,7 +268,7 @@
                 </h3>
                 <field name="trainer_module_line" nolabel="1" readonly="context.get('ctx', False)">
                   <tree string="List" editable="bottom">
-                    <field name="trainer_module_id" />
+                    <field name="trainer_module_id" options="{'create': False, 'create_edit': False}"/>
                     <field name="trainer_code" />
                     <field name="trainer_rate" />
                     <field name="trainer_mod_status" />

@@ -50,18 +50,57 @@
               </h1>
             </div>
             <!-- Color Boxes -->
-            <div class="col-3">
+            <div class="col-40">
               <group>
+			  <div class="col-2" style="margin:0px;">
                 <div class="openerp oe_form_readonly schedule_status_box_9 ">
                   <div class="no_learners_9">Checklist Items</div>
                   <div class="learner_box_9">
 					<field name = "actual_number" />
 				  </div>
                 </div>
-                <div class="openerp oe_form_readonly schedule_status_box_10">
-                  <div class="no_learners_10">Status</div>
-                  <div class="learner_box_10">Blocked</div>
+				</div>
+				<div class="col-2" style="margin:0px;">
+				<div class="openerp oe_form_readonly schedule_status_box_10">
+                        <div class="no_learners_10">Status</div>
+                        <div class="learner_box_10">Blocked</div>
                 </div>
+				</div>
+                <!--div class="col-2" style="margin:0px;">
+				<div attrs="{'invisible': [('learner_status_display_1', 'in' , ('InComplete', 'InActive', 'Blocked', 'False'))]}">
+						<div id="div_status2" class="openerp oe_form_readonly learner_status_box">
+							<div class="learner_status_box_label">Status</div>
+							<div class="learner_status_box_status">
+								<field name="learner_status_display_1" readline="1" />
+							</div>
+							<div class="learner_status_box_date">
+								<field name="date2" />
+							</div>
+						</div>
+					</div>
+					<div attrs="{'invisible': [('learner_status_display_2', 'in' ,('Active','Complete', 'Blocked', 'False'))]}">
+						<div id="div_status1" class="openerp oe_form_readonly learner_status_box_1">
+							<div class="learner_status_box_label_1 ">Status</div>
+							<div class="learner_status_box_status_1">
+								<field name="learner_status_display_2" readline="1" />
+							</div>
+							<div class="learner_status_box_date_2 ">
+								<field name="date1" />
+							</div>
+						</div>
+					</div>
+					<div attrs="{'invisible': [('learner_status_display_3', 'in' ,('Active','Complete', 'InComplete', 'InActive', 'False'))]}">
+						<div id="div_status1" class="openerp oe_form_readonly learner_status_box_2">
+							<div class="learner_status_box_label_2 ">Status</div>
+							<div class="learner_status_box_status_2">
+								<field name="learner_status_display_3" readline="1" />
+							</div>
+							<div class="learner_status_box_date_2 ">
+								<field name="date2" />
+							</div>
+						</div>
+					</div>
+					</div-->
               </group>
             </div>
             <div class="clear" />
@@ -313,7 +352,8 @@
                     <field name="s_no" />
                     <field name="item" />
                     <field name="confirmation" />
-                    <field name="upload_docs" />
+                    <field name="upload_docs" filename="datas_fname"/>
+                     <field name="datas_fname" invisible="1"/>
                     <!--button name="import_file" string="Upload" type="object" /-->
                   </tree>
                 </field>
@@ -406,7 +446,7 @@
                     <field name="emp_staus" style="width:280px;" />
                     <field name="company_name" string="Company" style="width:280px;" />
                     <field name="desig_detail" style="width:280px;" editable="bottom" />
-                    <field name="sal_range" style="width:280px;" />
+                    <field name="salary_range" style="width:280px;" />
                     <field name="sponsor_ship" style="width:280px;" />
                   </group>
                 </div>
@@ -415,7 +455,7 @@
                     <label string="Contact Details" readonly="context.get('ctx', False)" />
                   </h3>
                   <group>
-                    <field name="email_id" />
+                    <field name="email_id" on_change="ValidateEmail(email_id)"/>
                     <field name="addr_1" style="width:280px;" />
                     <field name="mobile_no" style="width:280px;" />
                     <field name="landline_no" style="width:280px;" />
@@ -476,19 +516,54 @@
                 </div>
               </group>
             </div>
-            <div class="col-2">
+			<div class="col-2">
               <group>
                 <div class="openerp oe_form_readonly schedule_status_box_7">
                   <div class="no_learners_7">Call Status</div>
                   <div class="learner_box_7">DON'T
-								CALL</div>
-                </div>
-                <div class="openerp oe_form_readonly schedule_status_box_8">
-                  <div class="no_learners_8">Status</div>
-                  <div class="learner_box_8">Blocked</div>
-                </div>
+									CALL</div>
+					</div>
+                <div class="openerp oe_form_readonly schedule_status_box_7">
+                  <div class="no_learners_7">Status</div>
+				  <div class="learner_box_7">InActive</div>
+				</div>
               </group>
-            </div>
+			 </div>
+			<!--div class="col-2" style="margin:0px;">
+			<div attrs="{'invisible': [('learner_status_display_1', 'in' , ('InComplete', 'InActive', 'Blocked', 'False'))]}">
+					<div id="div_status2" class="openerp oe_form_readonly learner_status_box">
+						<div class="learner_status_box_label">Status</div>
+						<div class="learner_status_box_status">
+							<field name="learner_status_display_1" readline="1" />
+						</div>
+						<div class="learner_status_box_date">
+							<field name="date2" />
+						</div>
+					</div>
+				</div>
+				<div attrs="{'invisible': [('learner_status_display_2', 'in' ,('Active','Complete', 'Blocked', 'False'))]}">
+					<div id="div_status1" class="openerp oe_form_readonly learner_status_box_1">
+						<div class="learner_status_box_label_1 ">Status</div>
+						<div class="learner_status_box_status_1">
+							<field name="learner_status_display_2" readline="1" />
+						</div>
+						<div class="learner_status_box_date_1 ">
+							<field name="date2" />
+						</div>
+					</div>
+				</div>
+				<div attrs="{'invisible': [('learner_status_display_3', 'in' ,('Active','Complete', 'InComplete', 'InActive', 'False'))]}">
+					<div id="div_status1" class="openerp oe_form_readonly learner_status_box_2">
+						<div class="learner_status_box_label_2 ">Status</div>
+						<div class="learner_status_box_status_2">
+							<field name="learner_status_display_3" readline="1" />
+						</div>
+						<div class="learner_status_box_date_2 ">
+							<field name="date2" />
+						</div>
+					</div>
+				</div>
+				</div-->
             <div class="clear" />
             <div class="col-2">
               <h3>
@@ -569,7 +644,7 @@
                     <field name="emp_staus" style="width:280px;" />
                     <field name="company_name" string="Company" style="width:280px;" />
                     <field name="desig_detail" style="width:280px;" editable="bottom" />
-                    <field name="sal_range" style="width:280px;" />
+                    <field name="salary_range" style="width:280px;" />
                     <field name="sponsor_ship" style="width:280px;" />
                   </group>
                 </div>
@@ -578,7 +653,7 @@
                     <label string="Contact Details" readonly="context.get('ctx', False)" />
                   </h2>
                   <group>
-                    <field name="email_id" />
+                    <field name="email_id" on_change="ValidateEmail(email_id)"/>
                     <field name="addr_1" style="width:280px;" />
                     <field name="mobile_no" style="width:280px;" />
                     <field name="landline_no" style="width:280px;" />
@@ -599,7 +674,7 @@
                     <field name="remarks_learner" style="width:280px;" />
                     <field name="support_docs_learner" style="width:280px;" />
                     <field name="upload_learner" style="width:280px;" />
-                    <!--	<button name="_get_attachments" string="Import" type="object" icon="upld_doc"  class="oe_highlight" />  -->
+                    <field name="datas_fname" invisible="1"/>
                     <field name="date_action" />
                     <field name="action_taken_learner" style="width:280px;" />
                   </tree>
@@ -727,6 +802,6 @@
     </record>
     <!-- ========================= Menu ============================= -->
     <menuitem name="Sales" id="menu_sales" parent="menu_lis_lab" />
-    <menuitem name="Learner Enrolment" id="sale_learner" parent="menu_sales" action="action_enrollment" />
+    <menuitem name="Learner Enrollment" id="sale_learner" parent="menu_sales" action="action_enrollment" />
   </data>
 </openerp>

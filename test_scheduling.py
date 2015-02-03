@@ -110,22 +110,22 @@ class test_info(osv.osv):
 
 		holiday = self.pool.get('holiday')
 		holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
-		holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
-		
-		holiday_list = []
-		holiday_line = self.pool.get('holiday.line')
-		holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
-		for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
-			t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
-			t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
-			if (t1start <= t2start <= t2end <= t1end):
-				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-			elif (t1start <= t2start <= t1end):
-				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-			elif (t1start <= t2end <= t1end):
-				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-			elif (t2start <= t1start <= t1end <= t2end):
-				raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+		if len(holiday_obj_id) > 0 :
+			holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+			holiday_list = []
+			holiday_line = self.pool.get('holiday.line')
+			holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+			for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+				t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+				t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+				if (t1start <= t2start <= t2end <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t1start <= t2start <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t1start <= t2end <= t1end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+				elif (t2start <= t1start <= t1end <= t2end):
+					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
 	
 		
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
@@ -137,12 +137,20 @@ class test_info(osv.osv):
 		
 		for x in values['learner_line'] : 
 			learner = self.pool.get('learner.info').browse(cr,uid,x[2]['learner_id'])
-			learner_mod_obj = self.pool.get('enroll.module.line')
-			learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('learner_info_id','=',learner.id)])
+			_logger.info("Learner %s",learner)
+			learner_mod_obj = self.pool.get('learner.mode.line')
+			learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',learner.id) or ('qualification_module_id_2','=',learner.id) or ('qualification_module_id_3','=',learner.id) or ('qualification_module_id_4','=',learner.id) or ('qualification_module_id_5','=',learner.id) or ('qualification_module_id_6','=',learner.id)])
 			lear_module_ids=[]
+			i=1
+			val = ""
 			for x in learner_mod_obj.browse(cr,uid,learner_mod_obj_ids):
-				lear_module_ids.append(x['module_id'].id)
-				
+				if i == 1 :
+					val = 'module_id'
+				else :
+					val = 'module_id_'+str(i)
+				lear_module_ids.append(x[val].id)
+				i = i +1 
+			_logger.info("total id %s",lear_module_ids)	
 			if values['module_id'] not in lear_module_ids:
 					raise osv.except_osv(_('Error!'),_("Learner Module Does Not Match Selected Module - "+str(learner.name)))
 		
@@ -214,23 +222,23 @@ class test_info(osv.osv):
 			
 			holiday = self.pool.get('holiday')
 			holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
-			holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
-			
-			holiday_list = []
-			holiday_line = self.pool.get('holiday.line')
-			holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
-			for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
-				t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
-				t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
-				if (t1start <= t2start <= t2end <= t1end):
-					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-				elif (t1start <= t2start <= t1end):
-					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-				elif (t1start <= t2end <= t1end):
-					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-				elif (t2start <= t1start <= t1end <= t2end):
-					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-	
+			if len(holiday_obj_id) > 0 :
+				holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+				holiday_list = []
+				holiday_line = self.pool.get('holiday.line')
+				holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+				for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+					t2start =datetime.strptime(holiday_line_obj['date_start'],"%Y-%m-%d %H:%M:%S")
+					t2end =datetime.strptime(holiday_line_obj['date_end'],"%Y-%m-%d %H:%M:%S")
+					if (t1start <= t2start <= t2end <= t1end):
+						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+					elif (t1start <= t2start <= t1end):
+						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+					elif (t1start <= t2end <= t1end):
+						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+					elif (t2start <= t1start <= t1end <= t2end):
+						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
+		
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
 			values['test_type_char']  = values['test_pre_type'] 
 		elif 'test_post_type' in values  and values['test_post_type'] != False :
@@ -242,12 +250,19 @@ class test_info(osv.osv):
 			if 'learner_line' in values :
 				for x in values['learner_line'] :
 					learner = self.pool.get('learner.info').browse(cr,uid,x[2]['learner_id'])
-					learner_mod_obj = self.pool.get('enroll.module.line')
-					learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('learner_info_id','=',learner.id)])
-					lear_module_ids = []
+					learner_mod_obj = self.pool.get('learner.mode.line')
+					learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',learner.id) or ('qualification_module_id_2','=',learner.id) or ('qualification_module_id_3','=',learner.id) or ('qualification_module_id_4','=',learner.id) or ('qualification_module_id_5','=',learner.id) or ('qualification_module_id_6','=',learner.id)])
+					lear_module_ids=[]
+					i=1
+					val = ""
 					for y in learner_mod_obj.browse(cr,uid,learner_mod_obj_ids):
-						lear_module_ids.append(y['module_id'].id)
-					
+						if i == 1 :
+							val = 'module_id'
+						else :
+							val = 'module_id_'+str(i)
+						lear_module_ids.append(y[val].id)
+						i = i +1 
+		
 					if values['module_id'] not in lear_module_ids:
 						raise osv.except_osv(_('Error!'),_("Learner Module Does Not Match Selected Module - "+str(learner.name)))
 			
@@ -255,12 +270,19 @@ class test_info(osv.osv):
 				test_info_obj = self.browse(cr,uid,ids)
 				for x in test_info_obj :
 						for y in x['learner_line'] :
-							learner_mod_obj = self.pool.get('enroll.module.line')
-							learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('learner_info_id','=',y['learner_id'].id)])
-							lear_module_ids = []
-							for z in learner_mod_obj.browse(cr,uid,learner_mod_obj_ids):
-								lear_module_ids.append(z['module_id'].id)
-							if z['module_id'].id not in lear_module_ids :
+							learner_mod_obj = self.pool.get('learner.mode.line')
+							learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',y['learner_id'].id) or ('qualification_module_id_2','=',y['learner_id'].id) or ('qualification_module_id_3','=',y['learner_id'].id) or ('qualification_module_id_4','=',y['learner_id'].id) or ('qualification_module_id_5','=',y['learner_id'].id) or ('qualification_module_id_6','=',y['learner_id'].id)])
+							lear_module_ids=[]
+							i=1
+							val = ""
+							for y in learner_mod_obj.browse(cr,uid,learner_mod_obj_ids):
+								if i == 1 :
+									val = 'module_id'
+								else :
+									val = 'module_id_'+str(i)
+								lear_module_ids.append(y[val].id)
+								i = i +1 
+							if x['module_id'].id not in lear_module_ids :
 									raise osv.except_osv(_('Error!'),_("Learner Module Does Not Match Selected Module - "+str(y['learner_id'].name)))
 		
 
