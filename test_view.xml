@@ -31,15 +31,15 @@
   			<notebook colspan="5" col="10">
                    <page string="Modules">
 						<field name='test_mod_line' nolabel='1'>
-									<tree string='List' editable="bottom">
-										<field name="s_no"/>
-										<field name='module_id' on_change="on_change_module_id(module_id)" options="{'create': False, 'create_edit': False}"/>
-										<field name = "module_code" on_change="on_change_module_id(module_id)"/>
-										<field name = "pre_test"/>
-										<field name = "in_class_test"/>
-										<field name = "post_test"/>
-										<button name="views" string="View Module" icon="view_mod" type="object"/>
-									</tree>
+								<tree string='List' editable="bottom">
+									<field name="s_no"/>
+									<field name='module_id' on_change="on_change_module_id(module_id)" options="{'create': False, 'create_edit': False}"/>
+									<field name = "module_code" on_change="on_change_module_id(module_id)"/>
+									<field name = "pre_test"/>
+									<field name = "in_class_test"/>
+									<field name = "post_test"/>
+									<button name="views" string="View Module" icon="view_mod" type="object"/>
+								</tree>
 						</field>
 					</page>
 					<page string="Modalities">
@@ -86,8 +86,8 @@
                 <tree string="Test">
 					<field name = "s_no"/>
 					<field name = "name" string="Test Defination"/>
-					<field name = "test_type"/> 
 					<field name = "test_mod_line" string="Modules Applied"/>
+					<button name= "views_test" string="View Module" icon="view_mod" type="object"/>
 		        </tree>
             </field>
         </record>

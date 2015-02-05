@@ -176,6 +176,16 @@ class class_info(osv.osv):
 					return False
 		return True
 
+	def create(self,cr, uid, values, context=None):
+		raise osv.except_osv(_('Error!'),_("Please select learners to move"))
+		sub_lines = []
+		#current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+		curr_class = self.pool.get('class.info').browse(cr, uid,uid, context=context)
+		sub_lines.append( (0,0, {'class_id':curr_class['class_id']}))
+		#,'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
+		values.update({'class_history_module': sub_lines})
+		module_id = super(program, self).create(cr, uid, values, context=context)
+		return module_id  
 
 	_name = "class.info"
 	_description = "This table is for keeping location data"
@@ -1373,6 +1383,16 @@ class learner_mod_line(osv.osv):
 	def on_change_learner_id(self, cr, uid, ids, learner_id):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
 		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
+		
+		
+	'''def create(self,cr, uid, values, ids, context=None):
+		#raise osv.except_osv(_('Error!'),_("Please select learners to move"))
+		curr_class = self.pool.get('class.info').browse(cr, uid,uid, context=context)
+		class_learner_ids = curr_class.search(cr, uid, ['|','|','|','|'('name', '=', ids[0]),('class_code', '=', ids[0]),('start_date', '=', ids[0]),('end_date', '=', ids[0])])
+
+		sql="insert into class_history_module (class_id, class_code, module_name) values (%s, '%s')" % (values['learner_id'], class_learner_ids[0], class_learner_ids[0], class_learner_ids[0], class_learner_ids[0], class_learner_ids[0])
+		cr.execute(sql)
+		#return module_id  '''
 	
 	_name = "learner.line"
 	_description = "Learner Line"

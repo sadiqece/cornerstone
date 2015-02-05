@@ -1,9 +1,14 @@
+import datetime
+from dateutil import relativedelta
 from openerp import addons
 import logging
+import time
 from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
+from datetime import datetime
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -117,9 +122,40 @@ class test(osv.osv):
 			test_type=1
 		if post_test :
 			test_type=1	
-		return {'value': {'test_type': test_type}}'''		
+		return {'value': {'test_type': test_type}}'''	
+
+	def views_test(self, cr, uid, ids, context=None):  
+		this = self.browse(cr, uid, ids, context=context)[0]  
+		mod_obj = self.pool.get('ir.model.data')  
+		res = mod_obj.get_object_reference(cr, uid, 'cornerstone', 'test_form')  
+		return {  
+			'type': 'ir.actions.act_window',  
+			'name': 'ESIC',  
+			'view_type': 'form',  
+			'view_mode': 'tree,form',  
+			'view_id': False,  
+			'res_model': 'test.module.line',  
+			'nodestroy': True,  
+			'res_id': False, # assuming the many2one is (mis)named 'hr_esic'  
+			'target': 'current',  
+			'context':{},  
+			'flags': {'form': {'action_buttons': True}}  
+			#'views': [(True, 'form')],  
+		}
 		
-		
+	'''def views_test(self,cr,uid,ids,context=None):
+		trainer_id = self.browse(cr, uid, ids[0], context=context).test_modules
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_form')
+		view_id = view_ref and view_ref[1] or False
+		return {
+		'type': 'ir.actions.act_window',
+		'name': _('Test'),
+		'res_model': 'test.module.line',
+		'view_type': 'form',
+		'res_id': ids[0], # this will open particular product,
+		'view_id': view_id,
+		'view_mode': 'form',
+		}	'''
 		
 	_name = "test"
 	_description = "This table is for keeping test data"
@@ -131,6 +167,8 @@ class test(osv.osv):
 		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
 		'test_description': fields.text('Description'),
+		'test_modules': fields.many2one('test.module.line', ondelete='cascade', help='Module', select=True, required=True),
+		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
@@ -164,36 +202,7 @@ class test_mod_line(osv.osv):
 				for self_obj in self.browse(cr, uid, ids, context=context):
 					if x.test_mod_id == self_obj.test_mod_id and x.module_id == self_obj.module_id:
 						return False
-		return True
-		
-	def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
-		res = super(cs_module,self).fields_view_get(cr, user, view_id, view_type, context, toolbar=toolbar, submenu=submenu)
-		doc = etree.XML(res['arch'])
-
-		global globvar
-		if globvar == 1:
-			for node in doc.xpath("//div[@id='div_status1']"):
-				node.set('class', "view_red")
-			for node in doc.xpath("//div[@id='div_status2']"):
-				node.set('class', "view_green")
-			globvar = 0
-			res['arch'] = etree.tostring(doc)
-			return res	
-			
-	def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
-		res = super(cs_module,self).fields_view_get(cr, user, view_id, view_type, context, toolbar=toolbar, submenu=submenu)
-		doc = etree.XML(res['arch'])
-
-		global globvar
-		if globvar == 1:
-			for node in doc.xpath("//div[@id='div_status1']"):
-				node.set('class', "view_red")
-			for node in doc.xpath("//div[@id='div_status2']"):
-				node.set('class', "view_green")
-		globvar = 0
-		res['arch'] = etree.tostring(doc)
-		return res
-	
+		return True	
 	
 	_name = "test.module.line"
 	_description = "Module Line"

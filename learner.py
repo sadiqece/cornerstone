@@ -26,9 +26,11 @@ class learner_info(osv.osv):
 		res = super(learner_info, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
-			seq_number = seq_number+1
+			seq_number = seq_number+100
 			r['s_no'] = seq_number		
 		return res
+		
+		
 		
 #Load Module Groups
 	def load_module_groups(self, cr, uid, ids, progid, context=None):
@@ -447,10 +449,6 @@ class learner_info(osv.osv):
 			val.update({'test_score_line': sub_lines})
 			
 			return {'value': val}
-		
-			return {'value': val}
-			
-			return {'value': val}
 			
 	'''def self_call(self, cr, uid, ids, context=None):
 		raise osv.except_osv(_('Warning!'),_('qualification award %s')%(1))
@@ -466,6 +464,24 @@ class learner_info(osv.osv):
 			total_mod = len(mod_line_ids)
 			res[line.id] = total_mod
 		return res
+		
+		
+#dob
+	def months_between(self, date1, date2):
+		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d')
+		date12 = datetime.datetime.strptime(date2, '%Y-%m-%d')
+		r = relativedelta.relativedelta(date12, date11)
+		return r.days
+	
+	def onchange_dob(self, cr, uid, ids, dob, context=None):
+		if dob:
+			d = self.months_between(dob, str(datetime.datetime.now().date()))
+			res = {'value':{}}
+			if d < 0:
+				res['value']['birth_date'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, future date not allowed.')}})
+				return res
+			return dob		
 		
 #Module Status
 	def _learner_status_display_1(self, cr, uid, ids, field_names, args,  context=None):
@@ -516,6 +532,13 @@ class learner_info(osv.osv):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.office_no < 0:
+				return False
+		return True
+		
+	def _salary_range(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.salary_range < 0:
 				return False
 		return True
 		
@@ -672,7 +695,7 @@ class learner_info(osv.osv):
 	   'date2': fields.date.context_today,
 	}
 	
-	_constraints = [(_check_unique_name, 'Error: Learner Already Exists', ['name']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office'])]
+	_constraints = [(_check_unique_name, 'Error: Learner Already Exists', ['name']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_salary_range, 'Error: Salary Range Cannot be Negative', ['Salary'])]
 
 	'''def on_change_module_name2(self, cr, uid, ids, module_name, s_name):
 		#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(s_name))
@@ -892,7 +915,7 @@ class checklist(osv.osv):
 		res = super(checklist, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
-			seq_number = seq_number+1
+			seq_number = seq_number+20
 			r['s_no'] = seq_number
 		
 		return res

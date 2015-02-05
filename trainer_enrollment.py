@@ -1,8 +1,6 @@
-import datetime
 from dateutil import relativedelta
 from openerp import addons
 import logging
-import time
 from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
@@ -311,6 +309,13 @@ class trainer_profile_info(osv.osv):
 				return False
 		return True
 		
+	def _no_children(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.No_of_Children < 0:
+				return False
+		return True
+		
 	_name = "trainer.profile.info"
 	_description = "This table is for keeping location data"
 	_columns = {
@@ -365,7 +370,7 @@ class trainer_profile_info(osv.osv):
 	   'date1': fields.date.context_today,
 	   'date2': fields.date.context_today,
     }
-	_constraints = [(_check_unique_trainer_name, 'Error: Trainer Already Exists', ['Trainer Name']),(_check_unique_name_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_id, 'Error: Email Already Exist', ['Email']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office'])]
+	_constraints = [(_check_unique_trainer_name, 'Error: Trainer Already Exists', ['Trainer Name']),(_check_unique_name_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_id, 'Error: Email Already Exist', ['Email']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_no_children, 'Error: Number of childrens Cannot be Negative', ['Children'])]
 trainer_profile_info()
 
 class avaliable(osv.osv):
@@ -435,6 +440,23 @@ class trainer_module(osv.osv):
 						return False
 		return True
 		
+#dob
+	def months_between(self, date1, date2):
+		date11 = datetime.now.datetime.now.strptime(date1, '%Y-%m-%d')
+		date12 = datetime.now.datetime.now.strptime(date2, '%Y-%m-%d')
+		r = relativedelta.relativedelta(date12, date11)
+		return r.days
+	
+	def onchange_dob(self, cr, uid, ids, dob, context=None):
+		if dob:
+			d = self.months_between(dob, str(datetime.now.datetime.now().date()))
+			res = {'value':{}}
+			if d < 0:
+				res['value']['trainer_date'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, future date not allowed.')}})
+				return res
+			return dob
+		
 	def _trainer_rate(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
@@ -448,7 +470,7 @@ class trainer_module(osv.osv):
 	'trainers_id' : fields.many2one('trainer.profile.info', 'Module'), 
 	'trainer_module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 	'trainer_code': fields.related('trainer_module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-	'trainer_rate': fields.integer('Trainer Rate', size=100),
+	'trainer_rate': fields.integer('Trainer Rate', size=6),
 	'trainer_mod_status': fields.selection((('Active','Active'),('Pending','Pending')),'Status', required=True),
 	'trainer_date':fields.date('Date'),
 	}
@@ -513,15 +535,6 @@ qualification()
 
 class work_exp(osv.osv):
 
-#Populate Year
-	'''def _populate_year(self, cursor, user_id, context=None):
-		val = {}
-		i = 0
-		for year_dropdown in range(2012, (datetime.now().year_from + 10)):
-			val[i] = ('choice'+str(i), str(year_dropdown))
-			i = i+1
-		return val'''
-
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
 		res = super(work_exp, self).read(cr, uid,ids, fields, context, load)
@@ -531,6 +544,13 @@ class work_exp(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
+		
+	def _year_from_to(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.year_to < self_obj.year_from:
+				return False
+		return True
 
 	_name = "work.exp.module"
 	_description = "Work Experience Tab"
@@ -544,7 +564,8 @@ class work_exp(osv.osv):
 	'year_to': fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year To'),
 	'key_responsibility':fields.char('Key Responsibilities'),
 	'trg_specific':fields.boolean('Trg Specific'),
-	}	
+	}
+	_constraints = [(_year_from_to, 'Error: Year To should be greater than Year From', ['Year'])]
 work_exp()
 
 

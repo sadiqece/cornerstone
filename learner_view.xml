@@ -425,7 +425,7 @@
                     <field name="marital_status" style="width:280px;" />
                     <field name="race" style="width:280px;" />
                     <field name="gender" style="width:280px;" />
-                    <field name="birth_date" />
+                    <field name="birth_date" on_change="onchange_dob(birth_date)"/>
                   </group>
                 </div>
                 <div class="col-2">
