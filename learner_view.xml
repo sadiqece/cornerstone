@@ -42,15 +42,17 @@
       <field name="arch" type="xml">
         <form string="enroll_info" version="7.0">
           <sheet>
-            <field name="image_medium" widget="image" class="oe_left oe_avatar" />
-            <div class="col-2">
-              <label for="name" class="oe_edit_only" />
-              <h1>
-                <field name="name"/>
-              </h1>
-            </div>
+			<div class="col-10">
+				<field name="image_medium" widget="image" class="oe_left oe_avatar" />
+			</div>
+				<div class="col-2">
+				  <label for="name" class="oe_edit_only" />
+				  <h1>
+					<field name="name"/>
+				  </h1>
+				</div>
             <!-- Color Boxes -->
-            <div class="col-40">
+            <div class="col-35">
               <group>
 			  <div class="col-2" style="margin:0px;">
                 <div class="openerp oe_form_readonly schedule_status_box_9 ">
@@ -446,7 +448,7 @@
                     <field name="emp_staus" style="width:280px;" />
                     <field name="company_name" string="Company" style="width:280px;" />
                     <field name="desig_detail" style="width:280px;" editable="bottom" />
-                    <field name="salary_range" style="width:280px;" />
+                    <field name="salary" style="width:280px;" />
                     <field name="sponsor_ship" style="width:280px;" />
                   </group>
                 </div>
@@ -455,7 +457,7 @@
                     <label string="Contact Details" readonly="context.get('ctx', False)" />
                   </h3>
                   <group>
-                    <field name="email_id" on_change="ValidateEmail(email_id)"/>
+                    <field name="email_id"/>
                     <field name="addr_1" style="width:280px;" />
                     <field name="mobile_no" style="width:280px;" />
                     <field name="landline_no" style="width:280px;" />
@@ -644,7 +646,7 @@
                     <field name="emp_staus" style="width:280px;" />
                     <field name="company_name" string="Company" style="width:280px;" />
                     <field name="desig_detail" style="width:280px;" editable="bottom" />
-                    <field name="salary_range" style="width:280px;" />
+                    <field name="salary" style="width:280px;" />
                     <field name="sponsor_ship" style="width:280px;" />
                   </group>
                 </div>
@@ -653,7 +655,7 @@
                     <label string="Contact Details" readonly="context.get('ctx', False)" />
                   </h2>
                   <group>
-                    <field name="email_id" on_change="ValidateEmail(email_id)"/>
+                    <field name="email_id"/>
                     <field name="addr_1" style="width:280px;" />
                     <field name="mobile_no" style="width:280px;" />
                     <field name="landline_no" style="width:280px;" />

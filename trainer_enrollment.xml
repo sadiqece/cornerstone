@@ -300,7 +300,7 @@
                         <label string="Contact Details" readonly="context.get('ctx', False)" />
                       </h3>
                       <group>
-                        <field name="email_id" on_change="ValidateEmail(email_id)" style="width:280px;" />
+                        <field name="email_id" style="width:280px;" />
                         <field name="addr_1" style="width:280px;" />
                         <field name="mobile_no" style="width:280px;" />
                         <field name="landline_no" style="width:280px;" />
@@ -355,6 +355,32 @@
       </field>
     </record>
     <!-- ========================= Action Layout ============================= -->
+	<record model="ir.ui.view" id="panel_kanban">
+        <field name="name">EM Admin Dashboard</field>
+        <field name="model">panel.info</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                            <div class="oe_resource_vignette">
+								<div class="oe_resource_image">
+									<a type="edit"><img t-att-src="kanban_image('object.name', 'photo', record.id.value)" class="oe_resource_picture"/></a>
+								</div>
+								<div class="oe_resource_details">
+                            <ul>
+<!--Here you have to write the object's field name which you want to display in kanban view -->
+                               <li><field name="name"/></li>
+                               <li><field name="class_sched"/></li>
+                               <li><field name="mod_sched"/> </li>                                   
+                             </ul>
+                        </div>
+                    </div> 
+                        </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+	
     <record id="edu_tree" model="ir.ui.view">
       <field name="name">EMI Admin Dashboard</field>
       <field name="model">edu.info</field>
@@ -369,28 +395,6 @@
         <tree string="EM Admin Panel">
           <field name="trainer_line" />
         </tree>
-      </field>
-    </record>
-    <!--record id="view_calencder_trainer_profile_info" model="ir.ui.view">
-		<field name="name">trainer.profile.info.calencder.view</field>
-		<field name="model">trainer.profile.info</field>
-		<field name="arch" type="xml">
-			<calendar string="Lịch sản xuất" color="name" date_start="date1" date_stop="date2">
-				<field name="name"/>       
-			</calendar>
-		 </field>
-	</record-->
-    <record model="ir.ui.view" id="hr_kanban_view_employees">
-      <field name="name">EM Admin Dashboard</field>
-      <field name="model">panel.info</field>
-      <field name="priority">10</field>
-      <field name="arch" type="xml">
-        <kanban>
-          <field name="trainer_line" />
-          <templates>
-            <t t-name="kanban-box" />
-          </templates>
-        </kanban>
       </field>
     </record>
     <record id="trainer_profile_tree" model="ir.ui.view">
@@ -442,7 +446,7 @@
       <field name="res_model">panel.info</field>
       <field name="view_type">form</field>
       <field name="limit">10</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">kanban,tree,form</field>
       <field name="view_id" ref="panel_tree" />
       <field name="search_view_id" ref="view_panel_filter" />
       <!--<field name="help" type="html">

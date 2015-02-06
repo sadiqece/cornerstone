@@ -320,11 +320,6 @@ class learner_info(osv.osv):
 		return res
 		
 	def onchange_populate_schedule2(self, cr, uid, ids, i_centre, i_mod, s_date, context=None):
-		'''obj = self.pool.get('class.info')
-		ids = obj.search(cr, uid, [('location_id','=',i_centre)])
-		res = obj.read(cr, uid, ids, ['start_date'], context)
-		res = [(r['start_date'], r['start_date']) for r in res]
-		return {'value':{'sch_date':res}}'''
 		
 		val2 ={}
 		sub_lines = []
@@ -394,24 +389,6 @@ class learner_info(osv.osv):
 				return False
 		return True
 
-	'''def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-
-		res = super(learner_info, self).read(cr, uid, ids, fields, context, load)
-		val = {}
-		sub_lines = []
-		i_learner = 'Learner 1'
-		if i_learner:
-			sql = "select distinct c.name, cm.name, c.start_date, c.end_date from class_info c, learner_line l, cs_module cm, learner_info li where l.learner_mod_id = c.id and cm.id =  c.module_id	 and l.learner_id = li.id and li.name = '%s'" % (i_learner) 
-			cr.execute(sql)
-			itm = cr.fetchall()
-			
-			sub_lines = []
-			for s in itm:
-				sub_lines.append({'class_code':s[0], 'module_name':s[1], 'start_date':s[2], 'end_date':s[3]})
-				
-			val.update({'class_history_line': sub_lines})
-			return res'''
-
 #Class History Tab, Test History Tab & Test Scores Info			
 	def onchange_class_hist(self, cr, uid, ids, i_learner, i_test_history, i_test_score, context=None):
 		val ={}
@@ -449,11 +426,6 @@ class learner_info(osv.osv):
 			val.update({'test_score_line': sub_lines})
 			
 			return {'value': val}
-			
-	'''def self_call(self, cr, uid, ids, context=None):
-		raise osv.except_osv(_('Warning!'),_('qualification award %s')%(1))
-		self.onchange_class_hist(cr, uid, ids, 'Learner 1',context=context)
-		return True'''
 		
 	def _calculate_total_checklist(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
@@ -507,12 +479,6 @@ class learner_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['learner_status']
 		return res
-		
-	def  ValidateEmail(self, cr, uid, ids, email_id):
-		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email_id) != None:
-			return True
-		else:
-			raise osv.except_osv('Invalid Email', 'Please enter a valid email address')
 			
 	def _mobile_no(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -538,11 +504,29 @@ class learner_info(osv.osv):
 	def _salary_range(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.salary_range < 0:
+			if self_obj.salary < 0:
 				return False
 		return True
 		
-		
+	def _check_email(self, cr, uid, ids, context=None):
+		rec = self.browse(cr, uid, ids)
+		cnt = 0
+		for data in rec:
+			xcv = data['email_id']
+			if xcv:
+				if len(str(xcv)) < 7:
+					raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
+
+				if xcv:
+					for i in xcv:
+						if i=='@' or i=='.':
+							cnt = cnt + 1
+
+		if xcv and cnt < 2:
+			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
+		else:
+			return True
+	
 #Table Learner Info
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
@@ -602,10 +586,7 @@ class learner_info(osv.osv):
 		('WSQ Diploma','WSQ Diploma'),('WSQ Specialist Diploma','WSQ Specialist Diploma'),('WSQ Graduate Diploma','WSQ Graduate Diploma'),('Others','Others'),('Not Reported','Not Reported')),'Highest Qualification'),
 		'language_proficiency':fields.boolean('Language Proficiency'),
 		#Work
-		#'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
-		#'salary_range':fields.selection((('10000-15000','10000-15000'),('15000-25000','15000-25000'),('25000-50000','25000-50000')),'Salary Range'),
-		'salary_range': fields.many2one('salary', 'Salary Range'),
-		#'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
+		'salary':fields.integer('Salary Range', size=14),
 		#Contact
 		'email_id': fields.char('Email', size=30),
 		'addr_1': fields.text('Address'),
@@ -695,24 +676,8 @@ class learner_info(osv.osv):
 	   'date2': fields.date.context_today,
 	}
 	
-	_constraints = [(_check_unique_name, 'Error: Learner Already Exists', ['name']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_salary_range, 'Error: Salary Range Cannot be Negative', ['Salary'])]
+	_constraints = [(_check_unique_name, 'Error: Learner Already Exists', ['name']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_salary_range, 'Error: Salary Range Number Cannot be Negative', ['Salary']), (_check_email, 'Error! Email is invalid.', ['work_email'])]
 
-	'''def on_change_module_name2(self, cr, uid, ids, module_name, s_name):
-		#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(s_name))
-		val ={}
-		sub_lines = []
-		if s_name:
-			sql = "select distinct c.name, cm.name, c.start_date, c.end_date from class_info c, learner_line l, cs_module cm, learner_info li where l.learner_mod_id = c.id and cm.id =  c.module_id	 and l.learner_id = li.id and li.name = '%s'" % (s_name) 
-			cr.execute(sql)
-			itm = cr.fetchall()
-			
-			sub_lines = []
-			for s in itm:
-				sub_lines.append({'class_code':s[0], 'module_name':s[1], 'start_date':s[2], 'end_date':s[3]})
-			val.update({'class_history_line': sub_lines})
-			
-			return {'value': val}'''	
-			
 learner_info ()
 
 class calling_fun(osv.osv):
@@ -854,7 +819,7 @@ class enroll_info(osv.osv):
 		#'emp_staus':fields.selection((('Employed','Employed'),('Unemployed','Unemployed'),('Self Emp','Self Emp')),'Employement Status'),
 		#'company_name':fields.selection((('ASZ','ASZ'),('HCL','HCL'),('CGI','CGI')),'Company'),
 		'desig_detail':fields.selection('designation', 'Designation'),
-		'salary_range':fields.selection((('10-15','10-15'),('15-25','15-25'),('25-50','25-50')),'Salary Range'),
+		#'salary_range':fields.integer('Salary Range', size=14),
 		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
 		'email_id': fields.char('Email', size=30),
 		'addr_1': fields.text('Address'),	
@@ -1048,25 +1013,6 @@ class master_desig(osv.osv):
 	_constraints = [(_check_master_desig, 'Error: Designation Status Already Exists', ['Designation'])]
 master_desig()
 
-class master_salary(osv.osv):
-	def _check_master_salary(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-	_name ='salary'
-	_description ="People and Facilites Tab"
-	_columns = {
-	'name':fields.char('Salary Range', size=10),
-	}
-	_constraints = [(_check_master_salary, 'Error: Salary Range Status Already Exists', ['Salary Range'])]
-master_salary()
-
 #Personal Details Sponsership Field
 class master_sponser(osv.osv):
 	def _check_unique_sponser(self, cr, uid, ids, context=None):
@@ -1230,20 +1176,6 @@ class class_history(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
-	
-	'''def onchange_populate_class_history(self, cr, uid, ids, mod_id, context=None):
-		sched_obj = self.pool.get('class.info')
-		value_ids = sched_obj.search(cr, uid, [('module_id', '=', mod_id)])
-		res = {'value':{}}
-		res['value']['class_code'] = 0
-		res['value']['Date_Commenced'] = ''
-		res['value']['Date_Completed'] = ''
-		for sched_line in sched_obj.browse(cr, uid, value_ids,context=context):
-			res['value']['class_code'] = sched_line.id
-			res['value']['Date_Commenced'] = sched_line.Date_Commenced
-			res['value']['Date_Completed'] = sched_line.Date_Completed
-		return res '''
-		
 		
 	_name = "class.history.module"
 	_description = "Class History Tab"
@@ -1251,7 +1183,7 @@ class class_history(osv.osv):
 	'class_id' : fields.many2one('learner.info'), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
-	'module_name':fields.char('Module'),
+	'module_name':fields.many2one('cs.module', 'Module'),
 	'class_code':fields.char('Class Code'),
 	'start_date': fields.date('Date Commenced'),
 	'end_date': fields.date('Date Completed'),
@@ -1278,9 +1210,9 @@ class test_history(osv.osv):
 	_name = "test.history.module"
 	_description = "Test History Tab"
 	_columns = {
-	'test_id' : fields.many2one('learner.info'), 
-	'test_type' : fields.char('Test'),
-	'test_code' : fields.char('Test Code',),
+	'test_id' : fields.many2one('learner.info', 'Learner'), 
+	'test_type' : fields.many2one('test', 'Test'),
+	'test_code' : fields.char('Test Code'),
 	'test_date' : fields.date('Test Date'),
 	'test_status' : fields.char('Test Status',),
 	

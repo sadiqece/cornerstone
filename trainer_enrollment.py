@@ -114,7 +114,8 @@ class panel_info(osv.osv):
 	'class_outstanding_noitce': fields.integer('Class Outstanding Notice', size=6),
 	'trainer_min_avail': fields.integer('Trainer Min Avaliablity (%)', size=6),
 	'base_rate': fields.integer('Base Rate ($ per hr)', size=4),
-	'trainer_ids' : fields.one2many('trainer.profile.info', 'trainer_id', 'Trainer'),	
+	'trainer_ids' : fields.one2many('trainer.profile.info', 'trainer_id', 'Trainer'),
+	'name': fields.related('trainer_ids','name', string='Status', type="char", relation="trainer.profile.info", readonly=1),
 	'all_trainer':fields.many2one('trainer.profile.info', 'All Trainer',ondelete='cascade', help='Program', select=True),
 	'class_sched':fields.many2one('class.info','Class',ondelete='cascade', help='Program', select=True),
 	'mod_sched':fields.many2one('cs.module','Module',ondelete='cascade', help='Program', select=True),
@@ -137,6 +138,7 @@ class assignment_schedule(osv.osv):
 	def onchange_trainer_hist(self, cr, uid, ids, i_trainer, i_mod, context=None):
 		val ={}
 		sub_lines = []
+		val.update({'scheduled_date':''})
 		if i_trainer and i_mod:
 			sql  ="select distinct c.start_date from class_info c, trainers_line t, cs_module cs, trainer_profile_info tp where t.trainers_line_id = c.id and cs.id =  c.module_id and tp.id = t.trainer_id and parent_id = 0 and cs.id = %s and tp.id = %s" % (i_mod, i_trainer)
 			cr.execute(sql)
@@ -262,11 +264,24 @@ class trainer_profile_info(osv.osv):
 				return ids[0]
 			return False
 			
-	def ValidateEmail(self, cr, uid, ids, email_id):
-		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email_id) != None:
-			return True
+	def _check_email(self, cr, uid, ids, context=None):
+		rec = self.browse(cr, uid, ids)
+		cnt = 0
+		for data in rec:
+			xcv = data['email_id']
+			if xcv:
+				if len(str(xcv)) < 7:
+					raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
+
+				if xcv:
+					for i in xcv:
+						if i=='@' or i=='.':
+							cnt = cnt + 1
+
+		if xcv and cnt < 2:
+			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
 		else:
-			raise osv.except_osv('Invalid Email', 'Please enter a valid email address')
+			return True
 			
 	def _check_unique_id(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -321,6 +336,7 @@ class trainer_profile_info(osv.osv):
 	_columns = {
 	'location_id': fields.integer('Id',size=20),
 	'name': fields.char('Name:', size=100,required=True, select=True),
+	'image': fields.binary("Image"),
 	'nric_name': fields.char('Name as in NRIC/FIN:', size=20),
 	'nric': fields.char('NRIC/FIN:', size=10),
 	'trainers_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status', required=True, select=True),
@@ -370,7 +386,7 @@ class trainer_profile_info(osv.osv):
 	   'date1': fields.date.context_today,
 	   'date2': fields.date.context_today,
     }
-	_constraints = [(_check_unique_trainer_name, 'Error: Trainer Already Exists', ['Trainer Name']),(_check_unique_name_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_id, 'Error: Email Already Exist', ['Email']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_no_children, 'Error: Number of childrens Cannot be Negative', ['Children'])]
+	_constraints = [(_check_unique_trainer_name, 'Error: Trainer Already Exists', ['Trainer Name']),(_check_unique_name_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_id, 'Error: Email Already Exist', ['Email']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_no_children, 'Error: Number of childrens Cannot be Negative', ['Children']), (_check_email, 'Error! Email is invalid.', ['work_email'])]
 trainer_profile_info()
 
 class avaliable(osv.osv):
@@ -442,14 +458,14 @@ class trainer_module(osv.osv):
 		
 #dob
 	def months_between(self, date1, date2):
-		date11 = datetime.now.datetime.now.strptime(date1, '%Y-%m-%d')
+		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d')
 		date12 = datetime.now.datetime.now.strptime(date2, '%Y-%m-%d')
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 	
 	def onchange_dob(self, cr, uid, ids, dob, context=None):
 		if dob:
-			d = self.months_between(dob, str(datetime.now.datetime.now().date()))
+			d = self.months_between(dob, str(datetime.datetime.now().date()))
 			res = {'value':{}}
 			if d < 0:
 				res['value']['trainer_date'] = ''

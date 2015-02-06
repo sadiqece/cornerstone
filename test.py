@@ -163,7 +163,7 @@ class test(osv.osv):
 		's_no': fields.integer('S.No',size=3),
 		'name': fields.char('Test Name', size=100,required=True, select=True),
 		'test_code': fields.char('Test Code', size=20),
-		'test_fee': fields.integer('Test Fee', size=4),
+		'test_fee': fields.float('Test Fee', size=6),
 		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
 		'test_description': fields.text('Description'),

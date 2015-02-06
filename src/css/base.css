@@ -4246,6 +4246,17 @@ label {
   display: block;
   float: left; 
 }
+.col-10{
+  width: 10%;
+  display: block;
+  float: left;
+}
+.col-35{
+  width: 35%;
+  margin: 10px 1%;  
+  display: block;
+  float: left;
+}
 .col-40{
   width: 40%;
   margin: 10px 1%;  
