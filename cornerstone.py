@@ -19,41 +19,57 @@ class program(osv.osv):
 #Dropdown to Show no. of module groups
 
     def onchange_no_of_mod_gp(self, cr, uid, ids, no_of_mod_gp):
+        sub_lines = []
         val = {}
-        val['no_module_box1'] = False
-        val['no_module_box2'] = False
-        val['no_module_box3'] = False
-        val['no_module_box4'] = False
-        val['no_module_box5'] = False
-        val['no_module_box6'] = False
+        val.update({'no_module_box1': False})
+        val.update({'no_module_box2': False})
+        val.update({'no_module_box3': False})
+        val.update({'no_module_box4': False})
+        val.update({'no_module_box5': False})
+        val.update({'no_module_box6': False})
         if no_of_mod_gp == '1':
-            val['no_module_box1'] = True
+            #val['no_module_box1'] = True
+            val.update({'no_module_box1': True})
+            val.update({'program_mod_line_2': sub_lines})
+            val.update({'program_mod_line_3': sub_lines})
+            val.update({'program_mod_line_4': sub_lines})
+            val.update({'program_mod_line_5': sub_lines})
+            val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '2':
-            val['no_module_box1'] = True
-            val['no_module_box2'] = True
+            val.update({'no_module_box1': True})
+            val.update({'no_module_box2': True})
+            val.update({'program_mod_line_3': sub_lines})
+            val.update({'program_mod_line_4': sub_lines})
+            val.update({'program_mod_line_5': sub_lines})
+            val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '3':
-            val['no_module_box1'] = True
-            val['no_module_box2'] = True
-            val['no_module_box3'] = True
+            val.update({'no_module_box1': True})
+            val.update({'no_module_box2': True})
+            val.update({'no_module_box3': True})
+            val.update({'program_mod_line_4': sub_lines})
+            val.update({'program_mod_line_5': sub_lines})
+            val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '4':
-            val['no_module_box1'] = True
-            val['no_module_box2'] = True
-            val['no_module_box3'] = True
-            val['no_module_box4'] = True
+            val.update({'no_module_box1': True})
+            val.update({'no_module_box2': True})
+            val.update({'no_module_box3': True})
+            val.update({'no_module_box4': True})
+            val.update({'program_mod_line_5': sub_lines})
+            val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '5':
-            val['no_module_box1'] = True
-            val['no_module_box2'] = True
-            val['no_module_box3'] = True
-            val['no_module_box4'] = True
-            val['no_module_box5'] = True
+            val.update({'no_module_box1': True})
+            val.update({'no_module_box2': True})
+            val.update({'no_module_box3': True})
+            val.update({'no_module_box4': True})
+            val.update({'no_module_box5': True})
+            val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '6':
-            val['no_module_box1'] = True
-            val['no_module_box2'] = True
-            val['no_module_box3'] = True
-            val['no_module_box4'] = True
-            val['no_module_box5'] = True
-            val['no_module_box6'] = True
-
+            val.update({'no_module_box1': True})
+            val.update({'no_module_box2': True})
+            val.update({'no_module_box3': True})
+            val.update({'no_module_box4': True})
+            val.update({'no_module_box5': True})
+            val.update({'no_module_box6': True})
         return {'value': val} 
 
 #Set Module as
@@ -734,6 +750,17 @@ program()
 
 globvar = 0
 class program_mod_line(osv.osv):
+
+#Modules Required
+	'''def unlink(self, cr, uid, ids, context=None):
+		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
+		test_checked =  self.pool.get('cs.module').browse(cr, uid, mod_id.id, context=context).pre_test
+		if test_checked:
+			sr_ids = super(pre_test, self).search(cr, uid, [('mod_id', '=', mod_id.id)],context=context)
+			final_val = len(sr_ids) - len(ids)
+			if final_val == 0: 
+				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
+		return super(pre_test, self).unlink(cr, uid, ids, context=context)'''
 
 #Validate Unique Modules
 	def _check_unique_module(self, cr, uid, ids, context=None):

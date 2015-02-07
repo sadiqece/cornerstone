@@ -42,15 +42,15 @@
       <field name="arch" type="xml">
         <form string="enroll_info" version="7.0">
           <sheet>
-			<div class="col-10">
-				<field name="image_medium" widget="image" class="oe_left oe_avatar" />
-			</div>
-				<div class="col-2">
-				  <label for="name" class="oe_edit_only" />
-				  <h1>
-					<field name="name"/>
-				  </h1>
-				</div>
+		  <div class="col-10">
+            <field name="image_medium" widget="image" class="oe_left oe_avatar" />
+		</div>
+            <div class="col-2">
+              <label for="name" class="oe_edit_only" />
+              <h1>
+                <field name="name"/>
+              </h1>
+            </div>
             <!-- Color Boxes -->
             <div class="col-35">
               <group>
@@ -168,8 +168,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id" invisible="1" />
                         <field name="module_id" widget="selection" />
-                        <field name="set_module_select_1" invisible="1" />
-                        <field name="select_mod_1" attrs="{'invisible': [('set_module_select_1', '=' , False)]}" />
+                        <field name="check_module_select_1" invisible="1" />
+                        <field name="select_mod_1" attrs="{'invisible': [('check_module_select_1', '=' , False)]}" />
                       </tree>
                     </field>
                   </div>
@@ -201,8 +201,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id_2" invisible="1" />
                         <field name="module_id_2" widget="selection" />
-                        <field name="set_module_select_2" invisible="1" />
-                        <field name="select_mod_2" attrs="{'invisible': [('set_module_select_2', '=' , False)]}" />
+                        <field name="check_module_select_2" invisible="1"/>
+						<field name="select_mod_2" attrs="{'invisible': [('check_module_select_2', '=' , False)]}"/> 	
                       </tree>
                     </field>
                   </div>
@@ -234,8 +234,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id_3" invisible="1" />
                         <field name="module_id_3" widget="selection" />
-                        <field name="set_module_select_3" invisible="1" />
-                        <field name="select_mod_3" attrs="{'invisible': [('set_module_select_3', '=' , False)]}" />
+                        <field name="check_module_select_3" invisible="1" />
+                        <field name="select_mod_3" attrs="{'invisible': [('check_module_select_3', '=' , False)]}" />
                       </tree>
                     </field>
                   </div>
@@ -268,8 +268,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id_4" invisible="1" />
                         <field name="module_id_4" widget="selection" />
-                        <field name="set_module_select_4" invisible="1" />
-                        <field name="select_mod_4" attrs="{'invisible': [('set_module_select_4', '=' , False)]}" />
+                        <field name="check_module_select_4" invisible="1" />
+                        <field name="select_mod_4" attrs="{'invisible': [('check_module_select_4', '=' , False)]}" />
                       </tree>
                     </field>
                   </div>
@@ -301,8 +301,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id_5" invisible="1" />
                         <field name="module_id_5" widget="selection" />
-                        <field name="set_module_select_5" invisible="1" />
-                        <field name="select_mod_5" attrs="{'invisible': [('set_module_select_5', '=' , False)]}" />
+                        <field name="check_module_select_5" invisible="1" />
+                        <field name="select_mod_5" attrs="{'invisible': [('check_module_select_5', '=' , False)]}" />
                       </tree>
                     </field>
                   </div>
@@ -334,8 +334,8 @@
                       <tree string="List" editable="bottom" create="false" delete="false">
                         <field name="prog_mod_id_6" invisible="1" />
                         <field name="module_id_6" widget="selection" />
-                        <field name="set_module_select_6" invisible="1" />
-                        <field name="select_mod_6" attrs="{'invisible': [('set_module_select_6', '=' , False)]}" />
+                        <field name="check_module_select_6" invisible="1" />
+                        <field name="select_mod_6" attrs="{'invisible': [('check_module_select_6', '=' , False)]}" />
                       </tree>
                     </field>
                   </div>

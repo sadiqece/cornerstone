@@ -143,20 +143,6 @@ class test(osv.osv):
 			#'views': [(True, 'form')],  
 		}
 		
-	'''def views_test(self,cr,uid,ids,context=None):
-		trainer_id = self.browse(cr, uid, ids[0], context=context).test_modules
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_form')
-		view_id = view_ref and view_ref[1] or False
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Test'),
-		'res_model': 'test.module.line',
-		'view_type': 'form',
-		'res_id': ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		}	'''
-		
 	_name = "test"
 	_description = "This table is for keeping test data"
 	_columns = {
@@ -167,8 +153,8 @@ class test(osv.osv):
 		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
 		'test_description': fields.text('Description'),
-		'test_modules': fields.many2one('test.module.line', ondelete='cascade', help='Module', select=True, required=True),
-		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		#'test_modules': fields.many2one('test.module.line', ondelete='cascade', help='Module', select=True, required=True),
+		#'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),

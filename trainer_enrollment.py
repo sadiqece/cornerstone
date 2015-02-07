@@ -264,24 +264,11 @@ class trainer_profile_info(osv.osv):
 				return ids[0]
 			return False
 			
-	def _check_email(self, cr, uid, ids, context=None):
-		rec = self.browse(cr, uid, ids)
-		cnt = 0
-		for data in rec:
-			xcv = data['email_id']
-			if xcv:
-				if len(str(xcv)) < 7:
-					raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
-
-				if xcv:
-					for i in xcv:
-						if i=='@' or i=='.':
-							cnt = cnt + 1
-
-		if xcv and cnt < 2:
-			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
-		else:
+	def ValidateEmail(self, cr, uid, ids, email_id):
+		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email_id) != None:
 			return True
+		else:
+			raise osv.except_osv('Invalid Email', 'Please enter a valid email address')
 			
 	def _check_unique_id(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -330,6 +317,25 @@ class trainer_profile_info(osv.osv):
 			if self_obj.No_of_Children < 0:
 				return False
 		return True
+		
+	def _check_email(self, cr, uid, ids, context=None):
+		rec = self.browse(cr, uid, ids)
+		cnt = 0
+		for data in rec:
+			xcv = data['email_id']
+			if xcv:
+				if len(str(xcv)) < 7:
+					raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
+
+				if xcv:
+					for i in xcv:
+						if i=='@' or i=='.':
+							cnt = cnt + 1
+
+		if xcv and cnt < 2:
+			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
+		else:
+			return True
 		
 	_name = "trainer.profile.info"
 	_description = "This table is for keeping location data"
@@ -458,14 +464,14 @@ class trainer_module(osv.osv):
 		
 #dob
 	def months_between(self, date1, date2):
-		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d')
+		date11 = datetime.now.datetime.now.strptime(date1, '%Y-%m-%d')
 		date12 = datetime.now.datetime.now.strptime(date2, '%Y-%m-%d')
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 	
 	def onchange_dob(self, cr, uid, ids, dob, context=None):
 		if dob:
-			d = self.months_between(dob, str(datetime.datetime.now().date()))
+			d = self.months_between(dob, str(datetime.now.datetime.now().date()))
 			res = {'value':{}}
 			if d < 0:
 				res['value']['trainer_date'] = ''

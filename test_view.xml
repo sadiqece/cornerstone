@@ -87,7 +87,7 @@
 					<field name = "s_no"/>
 					<field name = "name" string="Test Defination"/>
 					<field name = "test_mod_line" string="Modules Applied"/>
-					<button name= "views_test" string="View Module" icon="view_mod" type="object"/>
+					<!--button name= "views_test" string="View Module" icon="view_mod" type="object"/-->
 		        </tree>
             </field>
         </record>
