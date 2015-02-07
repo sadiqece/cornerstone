@@ -137,9 +137,8 @@ class test_info(osv.osv):
 		
 		for x in values['learner_line'] : 
 			learner = self.pool.get('learner.info').browse(cr,uid,x[2]['learner_id'])
-			_logger.info("Learner %s",learner)
 			learner_mod_obj = self.pool.get('learner.mode.line')
-			learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',learner.id) or ('qualification_module_id_2','=',learner.id) or ('qualification_module_id_3','=',learner.id) or ('qualification_module_id_4','=',learner.id) or ('qualification_module_id_5','=',learner.id) or ('qualification_module_id_6','=',learner.id)])
+			learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id','=',learner.id)])
 			lear_module_ids=[]
 			i=1
 			val = ""
@@ -150,7 +149,7 @@ class test_info(osv.osv):
 					val = 'module_id_'+str(i)
 				lear_module_ids.append(x[val].id)
 				i = i +1 
-			_logger.info("total id %s",lear_module_ids)	
+				
 			if values['module_id'] not in lear_module_ids:
 					raise osv.except_osv(_('Error!'),_("Learner Module Does Not Match Selected Module - "+str(learner.name)))
 		
@@ -251,7 +250,7 @@ class test_info(osv.osv):
 				for x in values['learner_line'] :
 					learner = self.pool.get('learner.info').browse(cr,uid,x[2]['learner_id'])
 					learner_mod_obj = self.pool.get('learner.mode.line')
-					learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',learner.id) or ('qualification_module_id_2','=',learner.id) or ('qualification_module_id_3','=',learner.id) or ('qualification_module_id_4','=',learner.id) or ('qualification_module_id_5','=',learner.id) or ('qualification_module_id_6','=',learner.id)])
+					learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id','=',learner.id)])
 					lear_module_ids=[]
 					i=1
 					val = ""
@@ -271,7 +270,7 @@ class test_info(osv.osv):
 				for x in test_info_obj :
 						for y in x['learner_line'] :
 							learner_mod_obj = self.pool.get('learner.mode.line')
-							learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id_1','=',y['learner_id'].id) or ('qualification_module_id_2','=',y['learner_id'].id) or ('qualification_module_id_3','=',y['learner_id'].id) or ('qualification_module_id_4','=',y['learner_id'].id) or ('qualification_module_id_5','=',y['learner_id'].id) or ('qualification_module_id_6','=',y['learner_id'].id)])
+							learner_mod_obj_ids = learner_mod_obj.search(cr,uid,[('qualification_module_id','=',y['learner_id'].id)])
 							lear_module_ids=[]
 							i=1
 							val = ""
