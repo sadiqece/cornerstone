@@ -3,7 +3,7 @@
   <data>
     <!-- ========================= EMI Admin (Not Used as of Now) ============================= -->
     <record id="edu_form" model="ir.ui.view">
-      <field name="name">edu.form</field>
+      <field name="name">EM Admin Panel</field>
       <field name="model">edu.info</field>
       <field name="arch" type="xml">
         <form string="edu_info" version="7.0">
@@ -166,7 +166,7 @@
     </record>
     <!-- ========================= Trainer Profile ============================= -->
     <record id="trainer_profile_form" model="ir.ui.view">
-      <field name="name">trainer.profile.form</field>
+      <field name="name">Trainers Profile</field>
       <field name="model">trainer.profile.info</field>
       <field name="arch" type="xml">
         <form string="trainer_profile_info" version="7.0">
@@ -446,7 +446,7 @@
       <field name="res_model">panel.info</field>
       <field name="view_type">form</field>
       <field name="limit">10</field>
-      <field name="view_mode">kanban,tree,form</field>
+      <field name="view_mode">tree,form</field>
       <field name="view_id" ref="panel_tree" />
       <field name="search_view_id" ref="view_panel_filter" />
       <!--<field name="help" type="html">

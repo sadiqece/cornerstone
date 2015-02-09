@@ -121,11 +121,7 @@ class holiday_line(osv.osv):
 			if str(chng_year.year) != str(year2):
 				res['value']['date_start'] = ''
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
-				#return res
-			elif str(year.chng_year) != str(year2):
-				res['value']['date_start'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
-				return res				
+				return res
 			d = self.months_between1(chng_year, current_date) 
 			if d < 0:
 				res['value']['date_start'] = ''

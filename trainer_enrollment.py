@@ -102,11 +102,25 @@ class panel_info(osv.osv):
 			if self_obj.base_rate < 0:
 				return False
 		return True
+		
+	'''def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
+	
+		return {
+		'type': 'ir.actions.act_window',
+		'name': _('Trainer'),
+		'res_model': 'panel.info',
+		'view_type': 'form',
+		'res_id': 1, # this will open particular product,
+		'view_id': view_id,
+		'view_mode': 'form',
+		'nodestroy': True,
+		'context': context,
+		}'''
 
 	_name = "panel.info"
 	_description = "This table is for keeping location data"
 	_columns = {
-	'trainer_line': fields.one2many('trainer.line','trainer_id','Trainers'),
+	'trainer_line': fields.one2many('trainer.line','trainer_id','Trainers',ondelete='cascade', help='Class Calendar', select=True),
 	'asssign_schedule_line': fields.one2many('assign.schedule.line','sche_id','Assignment Schedules'),
 	'assigned_line': fields.one2many('assignment.schedule','assigned_id','Assignment Schedule',ondelete='cascade', help='Class Calendar', select=True),
 	'setting_panel_line': fields.one2many('setting.line','setting_id','Settings'),
@@ -114,7 +128,7 @@ class panel_info(osv.osv):
 	'class_outstanding_noitce': fields.integer('Class Outstanding Notice', size=6),
 	'trainer_min_avail': fields.integer('Trainer Min Avaliablity (%)', size=6),
 	'base_rate': fields.integer('Base Rate ($ per hr)', size=4),
-	'trainer_ids' : fields.one2many('trainer.profile.info', 'trainer_id', 'Trainer'),
+	'trainer_ids' : fields.one2many('trainer.profile.info', 'trainer_id', 'Trainer', ondelete='cascade', help='Class Calendar', select=True),
 	'name': fields.related('trainer_ids','name', string='Status', type="char", relation="trainer.profile.info", readonly=1),
 	'all_trainer':fields.many2one('trainer.profile.info', 'All Trainer',ondelete='cascade', help='Program', select=True),
 	'class_sched':fields.many2one('class.info','Class',ondelete='cascade', help='Program', select=True),
@@ -541,6 +555,15 @@ class qualification(osv.osv):
 		
 		return res
 		
+	def _check_unique_certification(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.qualify_id == self_obj.qualify_id and x.certification == self_obj.certification:
+						return False
+		return True
+		
 	_name = "qualification.trainer.module"
 	_description = "Qualification Tab"
 	_columns = { 
@@ -551,8 +574,8 @@ class qualification(osv.osv):
 	'board_university':fields.char('Board/University',size=25),
 	'year_awarded':fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year Awarded'),
 	'Prof_Cert': fields.boolean('Prof Cert'),
-	
-	}	
+	}
+	_constraints = [(_check_unique_certification, 'Error: Certification Already Exists', ['Certification'])]
 qualification()
 
 class work_exp(osv.osv):
@@ -573,6 +596,24 @@ class work_exp(osv.osv):
 			if self_obj.year_to < self_obj.year_from:
 				return False
 		return True
+		
+	def _check_unique_year_from(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.work_id == self_obj.work_id and x.year_from == self_obj.year_from:
+						return False
+		return True
+		
+	def _check_unique_year_to(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.work_id == self_obj.work_id and x.year_to == self_obj.year_to:
+						return False
+		return True
 
 	_name = "work.exp.module"
 	_description = "Work Experience Tab"
@@ -587,7 +628,7 @@ class work_exp(osv.osv):
 	'key_responsibility':fields.char('Key Responsibilities'),
 	'trg_specific':fields.boolean('Trg Specific'),
 	}
-	_constraints = [(_year_from_to, 'Error: Year To should be greater than Year From', ['Year'])]
+	_constraints = [(_year_from_to, 'Error: Year To should be greater than Year From', ['Year']), (_check_unique_year_from, 'Error: Year From Already Exists', ['Year From']), (_check_unique_year_to, 'Error: Year To Already Exists', ['Year To'])]
 work_exp()
 
 

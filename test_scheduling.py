@@ -81,12 +81,15 @@ class test_info(osv.osv):
 		'status': fields.related('test_def_id','test_status',type="char",relation="test",string="Status", readonly=1,),
 		'capacity':fields.related('test_def_id','test_max_Pax',type="integer",relation="test",string="Capacity", readonly=1,),
 		'actual_number':fields.function(_calculate_total_learners, relation="test.info",readonly=1,string='No. Learners',type='integer'),
-		
+		't_status':fields.char('Status')
 	}
+	_defaults = { 
+		't_status': 'Draft',
+	} 
 	
 
 	def create(self,cr, uid, values, context=None):
-	
+		values['t_status'] = 'Edit'
 		if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
 		
@@ -177,7 +180,7 @@ class test_info(osv.osv):
 				t1end = test_obj['end_date']
 				
 				
-			r1 = Range(start=t1start, end=t1end)
+			r1 = Range(start=datetime.strptime(t1start, "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(t1end, "%Y-%m-%d %H:%M:%S"))
 	
 			sr_ids = self.search(cr, 1 ,[], context=context)
 			for x in self.browse(cr, uid, sr_ids, context=context):

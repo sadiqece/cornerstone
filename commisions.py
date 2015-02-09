@@ -202,24 +202,6 @@ class project_value_line(osv.osv):
 		return True
 # 19-1-15	
 
-	def _check_unique_s_range(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.project_value_lineid == self_obj.project_value_lineid and x.s_range1 == self_obj.s_range1:
-						return False
-		return True		
-
-	def _check_unique_e_range(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.project_value_lineid == self_obj.project_value_lineid and x.e_range1 == self_obj.e_range1:
-						return False
-		return True	
-
 # Zeya 19-1-15
 	'''def ranges_between(self, s_range1, e_range1):
 		 latest_start = max(r1.s_range1, r2.s_range1)
@@ -228,7 +210,18 @@ class project_value_line(osv.osv):
 		 overlap
 		return r.val
 '''
-
+	def _check_all_range(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, uid ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.project_value_lineid == self_obj.project_value_lineid and x.e_range1 == self_obj.e_range1:
+						return False
+					elif x.project_value_lineid == self_obj.project_value_lineid and self_obj.s_range1 >= x.s_range1 and self_obj.s_range1 <= x.e_range1:
+						return False
+					elif x.project_value_lineid == self_obj.project_value_lineid and self_obj.e_range1 >= x.s_range1 and self_obj.e_range1 <= x.e_range1:
+						return False
+		return True
 
 		
 	_name = "project.value.line"
@@ -245,8 +238,7 @@ class project_value_line(osv.osv):
 	   'e_range1': 0,
 	   'value1': 0,
 	  }
-	_constraints = [(_check_unique_s_range, 'Error: Start Range Value Already Exist', ['Start of Range']),(_check_unique_e_range, 'Error: End Range Value Already Exist', ['End of Range']),
-	(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range'])]
+	_constraints = [(_check_value1, 'Error: Value Cannot be negative', ['Value']),(_check_min_max_srange, 'Error: Start and End Range values are not correct', ['Range']),(_check_all_range, 'Error: Start or End Range Values Already Exist', ['Check Start or End Range'])]
 
 	def onchange_range(self, cr, uid, ids, sr, er, context=None):
 		res = {'value':{}}

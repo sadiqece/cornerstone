@@ -12,8 +12,9 @@
 			<sheet>
 				<group>
 					<group class="oe_title" style="width:350px;">
-							<field name = "test_def_id"  options="{'create': False, 'create_edit': False}" on_change="on_change_test_definition(test_def_id,context)"  />
+							<field name = "test_def_id"  options="{'create': False, 'create_edit': False}" on_change="on_change_test_definition(test_def_id,context)" attrs="{'readonly':[('t_status','=','Edit')]}"/>
 							<field name = "status"  invisible="1"/>
+							<field name = "t_status"  invisible="1"/>
 			        </group>
 					<div>
 							<group col="4">
@@ -130,7 +131,7 @@
 									<tree string='List' create="false" delete="false">
 										<field name='learner_id' />
 										<field name='learner_nric'/>
-										<button  name="view_scores"  string="View Scores" type="object" icon="view_scores"/>
+										<button  name="view_scores"  string="View Scores" type="object"/>
 									</tree>
 							</field>
 						</page>

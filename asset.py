@@ -146,7 +146,19 @@ class asset_line(osv.osv):
 						res.update({'warning': {'title': _('Warning !'), 'message': _('Please Check the Date, Invalid Date not Allowed.')}})
 						return res
 			return issue
-
+				
+						
+	'''def onchange_stopeddate(self, cr, uid, ids, stop, sd, context=None):
+		if stop:
+			d = self.months_between(stop, str(datetime.datetime.now().date()))
+			c = self.months_between2(stop, str(sd))
+			res = {'value':{}}
+			if d > 0 or c < 0:
+				res['value']['date_stopped'] = ''
+				#res['warning'][''] = {'title':'Error', 'messagge':'Insert 10 chars!'}
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, Past date not allowed.')}})
+				return res
+			return stop'''
  # EOF
 
 			
