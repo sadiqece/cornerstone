@@ -468,8 +468,20 @@
               </page>
               <!-- Payment Tab -->
               <page string="Payment">
-                <span>Payment Tab</span>
+				  <h3>
+					<label string="Payment" readonly="context.get('ctx', False)" />
+                  </h3>
+                <field name="payment_learner" nolabel="1">
+                <tree string="List" editable="bottom">
+					<field name="s_no" />
+					<field name="item_name" />
+					<field name="cost" />
+				</tree>	
+                </field>
+					<label string="Grand Total $:" readonly="context.get('ctx', False)" />
+					<field name="Grand_total" />
               </page>
+             
             </notebook>
           </sheet>
         </form>
@@ -486,7 +498,7 @@
             <div class="col-3">
               <label for="name" class="oe_edit_only" />
               <h1>
-                <field name="name" on_change="onchange_class_hist(name,name,name)"/>
+                <field name="name"/>
               </h1>
             </div>
             <div class="clear" />
@@ -682,9 +694,20 @@
                   </tree>
                 </field>
               </page>
-              <!-- Payment Tab -->
+                <!-- Payment Tab -->
               <page string="Payment History">
-                <h3>Payment History</h3>
+				  <h3>
+					<label string="Payment History" readonly="context.get('ctx', False)" />
+                  </h3>
+                <field name="payment_learner" nolabel="1">
+                <tree string="List" editable="bottom">
+					<field name="s_no" />
+					<field name="item_name" />
+					<field name="cost" />
+				</tree>	
+                </field>	
+					<label string="Grand Total $:" readonly="context.get('ctx', False)" />
+					<field name="Grand_total" />				
               </page>
               <!-- Class History Tab -->
               <page string="Class History">

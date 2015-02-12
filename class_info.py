@@ -238,7 +238,7 @@ class class_info(osv.osv):
 		'binder_in_use':fields.boolean('Binder'),
 		'tablet_in_use':fields.boolean('Tablet'),
 		'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet')),'Primary'),
-		'moi_eq_line': fields.one2many('class.moi','class_moi_id','Equipment List'),
+		'moi_eq_line': fields.one2many('class.moi','equip_list','Equipment List'),
 		'room_arr': fields.selection((('Default','Default'),('Active','Active')),'Room Arrangment'),
 		'learner_asset': fields.one2many('learner.asset','learner_asset_id','Asset'),
 		'non_std_items': fields.selection((('Food','Food'),('Materials','Materials'),('Learning Assets','Learning Assets'),('Rooms','Rooms')),'Items'),
@@ -1318,7 +1318,21 @@ class learner_mod_line(osv.osv):
 					if x.learner_mod_id == self_obj.learner_mod_id and x.learner_id == self_obj.learner_id:
 						return False
 		return True
-	
+
+	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
+			obj_res_hist = self.pool.get('class.history.module')
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			for ch in values:
+				vals = {
+					'end_date':ed,
+					'class_id':ch['learner_id'],
+					'class_code':cc,
+					'start_date': sd,
+					'module_name':mn
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
+		
 	def create(self,cr, uid, values, context=None):
 		global class_create
 		if class_create == True :
@@ -1328,6 +1342,14 @@ class learner_mod_line(osv.osv):
 		class_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('class.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
+		#Masih
+		ed = class_info_obj_id.end_date
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.module_id.id
+		cc = class_info_obj_id.class_code
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
+		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		#Masih
 		parent_id = class_info_obj_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1343,6 +1365,10 @@ class learner_mod_line(osv.osv):
 				new_array['learner_mod_id'] = prog_module_line
 				new_array['attendance'] = False
 				super(learner_mod_line, self).create(cr, uid, new_array, context=context)
+				
+		#Masih
+		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		#Masih
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
@@ -1376,7 +1402,7 @@ class learner_mod_line(osv.osv):
 	_columns = {
 		'learner_mod_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, required=True),
-		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1, required=True),
+		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1),
 		'binder':fields.boolean('Binder'),
 		'tablet':fields.boolean('Tablet'),
 		'blended':fields.boolean('Blended'),
@@ -1498,7 +1524,7 @@ class trainers_line(osv.osv):
 		
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
-		res = super(trainers_line, self).read(cr, uid,ids, fields, context, load)
+		res = super(trainers_line, self).read(cr, uid, ids, fields, context, load)
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+1
@@ -1598,7 +1624,7 @@ class class_moi(osv.osv):
 	_description ="People and Facilites Tab"
 	_columns = {
 	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
-	'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
+	#'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 	}
 	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['equip_list'])]
 class_moi()

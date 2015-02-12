@@ -435,7 +435,7 @@ class learner_info(osv.osv):
 			return res'''
 
 #Class History Tab, Test History Tab & Test Scores Info			
-	def onchange_class_hist(self, cr, uid, ids, i_learner, i_test_history, i_test_score, context=None):
+	'''def onchange_class_hist(self, cr, uid, ids, i_learner, i_test_history, i_test_score, context=None):
 		val ={}
 		sub_lines = []
 #Class History Tab
@@ -470,7 +470,7 @@ class learner_info(osv.osv):
 				sub_lines.append({'test_score_type':s[0], 'test_sc_code':s[1], 'test_sc_date':s[2]})
 			val.update({'test_score_line': sub_lines})
 			
-			return {'value': val}
+			return {'value': val}'''
 			
 	'''def self_call(self, cr, uid, ids, context=None):
 		raise osv.except_osv(_('Warning!'),_('qualification award %s')%(1))
@@ -629,6 +629,9 @@ class learner_info(osv.osv):
 		'end_date':fields.date('End Date', readonly=1),
 		'sch_date':fields.selection((_onchange_populate_schedule), 'Select Date', type='char'),
 		#'sch_date':fields.many2one('class.info', 'start_date'),
+		#payment
+		'payment_learner':fields.one2many('payment.module','pay_id','Payment', readonly=1),
+		'Grand_total':fields.integer('Grand Total', readonly=1),
 		#Personal Tab Fields
 		'nationality':fields.many2one('res.country', 'Nationality'),
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
@@ -657,7 +660,7 @@ class learner_info(osv.osv):
 		'learner_mod_line_4': fields.one2many('learner.mode.line', 'qualification_module_id_4', 'Order Lines', select=True),
 		'learner_mod_line_5': fields.one2many('learner.mode.line', 'qualification_module_id_5', 'Order Lines', select=True),
 		'learner_mod_line_6': fields.one2many('learner.mode.line', 'qualification_module_id_6', 'Order Lines', select=True),
-		#
+		# Module No.
 		'no_module_box1': fields.boolean('1'),
 		'no_module_box2': fields.boolean('2'),
 		'no_module_box3': fields.boolean('3'),
@@ -899,7 +902,7 @@ class enroll_info(osv.osv):
 		'mobile_no': fields.integer('Mobile No'),
 		'landline_no': fields.integer('Home Number'),
 		'office_no': fields.integer('Office'),
-		'payment_line': fields.one2many('payment.module','payment_id','payment'),
+		#'payment_history': fields.one2many('payment.history.module','payment_id','Payment History'),
 		'history_line': fields.one2many('history.learner.module','history_id','history'),
 		'image': fields.binary("Photo",
 			help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
@@ -953,7 +956,7 @@ class checklist(osv.osv):
 		res = super(checklist, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
-			seq_number = seq_number+20
+			seq_number = seq_number+1
 			r['s_no'] = seq_number
 		
 		return res
@@ -1107,6 +1110,29 @@ class master_sponser(osv.osv):
 	_constraints = [(_check_unique_sponser, 'Error: Sponsership Already Exists', ['Sponsership'])]	
 master_sponser()
 
+# With 5 tab Payment (Learner info)
+class payment(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(checklist, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+
+	_name ='payment.module'
+	_description ="payment Tab"
+	_columns = {
+		'pay_id':fields.integer('Id',size=20, readonly=1),
+		's_no' : fields.integer('S.No', size=50, readonly=1),
+		'item_name' : fields.char('Item', size=20),
+		'cost': fields.integer('Cost'),
+	}
+payment ()
+
 #Learner Outstanding Tab
 class outstanding(osv.osv):	
 
@@ -1226,16 +1252,7 @@ class action_learn(osv.osv):
 action_learn()
 
 #Learner Payment History Tab
-class payment_history(osv.osv):
-	_name = "payment.history.module"
-	_description = "Payment History Tab"
-	_columns = {
-	'payment_id' : fields.integer('Id',size=20), 
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	
-	
-	}	
-payment_history()
+
 
 #Learner Class History Tab
 class class_history(osv.osv):
@@ -1415,6 +1432,8 @@ class feedback(osv.osv):
 	   'entered_by': _current_user,
 	   'date_of_feedback': fields.date.context_today,
 	}
+	
+	_order = "date_of_feedback desc"
 feedback()
 
 #Learner Remarks Tab
@@ -1452,6 +1471,6 @@ class remarks(osv.osv):
 	   'enter_by': _current_user,
 	   'date_of_remarks': fields.date.context_today,
 	   }
+	_order = "date_of_remarks desc"
 remarks()
-
 	

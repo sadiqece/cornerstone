@@ -20,10 +20,21 @@
                             </h2>
 						</div>
 		       </group>
-			   <group style="width:380px;">
-					<field name='location_type_permanent' invisible="1"/>
-					<field name='location_type_temporary' invisible="1"/>
-					<field name = "location_type" on_change="on_change_location_type(location_type)"/>
+				<group style="width:280px;">
+					<field name='location_type' attrs="{'readonly':[('location_type','!=',False)]}" on_change="on_change_location_type(location_type)"/> 
+				</group>
+				<group>
+			 		<div>	
+						<group attrs="{'invisible': [('location_type_temporary', '=' , True)]}">
+							<field name='location_type_permanent' invisible="1"/>
+						</group>
+					
+						<group attrs="{'invisible': [('location_type_permanent', '=' , True)]}">
+							<field name='location_type_temporary' invisible="1"/>
+						</group>
+					</div>
+				</group>
+			    <group style="width:380px;">
 					<field name = "location_address"/>
 					<field name = "location_postal_code"/>
 					<field name = "location_contact_no" />

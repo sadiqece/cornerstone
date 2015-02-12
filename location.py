@@ -99,9 +99,6 @@ class location(osv.osv):
 		'location_room_line': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
 		'no_of_rooms': fields.function(_calculate_total_room, relation="room", readonly=1, string='Number of Rooms', type='integer'),
 	}
-	_defaults = {
-		'location_type': 'Permanent'
-	}
 	_constraints = [(_check_postal_code, 'Error: Postal Code Cannot be Negative value', ['Postal Code']),(_check_contact_no, 'Error: Contact No Cannot be Negative value', ['Contact no.']),
 	(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
 location() 
@@ -118,26 +115,22 @@ class room(osv.osv):
 		
 		return res
 		
-	def _check_unique_name(self, cr, uid, ids, context=None):
+	def _check_unique_room_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.location_id == self_obj.location_id and x.name == self_obj.name:
+						return False
 		return True
 		
-	def _check_unique_code(self, cr, uid, ids, context=None):
+	def _check_unique_room_code(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.room_number.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.room_number and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.room_number and self_obj.room_number.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.location_id == self_obj.location_id and x.room_number == self_obj.room_number:
+						return False
 		return True
 		
 	def on_change_location_id(self, cr, uid, ids, location_id):
@@ -229,7 +222,7 @@ class room(osv.osv):
 		return {'value': {'name':location_obj.name,'location_code':location_obj.location_code}}
 	
 	_constraints = [(_check_room_max_cap, 'Error: Maximum Capacity Cannot be Negative value', ['Maximum Capacity']),(_check_room_floor_area, 'Error: Floor Area (Sqm) Cannot be Negative value', ['Floor Area(Sqm)']),
-	(_check_unique_name, 'Error: Room Name Already Exists', ['Name']),(_check_unique_code, 'Error: Room Number Already Exists', ['Room Number'])]
+	(_check_unique_room_name, 'Error: Room Name Already Exists', ['Name']),(_check_unique_room_code, 'Error: Room Number Already Exists', ['Room Number'])]
 room()
 
 class location_room_line(osv.osv):
