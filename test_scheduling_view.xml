@@ -131,7 +131,7 @@
 									<tree string='List' create="false" delete="false">
 										<field name='learner_id' />
 										<field name='learner_nric'/>
-										<button  name="view_scores"  string="View Scores" type="object"/>
+										<button  name="view_scores"  string="View Scores" type="object" icon="view_modalities"/>
 									</tree>
 							</field>
 						</page>
@@ -260,8 +260,10 @@
             <field name="model">test.info</field>
             <field name="arch" type="xml">
                 <search string="Test Scheduling">
-
+                    <field name="name" string="Test"/>
+					<field name="test_code" string="Code"/>
 	           </search>
+	          
             </field>
         </record>
 		
@@ -270,6 +272,7 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">test.info</field>
             <field name="view_type">form</field>
+			<field name="limit">10</field>
             <field name="view_mode">calendar,tree,form</field>
 			<field name="view_id" ref="test_listing_page_tree"/>
 			<field name="search_view_id" ref="view_test_listing_filter"/>

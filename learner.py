@@ -34,6 +34,7 @@ class learner_info(osv.osv):
 		
 #Load Module Groups
 	def load_module_groups(self, cr, uid, ids, progid, context=None):
+
 		val ={}	
 		sub_lines = []
 		set_group_as_sel_1 = False
@@ -303,8 +304,82 @@ class learner_info(osv.osv):
 			sub_lines.append({'item':prog_line['master_show_do'].id, 'confirmation':prog_line['supp_doc_req']})
 			
 		val.update({'checklist_tab': sub_lines})
-		return {'value': val}		
-# Zeya 24-1-15 EOF		
+		#return {'value': val}	
+# Zeya 24-1-15
+# Payment
+		learner_id = 0
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			learner_id = self_obj.id
+			
+		sql = "select distinct pl.module_id, m.module_fee from lis_program p, program_module_line pl, cs_module m, \
+			learner_info l, learner_mode_line ll \
+			where p.id = pl.prog_mod_id and pl.module_id = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_1 = l.id \
+			and ((select_mod_gp_1 = 't' and p.set_module_as_1 != 'Selectable' or p.set_group_as_sel_1 = 'f' and p.set_module_as_1 != 'Selectable') \
+			or (p.set_group_as_sel_1 = 'f' and p.set_module_as_1 = 'Selectable' and ll.select_mod_1 = 't' ) \
+			or (p.set_module_as_1 = 'Selectable' and ll.select_mod_1 = 't') \
+			or (select_mod_gp_1 = 't' and p.set_module_as_1 = 'Selectable' and ll.select_mod_1 = 't' )) \
+			and p.id = %s and l.id = %s \
+		union all \
+		select distinct pl.module_id_2, m.module_fee from lis_program p, program_module_line pl, cs_module m, learner_info l, \
+			learner_mode_line ll \
+			where p.id = pl.prog_mod_id_2 and pl.module_id_2 = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_2 = l.id \
+			and ((select_mod_gp_2 = 't' and p.set_module_as_2 != 'Selectable' or p.set_group_as_sel_2 = 'f' and p.set_module_as_2 != 'Selectable') \
+			or (p.set_group_as_sel_2 = 'f' and p.set_module_as_2 = 'Selectable' and ll.select_mod_2 = 't' ) \
+			or (p.set_module_as_2 = 'Selectable' and ll.select_mod_2 = 't') \
+			or (select_mod_gp_2 = 't' and p.set_module_as_2 = 'Selectable' and ll.select_mod_2 = 't' )) \
+			and p.id = %s and l.id = %s \
+		union all \
+		select distinct pl.module_id_3, m.module_fee from lis_program p, program_module_line pl, cs_module m, learner_info l, \
+			learner_mode_line ll \
+			where p.id = pl.prog_mod_id_3 and pl.module_id_3 = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_3 = l.id \
+			and ((select_mod_gp_3 = 't' and p.set_module_as_3 != 'Selectable' or p.set_group_as_sel_3 = 'f' and p.set_module_as_3 != 'Selectable') \
+			or (p.set_group_as_sel_3 = 'f' and p.set_module_as_3 = 'Selectable' and ll.select_mod_3 = 't' ) \
+			or (p.set_module_as_3 = 'Selectable' and ll.select_mod_3 = 't') \
+			or (select_mod_gp_3 = 't' and p.set_module_as_3 = 'Selectable' and ll.select_mod_3 = 't' )) \
+			and p.id = %s and l.id = %s \
+		union all \
+		select distinct pl.module_id_4, m.module_fee from lis_program p, program_module_line pl, cs_module m, learner_info l, \
+			learner_mode_line ll \
+			where p.id = pl.prog_mod_id_4 and pl.module_id_4 = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_4 = l.id  \
+			and ((select_mod_gp_4 = 't' and p.set_module_as_4 != 'Selectable' or p.set_group_as_sel_4 = 'f' and p.set_module_as_4 != 'Selectable') \
+			or (p.set_module_as_4 = 'Selectable' and ll.select_mod_4 = 't') \
+			or (select_mod_gp_4 = 't' and p.set_module_as_4 = 'Selectable' and ll.select_mod_4 = 't' )) \
+			and p.id = %s and l.id = %s \
+		union all \
+		select distinct pl.module_id_5, m.module_fee from lis_program p, program_module_line pl, cs_module m, learner_info l, \
+			learner_mode_line ll \
+			where p.id = pl.prog_mod_id_5 and pl.module_id_5 = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_5 = l.id \
+			and ((select_mod_gp_5 = 't' and p.set_module_as_5 != 'Selectable' or p.set_group_as_sel_5 = 'f' and p.set_module_as_5 != 'Selectable') \
+			or (p.set_group_as_sel_5 = 'f' and p.set_module_as_5 = 'Selectable' and ll.select_mod_5 = 't' ) \
+			or (p.set_module_as_5 = 'Selectable' and ll.select_mod_5 = 't') \
+			or (select_mod_gp_5 = 't' and p.set_module_as_5 = 'Selectable' and ll.select_mod_5 = 't' )) \
+			and p.id = %s and l.id = %s \
+		union all \
+		select distinct pl.module_id_6, m.module_fee from lis_program p, program_module_line pl, cs_module m, learner_info l, \
+			learner_mode_line ll \
+			where p.id = pl.prog_mod_id_6 and pl.module_id_6 = m.id and l.program_learner = p.id \
+			and ll.qualification_module_id_6 = l.id \
+			and ((select_mod_gp_6 = 't' and p.set_module_as_6 != 'Selectable' or p.set_group_as_sel_6 = 'f' and p.set_module_as_6 != 'Selectable') \
+			or (p.set_group_as_sel_6 = 'f' and p.set_module_as_6 = 'Selectable' and ll.select_mod_6 = 't' ) \
+			or (p.set_module_as_6 = 'Selectable' and ll.select_mod_6 = 't') \
+			or (select_mod_gp_6 = 't' and p.set_module_as_6 = 'Selectable' and ll.select_mod_6 = 't' )) \
+			and p.id = %s and l.id = %s" % (progid, learner_id, progid, learner_id, progid, learner_id, progid, learner_id, progid, learner_id, progid, learner_id)
+		cr.execute(sql)
+		pay_recs = cr.fetchall()		
+
+		sub_lines = []
+		for i in pay_recs:
+			sub_lines.append({'item_name':i[0], 'cost':i[1]})
+			
+		val.update({'payment_learner': sub_lines})
+		return {'value': val}	
+		
+# EOF	
 		
 #Image
 	def _get_image(self, cr, uid, ids, name, args, context=None):
@@ -1115,7 +1190,7 @@ class payment(osv.osv):
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
-		res = super(checklist, self).read(cr, uid,ids, fields, context, load)
+		res = super(payment, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+1
@@ -1128,8 +1203,8 @@ class payment(osv.osv):
 	_columns = {
 		'pay_id':fields.integer('Id',size=20, readonly=1),
 		's_no' : fields.integer('S.No', size=50, readonly=1),
-		'item_name' : fields.char('Item', size=20),
-		'cost': fields.integer('Cost'),
+		'item_name' : fields.many2one('cs.module', 'Module Name'),
+		'cost': fields.float('Cost', size=9),
 	}
 payment ()
 
@@ -1284,10 +1359,10 @@ class class_history(osv.osv):
 	_name = "class.history.module"
 	_description = "Class History Tab"
 	_columns = {
-	'class_id' : fields.many2one('learner.info'), 
+	'class_id' : fields.many2one('learner.info', ondelete='cascade'), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
-	'module_name':fields.many2one('cs.module', 'Module'),
+	'module_name':fields.many2one('cs.module', 'Module', ondelete='cascade'),
 	'class_code':fields.char('Class Code'),
 	'start_date': fields.date('Date Commenced'),
 	'end_date': fields.date('Date Completed'),
@@ -1314,8 +1389,8 @@ class test_history(osv.osv):
 	_name = "test.history.module"
 	_description = "Test History Tab"
 	_columns = {
-	'test_id' : fields.many2one('learner.info'), 
-	'test_type' : fields.char('Test'),
+	'test_id' : fields.many2one('learner.info', ondelete='cascade'), 
+	'test_type' : fields.many2one('test','Test', ondelete='cascade'),
 	'test_code' : fields.char('Test Code',),
 	'test_date' : fields.date('Test Date'),
 	'test_status' : fields.char('Test Status',),
@@ -1329,7 +1404,7 @@ class test_score(osv.osv):
 	_description = "Test Score Tab"
 	_columns = {
 	'test_score_id' : fields.integer('Id',size=20), 
-	'test_score_type' : fields.char('Test',),
+	'test_score_type' : fields.many2one('test','Test', ondelete='cascade'),
 	'test_sc_code' : fields.char('Test Code',),
 	'test_sc_date' : fields.date('Test Date'),
 	'test_compre' : fields.char('Compr',),

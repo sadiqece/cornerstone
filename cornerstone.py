@@ -16,6 +16,88 @@ _logger = logging.getLogger(__name__)
 
 class program(osv.osv):
 
+# Module Item Mandatory
+    def _make_mandatory1(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_1'] == 'Selectable':
+                for line in progline.program_mod_line:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True
+		
+    def _make_mandatory2(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_2'] == 'Selectable':
+                for line in progline.program_mod_line_2:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True
+
+
+    def _make_mandatory3(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_3'] == 'Selectable':
+                for line in progline.program_mod_line_3:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True
+
+
+    def _make_mandatory4(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_4'] == 'Selectable':
+                for line in progline.program_mod_line_4:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True
+
+
+    def _make_mandatory5(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_5'] == 'Selectable':
+                for line in progline.program_mod_line_5:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True
+
+
+    def _make_mandatory6(self, cr, uid, ids, context=None):
+        pl = self.pool.get('program.module.line')
+        isFound = False
+        for progline in self.browse(cr, uid, ids, context=None):
+            if progline['set_module_as_6'] == 'Selectable':
+                for line in progline.program_mod_line_6:
+                    isFound = True
+                if isFound:
+                    return True
+                else:
+                    return False
+        return True		
 #Dropdown to Show no. of module groups
 
     def onchange_no_of_mod_gp(self, cr, uid, ids, no_of_mod_gp):
@@ -741,7 +823,14 @@ class program(osv.osv):
 	   'set_group_as_sel_5': True,
 	   'set_group_as_sel_6': True,
     }
-    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['Program Name']),(_check_unique_code, 'Error: Program Code Already Exists', ['Program Code']),(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['Module Group Name']),(_check_min_max_1, 'Error: Invalid Min/Max Values', ['Module Group 1']),(_check_min_max_2, 'Error: Invalid Min/Max Values', ['Module Group 2']),(_check_min_max_3, 'Error: Invalid Min/Max Values', ['Module Group 3']),(_check_min_max_4, 'Error: Invalid Min/Max Values', ['Module Group 4']),(_check_min_max_5, 'Error: Invalid Min/Max Values', ['Module Group 5']),(_check_min_max_6, 'Error: Invalid Min/Max Values', ['Module Group 6'])]
+    _constraints = [(_make_mandatory1, 'Error: Select Atleast One Item for Group 1', ['module item']),(_make_mandatory2, 'Error: Select Atleast One Item for Group 2', ['module item']),
+	(_make_mandatory3, 'Error: Select Atleast One Item for Group 3', ['module item']),(_make_mandatory4, 'Error: Select Atleast One Item for Group 4', ['module item']),
+	(_make_mandatory5, 'Error: Select Atleast One Item for Group 5', ['module item']),(_make_mandatory6, 'Error: Select Atleast One Item for Group 6', ['module item']),
+	(_check_unique_name, 'Error: Program Name Already Exists', ['Program Name']),(_check_unique_code, 'Error: Program Code Already Exists', ['Program Code']),
+	(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['Module Group Name']),(_check_min_max_1, 'Error: Invalid Min/Max Values', ['Module Group 1']),
+	(_check_min_max_2, 'Error: Invalid Min/Max Values', ['Module Group 2']),(_check_min_max_3, 'Error: Invalid Min/Max Values', ['Module Group 3']),
+	(_check_min_max_4, 'Error: Invalid Min/Max Values', ['Module Group 4']),(_check_min_max_5, 'Error: Invalid Min/Max Values', ['Module Group 5']),
+	(_check_min_max_6, 'Error: Invalid Min/Max Values', ['Module Group 6'])]
 program()
 
 

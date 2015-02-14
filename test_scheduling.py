@@ -8,8 +8,6 @@ from collections import namedtuple
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
-
-
 import logging
 import pytz
 import re
@@ -56,6 +54,7 @@ class test_info(osv.osv):
 	_description = "This table is for keeping Test Schedules"
 	_columns = {
 		's_no': fields.integer('S_No', size=100),
+		'test_id': fields.integer('Id',size=20),
 		'test_def_id': fields.many2one('test', 'Test Definition',  ondelete='cascade', help='Test', select=True, required=True),
 		'name': fields.related('test_def_id','name',type="char",relation="test",string="Name", readonly=1,),
 		'test_type_id':fields.integer('Test Type Id'),
@@ -472,9 +471,35 @@ class test_learner(osv.osv):
 			class_code = class_obj.class_code
 		return {'value': {'learner_nric': module_obj.learner_nric,'class_code':class_code,'compliance_code':context.get('test_code')}}
 		
+	def _test_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
+			obj_res_hist = self.pool.get('test.history.module')
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			for ch in values:
+				vals = {
+					'test_type':ed,
+					'test_id':ch['learner_id'],
+					'test_status':cc,
+					'test_date': sd,
+					'test_code':mn
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
+		
 	def create(self,cr, uid, values, context=None):
 		id = super(test_learner, self).create(cr, uid, values, context=context)
 		self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
+		#Masih
+		test_id = values['learner_mod_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		ed = class_info_obj_id.test_def_id.id
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.test_code
+		cc = class_info_obj_id.t_status
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
+		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		#Masih
+		self._test_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
@@ -536,6 +561,35 @@ class test_scores(osv.osv):
 			'target':'new',
 			'context': ctx,
 		}
+		
+	def _test_scores(self, cr, uid, ed, sd, mn, values, context=None):
+			obj_res_hist = self.pool.get('test.score.module')
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			for ch in values:
+				vals = {
+					'test_score_type':ed,
+					'test_score_id':ch['learner_id'],
+					'test_sc_date': sd,
+					'test_sc_code':mn
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
+			
+	def create(self,cr, uid, values, context=None):
+		id = super(test_scores, self).create(cr, uid, values, context=context)
+		#self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
+		#Masih
+		test_id = values['test_scores_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		ed = class_info_obj_id.test_def_id.id
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.test_code
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
+		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		#Masih
+		self._test_scores(cr, uid, ed, sd, mn,[values], context=context)
+		return id
 	
 	def save_scores(self, cr, uid, ids, context=None): 
 		obj = self.browse(cr,uid,ids)
@@ -587,8 +641,11 @@ class test_scores(osv.osv):
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
 		if 'conv' in values and values['conv'] < 0:
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
+		
+		compr_id = values['compr']
 
 		id = super(test_scores, self).write(cr, uid, ids,values, context=context)
+		self._test_hist(cr, uid, compr_id, [values], context=context)
 		return id
 	_name ='test.scores'
 	_description ="Test Scores Tab"
