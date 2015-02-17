@@ -53,7 +53,7 @@ class class_info(osv.osv):
 			prog_mod_ids.append(spus[0].id)
 			
 		for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
-			if prog_module_line['sess_issues'] == 'None' :
+			if 'sess_issues' in prog_module_line and prog_module_line['sess_issues'] == 'None' :
 					module_ids.append(prog_module_line.id)
 		
 		value_ids = self.search(cr, uid, [('id', 'in', module_ids)])
@@ -238,7 +238,7 @@ class class_info(osv.osv):
 		'binder_in_use':fields.boolean('Binder'),
 		'tablet_in_use':fields.boolean('Tablet'),
 		'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet')),'Primary'),
-		'moi_eq_line': fields.one2many('class.moi','equip_list','Equipment List'),
+		'moi_eq_line': fields.one2many('class.moi','class_moi_id','Equipment List'),
 		'room_arr': fields.selection((('Default','Default'),('Active','Active')),'Room Arrangment'),
 		'learner_asset': fields.one2many('learner.asset','learner_asset_id','Asset'),
 		'non_std_items': fields.selection((('Food','Food'),('Materials','Materials'),('Learning Assets','Learning Assets'),('Rooms','Rooms')),'Items'),
@@ -862,6 +862,7 @@ class class_info(osv.osv):
 		
 		
 	def write(self,cr, uid, ids, values, context=None,holidays=False):
+		_logger.info("write class %s",values)
 		if holidays ==  False :
 			if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
@@ -1318,7 +1319,7 @@ class learner_mod_line(osv.osv):
 					if x.learner_mod_id == self_obj.learner_mod_id and x.learner_id == self_obj.learner_id:
 						return False
 		return True
-
+		
 	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
 			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
@@ -1332,7 +1333,7 @@ class learner_mod_line(osv.osv):
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
-		
+	
 	def create(self,cr, uid, values, context=None):
 		global class_create
 		if class_create == True :
@@ -1347,9 +1348,6 @@ class learner_mod_line(osv.osv):
 		sd = class_info_obj_id.start_date
 		mn = class_info_obj_id.module_id.id
 		cc = class_info_obj_id.class_code
-		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
-		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
-		#Masih
 		parent_id = class_info_obj_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1365,7 +1363,6 @@ class learner_mod_line(osv.osv):
 				new_array['learner_mod_id'] = prog_module_line
 				new_array['attendance'] = False
 				super(learner_mod_line, self).create(cr, uid, new_array, context=context)
-				
 		#Masih
 		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		#Masih
@@ -1396,13 +1393,35 @@ class learner_mod_line(osv.osv):
 	def on_change_learner_id(self, cr, uid, ids, learner_id):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
 		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
+		
+	def unlink(self, cr, uid, ids, context=None):
+		_logger.info("Unlink Learner Line %s",ids)
+		values_obj = self.browse(cr,uid,ids,context)[0]
+		class_id = values_obj['learner_mod_id']
+		
+		parent_id = class_id['parent_id']
+		if parent_id > 0:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
+			ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
+			prog_mod_ids.append(ids_1[0])
+		else:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
+			prog_mod_ids.append(class_id.id)
+		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
+		_logger.info("Unlink Learner line_ids %s",line_ids)
+		for prog_module_line in self.browse(cr,uid,line_ids,context):
+			_logger.info("Unlink Learner prog_module_line %s",line_ids)
+			super(learner_mod_line, self).unlink(cr, uid, prog_module_line.id, context=context)
+			
+		id = super(learner_mod_line, self).unlink(cr, uid, ids, context=context)
+		return id
 	
 	_name = "learner.line"
 	_description = "Learner Line"
 	_columns = {
 		'learner_mod_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
-		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, required=True),
-		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1),
+		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, ),
+		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1, required=True),
 		'binder':fields.boolean('Binder'),
 		'tablet':fields.boolean('Tablet'),
 		'blended':fields.boolean('Blended'),
@@ -1426,20 +1445,32 @@ class session_info(osv.osv):
 	}
 session_info()
 
+global trianer_created
+trianer_created = False
 class trainers_line(osv.osv):
 	
 	def _check_unique_trainer(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.trainers_line_id == self_obj.trainers_line_id and x.trainer_id == self_obj.trainer_id:
-						return False
+		if trianer_created == True :
+			global trianer_created
+			trianer_created = False
+			_logger.info("unique %s",ids)
+			sr_ids = self.search(cr, 1 ,[], context=context)
+			for x in self.browse(cr, uid, sr_ids, context=context):
+				_logger.info("Trainer x.trainers_line_id X %s",x.trainers_line_id.id)
+				_logger.info("Trainer x.trainer_id X %s",x.trainer_id.id)
+				if x.id != ids[0]:
+					for self_obj in self.browse(cr, uid, ids, context=context):
+						_logger.info("Trainer self_obj.trainers_line_id %s",self_obj.trainers_line_id.id )
+						_logger.info("Trainer self_obj.trainer_id %s",self_obj.trainer_id.id)
+						if x.trainers_line_id.id == self_obj.trainers_line_id.id and x.trainer_id.id == self_obj.trainer_id.id:
+							return False
 		return True
 	def update_status(self,cr, uid, ids, values, context=None):
 		super(trainers_line, self).write(cr, uid, ids,values, context=context)
 	
 	def create(self,cr, uid, values, context=None):
+		global trianer_created
+		trianer_created = True
 		global class_create
 		if class_create == True :
 			id = super(trainers_line, self).create(cr, uid, values, context=context)
@@ -1466,6 +1497,9 @@ class trainers_line(osv.osv):
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
+		_logger.info("write %s",values)
+		global trianer_created
+		trianer_created = True
 		id = super(trainers_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['trainers_line_id']
@@ -1520,16 +1554,6 @@ class trainers_line(osv.osv):
 		res = {}
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = 5
-		return res
-		
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(trainers_line, self).read(cr, uid, ids, fields, context, load)
-		seq_number =0 
-		for r in res:
-			seq_number = seq_number+1
-			r['s_no'] = seq_number
-		
 		return res
 		
 	_name ='trainers.line'
@@ -1617,14 +1641,33 @@ class class_moi(osv.osv):
 		line_ids = self.search(cr,uid,[('class_moi_id','in',prog_mod_ids)])
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
-				super(learner_mod_line, self).write(cr, uid, prog_module_line.id,values, context=context)
+				super(class_moi, self).write(cr, uid, prog_module_line.id,values, context=context)
+		return id
+	
+	def unlink(self, cr, uid, ids, context=None):
+		values_obj = self.browse(cr,uid,ids,context)[0]
+		class_id = values_obj['learner_mod_id']
+		
+		parent_id = class_id['parent_id']
+		if parent_id > 0:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
+			ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
+			prog_mod_ids.append(ids_1[0])
+		else:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
+			prog_mod_ids.append(class_id.id)
+		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids)])
+		for prog_module_line in self.browse(cr,uid,line_ids,context):
+			super(class_moi, self).unlink(cr, uid, prog_module_line.id, context=context)
+			
+		id = super(class_moi, self).unlink(cr, uid, ids, context=context)
 		return id
 		
 	_name ='class.moi'
 	_description ="People and Facilites Tab"
 	_columns = {
 	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
-	#'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
+	'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 	}
 	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['equip_list'])]
 class_moi()
@@ -1684,6 +1727,25 @@ class learner_asset(osv.osv):
 			if prog_module_line.id != class_id.id:
 				super(learner_asset, self).write(cr, uid, prog_module_line.id,values, context=context)
 		return id
+	def unlink(self, cr, uid, ids, context=None):
+		values_obj = self.browse(cr,uid,ids,context)[0]
+		class_id = values_obj['learner_mod_id']
+		
+		parent_id = class_id['parent_id']
+		if parent_id > 0:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
+			ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
+			prog_mod_ids.append(ids_1[0])
+		else:
+			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
+			prog_mod_ids.append(class_id.id)
+		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids)])
+		for prog_module_line in self.browse(cr,uid,line_ids,context):
+			super(learner_asset, self).unlink(cr, uid, prog_module_line.id, context=context)
+			
+		id = super(learner_asset, self).unlink(cr, uid, ids, context=context)
+		return id
+	
 	_name ='learner.asset'
 	_description ="Learner Asset Tab"
 	_columns = {

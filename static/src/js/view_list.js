@@ -114,7 +114,7 @@ instance.web.ListView = instance.web.View.extend( /** @lends instance.web.ListVi
             this._limit = (this.options.limit
                         || this.defaults.limit
                         || (this.getParent().action || {}).limit
-                        || 80);
+                        || 10);
         }
         return this._limit;
     },
@@ -320,11 +320,7 @@ instance.web.ListView = instance.web.View.extend( /** @lends instance.web.ListVi
                         var $select = $('<select>')
                             .appendTo($this.empty())
                             .click(function (e) {e.stopPropagation();})
-                            .append('<option value="80">80</option>' +
-                                    '<option value="200">200</option>' +
-                                    '<option value="500">500</option>' +
-                                    '<option value="2000">2000</option>' +
-                                    '<option value="NaN">' + _t("Unlimited") + '</option>')
+                            .append('<option value="10">10</option>')
                             .change(function () {
                                 var val = parseInt($select.val(), 10);
                                 self._limit = (isNaN(val) ? null : val);

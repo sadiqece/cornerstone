@@ -17,7 +17,7 @@
 						
 		       </group>
 			   <group style="width:200px;">
-					<field name='year'/>
+					<field name='year' attrs="{'readonly':[('year','!=',False)]}"/>
 			   </group>
 			 		<field name='holiday_line'>
 						<tree string='List'  editable="bottom" >

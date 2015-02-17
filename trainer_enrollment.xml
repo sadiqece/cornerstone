@@ -1,170 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
   <data>
-    <!-- ========================= EMI Admin (Not Used as of Now) ============================= -->
-    <record id="edu_form" model="ir.ui.view">
-      <field name="name">EM Admin Panel</field>
-      <field name="model">edu.info</field>
+	
+	<!-- ==================================================
+************************ Trainer Profile *********************
+ ================================================== -->
+	
+	<!-- ===================== Trainer Profile List View ============================= -->
+	
+	<record id="view_trainer_profile_filter" model="ir.ui.view">
+      <field name="name">Trainer Profile</field>
+      <field name="model">trainer.profile.info</field>
       <field name="arch" type="xml">
-        <form string="edu_info" version="7.0">
-          <sheet>
-            <group>
-              <h3>
-                <label string="Admin Panel" />
-              </h3>
-              <div>
-                <group>
-                  <tree string="Program Status Order Lines" create="false" delete="false">
-                    <div class="openerp edu_dashboard_1">
-                      <div class="assigment_req">Assignment Requirment</div>
-                      <div class="number_24">24</div>
-                    </div>
-                  </tree>
-                  <tree string=" Program Status Order Lines" create="false" delete="false">
-                    <div class="openerp edu_dashboard_2">
-                      <div class="confirmation_req">Class Outstanding</div>
-                      <div class="number_25">10</div>
-                    </div>
-                  </tree>
-                  <tree string="Program Status Order Lines" create="false" delete="false">
-                    <div class="openerp edu_dashboard_3">
-                      <div class="class_outstanding">Confirmation Required</div>
-                      <div class="number_10">24</div>
-                    </div>
-                  </tree>
-                  <tree string="Program Status Order Lines" create="false" delete="false">
-                    <div class="openerp edu_dashboard_4">
-                      <div class="class_assigned">Class Assigned</div>
-                      <div class="number_100">100</div>
-                    </div>
-                  </tree>
-                </group>
-              </div>
-            </group>
-            <notebook colspan="5" col="10">
-              <page string="Assignment Required">
-                <field name="assign_line" nolabel="1">
-                  <tree string="List" editable="bottom">
-                    <field name="assign_id" invisible="1" />
-                    <field name="class_name" />
-                    <field name="class_code" />
-                    <field name="location_name" />
-                    <field name="date_start" />
-                    <field name="date_schesule" />
-                    <field name="days_left" />
-                  </tree>
-                </field>
-              </page>
-              <page string="Assignment Confirmation">
-                <field name="assign_confirm" nolabel="1">
-                  <tree string="List" editable="bottom">
-                    <field name="assign_id" invisible="1" />
-                    <field name="class_name" />
-                    <field name="class_code" />
-                    <field name="location_name" />
-                    <field name="assign_date" />
-                    <field name="no_assign" />
-                    <field name="no_of_resp" />
-                    <field name="date_start" />
-                    <field name="date_schesule" />
-                    <field name="days_left" />
-                  </tree>
-                </field>
-              </page>
-              <page string="Assignment Outstanding">
-                <field name="assign_outstanding" nolabel="1">
-                  <tree string="List" editable="bottom">
-                    <field name="assign_id" invisible="1" />
-                    <field name="class_name" />
-                    <field name="class_code" />
-                    <field name="location_name" />
-                    <field name="assign_date" />
-                    <field name="no_assign" />
-                    <field name="no_of_resp" />
-                    <field name="date_start" />
-                    <field name="date_schesule" />
-                    <field name="days_left" />
-                  </tree>
-                </field>
-              </page>
-            </notebook>
-          </sheet>
-        </form>
+        <search string="Trainers Profile" />
       </field>
     </record>
-    <!-- ======================
- START
- ============== -->
-    <!-- ========================= EMI Admin Panel ============================= -->
-    <record id="panal_form" model="ir.ui.view">
-      <field name="name">EM Admin Panel</field>
-      <field name="model">panel.info</field>
+	
+	<record id="trainer_profile_tree" model="ir.ui.view">
+      <field name="name">Trainer Profile</field>
+      <field name="model">trainer.profile.info</field>
       <field name="arch" type="xml">
-        <form string="panel_info" version="7.0">
-          <sheet>
-            <notebook colspan="5" col="10">
-              <h3>
-                <label string="Educator Management Admin Panel" />
-              </h3>
-              <!-- Trainers Tab-->
-              <page string="Trainers">
-                <h3>
-                  <label string="Trainers" readonly="context.get('ctx', False)" />
-                </h3>
-                <field name="trainer_line" nolabel="1">
-                  <tree string="List" editable="bottom">
-                    <field name="trainer_name" />
-                    <field name="trainer_status" />
-                    <field name="date_join" />
-                    <button name="views_trainer" string="View Trainer" icon="edit_view" type="object" />
-                  </tree>
-                </field>
-              </page>
-              <!-- Assignment Tab-->
-              <page string="Assignment Schedules">
-				<h3>
-					<label string="Assignment Schedules" readonly="context.get('ctx', False)" />
-				</h3>
-				<field name="assigned_line" nolabel="1">
-					<tree string="List" editable="bottom">
-						<field name="all_trainer" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
-						<field name="class_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
-						<field name="mod_sched" on_change="onchange_trainer_hist(all_trainer, mod_sched )" options="{'create': False, 'create_edit': False}"/>
-						<field name="scheduled_date" />
-					</tree>
-				</field>					
-			</page>
-              <!-- Settings Tab -->
-              <page string="Settings">
-                <h3>
-                  <label string="Settings" readonly="context.get('ctx', False)" />
-                </h3>
-                <div class="col-2">
-                  <h3>
-                    <label string="i) Assignments" readonly="context.get('ctx', False)" />
-                  </h3>
-                  <group>
-                    <field name="class_start_notice" style="width:100px;" />
-                    <field name="class_outstanding_noitce" style="width:100px;" />
-                    <field name="trainer_min_avail" style="width:100px;" />
-                  </group>
-                </div>
-                <div class="col-2">
-                  <h3>
-                    <label string="ii) Finance" readonly="context.get('ctx', False)" />
-                  </h3>
-                  <group>
-                    <field name="base_rate" style="width:100px;" />
-                  </group>
-                </div>
-                <div class="clear" />
-              </page>
-            </notebook>
-          </sheet>
-        </form>
+        <tree string="EM Admin Panel">
+          <field name="name" />
+          <field name="nric_name" />
+          <field name="trainers_status" />
+        </tree>
       </field>
     </record>
-    <!-- ========================= Trainer Profile ============================= -->
+	
+	 <!-- ========================= Trainer Profile Action Layout ============================= -->
+	
+    <record model="ir.actions.act_window" id="action_panel">
+      <field name="name">EM Admin Panel</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">trainer.profile.info</field>
+      <field name="view_type">form</field>
+      <field name="limit">10</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_id" ref="trainer_profile_tree" />
+      <field name="search_view_id" ref="view_panel_filter" />
+		<!--<field name="help" type="html">
+		<p class="oe_view_nocontent_create">
+			Click to define a new learner form.
+		</p>
+		</field>-->
+    </record>
+  
+
+	<!-- ========================= Trainer Profile Form View ============================= -->
     <record id="trainer_profile_form" model="ir.ui.view">
       <field name="name">Trainers Profile</field>
       <field name="model">trainer.profile.info</field>
@@ -217,6 +100,40 @@
             </div>
             <div class="clear" />
             <notebook colspan="5" col="10">
+			<!--Details Tab -->
+              <page string="Personal Details">
+                <group>
+                  <div>
+                    <h3>
+                      <label string="Personal Details" readonly="context.get('ctx', False)" />
+                    </h3>
+                    <div>
+                      <group>
+                        <field name="nationality" style="width:280px;" />
+                        <field name="marital_status" style="width:280px;" />
+                        <field name="race" style="width:280px;" />
+                        <field name="gender" style="width:280px;" />
+                        <field name="Religion" />
+                        <field name="No_of_Children" />
+                      </group>
+                    </div>
+                  </div>
+                  <group>
+                    <div>
+                      <h3>
+                        <label string="Contact Details" readonly="context.get('ctx', False)" />
+                      </h3>
+                      <group>
+                        <field name="email_id" style="width:280px;" />
+                        <field name="addr_1" style="width:280px;" />
+                        <field name="mobile_no" style="width:280px;" />
+                        <field name="landline_no" style="width:280px;" />
+                        <field name="office_no" style="width:280px;" />
+                      </group>
+                    </div>
+                  </group>
+                </group>
+              </page>
               <!--Assignments Tab -->
               <page string="Assignments">
                 <h3>
@@ -276,40 +193,6 @@
                   </tree>
                 </field>
               </page>
-              <!--Details Tab -->
-              <page string="Personal Details">
-                <group>
-                  <div>
-                    <h3>
-                      <label string="Personal Details" readonly="context.get('ctx', False)" />
-                    </h3>
-                    <div>
-                      <group>
-                        <field name="nationality" style="width:280px;" />
-                        <field name="marital_status" style="width:280px;" />
-                        <field name="race" style="width:280px;" />
-                        <field name="gender" style="width:280px;" />
-                        <field name="Religion" />
-                        <field name="No_of_Children" />
-                      </group>
-                    </div>
-                  </div>
-                  <group>
-                    <div>
-                      <h3>
-                        <label string="Contact Details" readonly="context.get('ctx', False)" />
-                      </h3>
-                      <group>
-                        <field name="email_id" style="width:280px;" />
-                        <field name="addr_1" style="width:280px;" />
-                        <field name="mobile_no" style="width:280px;" />
-                        <field name="landline_no" style="width:280px;" />
-                        <field name="office_no" style="width:280px;" />
-                      </group>
-                    </div>
-                  </group>
-                </group>
-              </page>
               <!--Qualifications Tab -->
               <page string="Qualifications">
                 <h3>
@@ -354,41 +237,14 @@
         </form>
       </field>
     </record>
-    <!-- ========================= Action Layout ============================= -->
-	<record model="ir.ui.view" id="panel_kanban">
-        <field name="name">EM Admin Dashboard</field>
-        <field name="model">panel.info</field>
-        <field name="arch" type="xml">
-            <kanban>
-                <templates>
-                    <t t-name="kanban-box">
-                            <div class="oe_resource_vignette">
-								<div class="oe_resource_image">
-									<a type="edit"><img t-att-src="kanban_image('object.name', 'photo', record.id.value)" class="oe_resource_picture"/></a>
-								</div>
-								<div class="oe_resource_details">
-                            <ul>
-<!--Here you have to write the object's field name which you want to display in kanban view -->
-                               <li><field name="name"/></li>
-                               <li><field name="class_sched"/></li>
-                               <li><field name="mod_sched"/> </li>                                   
-                             </ul>
-                        </div>
-                    </div> 
-                        </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
 	
-    <record id="edu_tree" model="ir.ui.view">
-      <field name="name">EMI Admin Dashboard</field>
-      <field name="model">edu.info</field>
-      <field name="arch" type="xml">
-        <tree string="EMI Admin Dashboard" />
-      </field>
-    </record>
-    <record id="panel_tree" model="ir.ui.view">
+		<!-- ==================================================
+************************ Assignment Schedule and Settings *********************
+ ================================================== -->
+ 
+<!-- ===================== Assignment Schedule and Settings List View ============================= -->
+
+	<record id="panel_tree" model="ir.ui.view">
       <field name="name">EM Admin Dashboard</field>
       <field name="model">panel.info</field>
       <field name="arch" type="xml">
@@ -397,24 +253,7 @@
         </tree>
       </field>
     </record>
-    <record id="trainer_profile_tree" model="ir.ui.view">
-      <field name="name">Trainer Profile</field>
-      <field name="model">trainer.profile.info</field>
-      <field name="arch" type="xml">
-        <tree string="EM Admin Panel">
-          <field name="name" />
-          <field name="nric_name" />
-          <field name="trainers_status" />
-        </tree>
-      </field>
-    </record>
-    <record id="view_edu_filter" model="ir.ui.view">
-      <field name="name">EM Admin Dashboard</field>
-      <field name="model">edu.info</field>
-      <field name="arch" type="xml">
-        <search string="EMI Admin Dashboard" />
-      </field>
-    </record>
+    
     <record id="view_panel_filter" model="ir.ui.view">
       <field name="name">EM Admin Panel</field>
       <field name="model">panel.info</field>
@@ -422,53 +261,98 @@
         <search string="EMI Admin Panel" />
       </field>
     </record>
-    <record id="view_trainer_profile_filter" model="ir.ui.view">
-      <field name="name">Trainer Profile</field>
-      <field name="model">trainer.profile.info</field>
-      <field name="arch" type="xml">
-        <search string="Trainers Profile" />
-      </field>
-    </record>
-    <record model="ir.actions.act_window" id="action_admin">
-      <field name="name">EM Admin Dashboard</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">edu.info</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">form</field>
-      <field name="search_view_id" ref="view_edu_filter" />
-      <field name="help" type="html">
-        <p class="oe_view_nocontent_create">Click to define a new location.</p>
-      </field>
-    </record>
-    <record model="ir.actions.act_window" id="action_panel">
+	
+	<!-- ======================== Assignment Schedule and Settings Form View ===============================-->
+	
+	<record id="panal_form" model="ir.ui.view">
       <field name="name">EM Admin Panel</field>
+      <field name="model">panel.info</field>
+      <field name="arch" type="xml">
+        <form string="panel_info" version="7.0">
+          <sheet>
+			<group col = '6'>
+				<field name="all_trainer" on_change="onchange_trainer_hist(all_trainer, class_sched, mod_sched )" options="{'create': False, 'create_edit': False}"/>
+				<field name="class_sched" on_change="onchange_trainer_hist(all_trainer, class_sched, mod_sched)" options="{'create': False, 'create_edit': False}"/>
+				<field name="mod_sched" on_change="onchange_trainer_hist(all_trainer, class_sched, mod_sched)" options="{'create': False, 'create_edit': False}"/>
+			</group>
+			<div>
+				<h2>
+				  <label string="Scheduled Date" readonly="context.get('ctx', False)" />
+				</h2>
+				<field name="assigned_line" nolabel="1">
+				  <tree string="List" create="false" delete="false">
+					<field name="scheduled_date" />
+					<field name="session_no" invisible="1"/>
+					<field name="week_no" invisible="1"/>
+				  </tree>
+				</field>
+			</div>
+			   <button name="views_settings" string="Settings"  type="object"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+	
+	<!-- ========================= Assignment Schedule and Settings Action Layout ============================= -->
+	
+	<record model="ir.actions.act_window" id="action_assignment">
+      <field name="name">Assignment Schedule and Settings</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">panel.info</field>
       <field name="view_type">form</field>
       <field name="limit">10</field>
-      <field name="view_mode">tree,form</field>
-      <field name="view_id" ref="panel_tree" />
-      <field name="search_view_id" ref="view_panel_filter" />
-      <!--<field name="help" type="html">
-				<p class="oe_view_nocontent_create">
-					Click to define a new learner form.
-				</p>
-            </field>-->
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="panal_form" />
+		<!--<field name="help" type="html">
+		<p class="oe_view_nocontent_create">
+			Click to define a new learner form.
+		</p>
+		</field>-->
     </record>
-    <record model="ir.actions.act_window" id="action_trainers">
-      <field name="name">Trainer Profile</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">trainer.profile.info</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-      <field name="search_view_id" ref="view_trainer_profile_filter" />
-      <field name="help" type="html">
-        <p class="oe_view_nocontent_create">Click to define a new location.</p>
-      </field>
-    </record>
-    <menuitem name="Educator Management" id="menu_educator" parent="menu_lis_lab" />
-    <!--<menuitem name = "EM Admin Dashboard" id = "educator_dashboard" parent = "menu_educator" action="action_admin" />-->
+	
+	
+	<!-- ========================= Settings ============================= -->
+	<record id="setting_panel_form" model="ir.ui.view">
+      <field name="name">Settings</field>
+      <field name="model">setting.line</field>
+      <field name="arch" type="xml">
+        <form string="Setting" version="7.0">
+          <sheet>
+			<h3>
+			  <label string="Settings" />
+			</h3>
+			<div class="col-2">
+			  <h3>
+				<label string="i) Assignments" />
+			  </h3>
+			  <group>
+				<field name="class_start_notice" style="width:100px;" />
+				<field name="class_outstanding_noitce" style="width:100px;" />
+				<field name="trainer_min_avail" style="width:100px;" />
+			  </group>
+			</div>
+			<div class="col-2">
+			  <h3>
+				<label string="ii) Finance" />
+			  </h3>
+			  <group>
+				<field name="base_rate" style="width:100px;" />
+			  </group>
+			</div>
+			<div class="clear"/>
+			<div>
+			<button  name="save_settings"  string="Confirm" type="object"/>
+			 <button  name="cancel_settings"  string="Cancel" type="object"/>
+			</div>
+		  </sheet>
+		</form>
+	  </field>
+	</record>
+  
+	 <!-- ===========================Menu Settings=========================== -->
+  
+  <menuitem name="Educator Management" id="menu_educator" parent="menu_lis_lab" />
     <menuitem name="Trainer Enrollment" id="educator_panel" parent="menu_educator" action="action_panel" />
-    <!--<menuitem name = "Trainer Profile" id = "trainer_profile" parent = "menu_educator" action="action_trainers" />-->
+	<menuitem name="Assignment Schedule &amp; Settings" id="assignment_panel" parent="menu_educator" action="action_assignment" />
   </data>
 </openerp>

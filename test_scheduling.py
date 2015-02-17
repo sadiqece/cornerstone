@@ -7,13 +7,17 @@ from lxml import etree
 from collections import namedtuple
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
-
+from collections import Counter
 import logging
 import pytz
 import re
 import time
 from openerp import tools
 _logger = logging.getLogger(__name__)
+
+global dupliacte_found
+dupliacte_found = False
+
 
 class test_info(osv.osv):
 
@@ -54,7 +58,6 @@ class test_info(osv.osv):
 	_description = "This table is for keeping Test Schedules"
 	_columns = {
 		's_no': fields.integer('S_No', size=100),
-		'test_id': fields.integer('Id',size=20),
 		'test_def_id': fields.many2one('test', 'Test Definition',  ondelete='cascade', help='Test', select=True, required=True),
 		'name': fields.related('test_def_id','name',type="char",relation="test",string="Name", readonly=1,),
 		'test_type_id':fields.integer('Test Type Id'),
@@ -160,7 +163,7 @@ class test_info(osv.osv):
 		return module_id
 
 	def write(self,cr, uid, ids, values, context=None):
-	
+		_logger.info("write write Called %s",values)
 		if 'duration' in values and values['duration'] < 0:
 			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
 			
@@ -216,10 +219,6 @@ class test_info(osv.osv):
 				overlap = (earliest_end - latest_start)
 				if overlap.days == 0 and x.room_id.id == test_info_obj['room_id'].id:
 					raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
-			
-			
-			
-			
 			
 			holiday = self.pool.get('holiday')
 			holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
@@ -294,7 +293,50 @@ class test_info(osv.osv):
 			learner_ids = learner_obj.search(cr,uid,[('learner_mod_id' ,'=',ids[0])])
 			for x in learner_ids :
 				learner_obj.write(cr,uid,x,{'class_code':class_obj.class_code})
-
+		global dupliacte_found
+		dupliacte_found = False	
+	
+		if 'learner_line' in values :
+			if values['learner_line']  > 1 and 'learner_id' in values:
+				ids_test_lear = self.pool.get('test.learner').search(cr,1,[])
+				table_ids = [] 
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('test.learner').browse(cr,1,ids_test_lear):
+					table_ids.append(dd.learner_id.id)
+				for x in values['learner_line'] :
+					if x[2] ==  False :
+						obj = self.pool.get('test.learner').browse(cr,uid,x[1])
+						deleted_ids.append(obj.learner_id.id)
+					elif x[0] == 0 :
+						added_ids.append(x[2]['learner_id'])
+					elif x[0] == 1 :
+						updated_ids.append(x[2]['learner_id'])
+				'''create check'''		
+				if len((Counter(added_ids) - Counter(set(added_ids))).keys()) >  0 :
+					global dupliacte_found
+					dupliacte_found = True
+				else:
+					'''check create in table'''
+					for c in added_ids :
+						if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_found
+							dupliacte_found = True
+					'''check for update ids '''
+					if len((Counter(updated_ids) - Counter(set(updated_ids))).keys()) >  0 :
+						global dupliacte_found
+						dupliacte_found = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in table_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_found
+							dupliacte_found = True
+								
+			_logger.info("dupliacte_found %s",dupliacte_found)	
 		module_id = super(test_info, self).write(cr, uid, ids,values, context=context)
 		return module_id
 	
@@ -364,7 +406,7 @@ class test_modality(osv.osv):
 	_name ='test.modality'
 	_description ="Trainer Learner Tab"
 	_columns = {
-	'test_modality_id' : fields.integer('Id',size=20,readonly=1),
+	'test_modality_id' :  fields.many2one('test.info', 'Test', ondelete='cascade', help='Test', select=True),
 	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),
 	'active':fields.boolean('Active'),
 
@@ -453,16 +495,13 @@ class test_learner(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-	
-	 
+		
 	def _check_unique_learner(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.learner_mod_id == self_obj.learner_mod_id and x.learner_id == self_obj.learner_id:
-						return False
-		return True
+		if dupliacte_found == True:
+			return False
+		else :
+			return True
+			
 	def on_change_learner_id(self, cr, uid, ids, learner_id,context):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
 		class_code = "N/A"
@@ -470,7 +509,7 @@ class test_learner(osv.osv):
 			class_obj = self.pool.get('class.info').browse(cr, uid, context.get('class_id'))
 			class_code = class_obj.class_code
 		return {'value': {'learner_nric': module_obj.learner_nric,'class_code':class_code,'compliance_code':context.get('test_code')}}
-		
+	
 	def _test_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('test.history.module')
 			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
@@ -484,8 +523,9 @@ class test_learner(osv.osv):
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
-		
+	
 	def create(self,cr, uid, values, context=None):
+		_logger.info("create Called %s",values)
 		id = super(test_learner, self).create(cr, uid, values, context=context)
 		self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
 		#Masih
@@ -503,6 +543,7 @@ class test_learner(osv.osv):
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
+		_logger.info("write Called %s",ids)
 		learner_obj = self.browse(cr,uid,ids[0])
 		if 'learner_id' in values :
 			scores_obj = self.pool.get('test.scores')
@@ -512,6 +553,7 @@ class test_learner(osv.osv):
 		return id
 
 	def unlink(self, cr, uid, ids, context=None):
+		_logger.info("Unlink Called %s",ids)
 		learner_obj = self.browse(cr, uid, ids)
 		learner_id = learner_obj[0]['learner_id']
 		score_leraner_id = self.pool.get('test.scores').search(cr, uid, [('learner_id', '=', learner_id.id)])
@@ -561,35 +603,6 @@ class test_scores(osv.osv):
 			'target':'new',
 			'context': ctx,
 		}
-		
-	def _test_scores(self, cr, uid, ed, sd, mn, values, context=None):
-			obj_res_hist = self.pool.get('test.score.module')
-			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
-			for ch in values:
-				vals = {
-					'test_score_type':ed,
-					'test_score_id':ch['learner_id'],
-					'test_sc_date': sd,
-					'test_sc_code':mn
-				}
-				obj_res_hist.create(cr, uid, vals, context=context)
-			return True
-			
-	def create(self,cr, uid, values, context=None):
-		id = super(test_scores, self).create(cr, uid, values, context=context)
-		#self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
-		#Masih
-		test_id = values['test_scores_id']
-		class_info_obj = self.pool.get('test.info')
-		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
-		ed = class_info_obj_id.test_def_id.id
-		sd = class_info_obj_id.start_date
-		mn = class_info_obj_id.test_code
-		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
-		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
-		#Masih
-		self._test_scores(cr, uid, ed, sd, mn,[values], context=context)
-		return id
 	
 	def save_scores(self, cr, uid, ids, context=None): 
 		obj = self.browse(cr,uid,ids)
@@ -626,6 +639,36 @@ class test_scores(osv.osv):
 			'target':'current',
 			'context': context,
 		}
+		
+	def _test_scores(self, cr, uid, ed, sd, mn, values, context=None):
+			obj_res_hist = self.pool.get('test.score.module')
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			for ch in values:
+				vals = {
+					'test_score_type':ed,
+					'test_score_id':ch['learner_id'],
+					'test_sc_date': sd,
+					'test_sc_code':mn
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
+			
+	def create(self,cr, uid, values, context=None):
+		id = super(test_scores, self).create(cr, uid, values, context=context)
+		#self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
+		#Masih
+		test_id = values['test_scores_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		ed = class_info_obj_id.test_def_id.id
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.test_code
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
+		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		#Masih
+		self._test_scores(cr, uid, ed, sd, mn,[values], context=context)
+		return id
+			
 	def write(self,cr, uid, ids, values, context=None):
 		if 'r_scores' in values and values['r_scores'] < 0:
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
@@ -641,11 +684,8 @@ class test_scores(osv.osv):
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
 		if 'conv' in values and values['conv'] < 0:
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
-		
-		compr_id = values['compr']
 
 		id = super(test_scores, self).write(cr, uid, ids,values, context=context)
-		self._test_hist(cr, uid, compr_id, [values], context=context)
 		return id
 	_name ='test.scores'
 	_description ="Test Scores Tab"

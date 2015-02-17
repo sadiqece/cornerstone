@@ -5,7 +5,7 @@ import logging
 from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
-from openerp import tools
+from openerp import tools	
 import re
 import base64
 from content_index_learner import cntIndex
@@ -21,6 +21,16 @@ _logger = logging.getLogger(__name__)
 ###############
 
 class learner_info(osv.osv):
+
+	#_inherit = "payment.module"
+	def _amount(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_learner:
+				total += line.cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):		
 		res = super(learner_info, self).read(cr, uid,ids, fields, context, load)
@@ -417,11 +427,6 @@ class learner_info(osv.osv):
 		return res
 		
 	def onchange_populate_schedule2(self, cr, uid, ids, i_centre, i_mod, s_date, context=None):
-		'''obj = self.pool.get('class.info')
-		ids = obj.search(cr, uid, [('location_id','=',i_centre)])
-		res = obj.read(cr, uid, ids, ['start_date'], context)
-		res = [(r['start_date'], r['start_date']) for r in res]
-		return {'value':{'sch_date':res}}'''
 		
 		val2 ={}
 		sub_lines = []
@@ -658,15 +663,28 @@ class learner_info(osv.osv):
 			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
 		else:
 			return True
+			
+	def _create_hist(self, cr, uid, ed, cc, values, context=None):
+			obj_res_hist = self.pool.get('payment.module')
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			for ch in values:
+				vals = {
+					'item_name':ed,
+					'class_id':ch['learner_id'],
+					'cost':cc,
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
 	
 #Table Learner Info
+		
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
 	_columns = {
 		'learner_id': fields.char('Id',size=20),
 		'name': fields.char('Name', size=100,required=True, select=True),
-		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20),
-		'learner_nric': fields.char('NRIC', size=20),
+		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=20,required=True),
+		'learner_nric': fields.char('NRIC', size=20,required=True),
 		'learner_status': fields.selection((('Active','Active'),('InActive','InActive'),('Complete','Complete'),('InComplete','InComplete'),('Blocked','Blocked')),'Status'),
 		'learner_status_display_1': fields.function(_learner_status_display_1, readonly=1, type='char'),
 		'learner_status_display_2': fields.function(_learner_status_display_2, readonly=1, type='char'),
@@ -705,10 +723,10 @@ class learner_info(osv.osv):
 		'sch_date':fields.selection((_onchange_populate_schedule), 'Select Date', type='char'),
 		#'sch_date':fields.many2one('class.info', 'start_date'),
 		#payment
-		'payment_learner':fields.one2many('payment.module','pay_id','Payment', readonly=1),
-		'Grand_total':fields.integer('Grand Total', readonly=1),
+		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment', readonly=1),
+		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		#Personal Tab Fields
-		'nationality':fields.many2one('res.country', 'Nationality'),
+		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
 		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
@@ -930,12 +948,12 @@ class enroll_info(osv.osv):
 		return True
 		
 #Nationality Info				
-	def _nationality_get(self, cr, uid, ids, context=None):
+	'''def _nationality_get(self, cr, uid, ids, context=None):
 		ids = self.pool.get('res.country').search(cr, uid, [('name', '=', 'Singapore')], context=context)
 		#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(ids[0]))
 		if ids:
 			return ids[0]
-		return False			
+		return False'''			
 	_name = "enroll.info"
 	_description = "This table is for keeping location data"
 	_columns = {
@@ -956,7 +974,7 @@ class enroll_info(osv.osv):
 		'start_date':fields.date('Start Date', readonly='True'),
 		'end_date':fields.date('End Date', readonly='True'),
 		'personal_line': fields.one2many('personal.module','personal_id','Personal Details'),
-		'nationality':fields.many2one('res.country', 'Nationality'),
+		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
 		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
