@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+  
+	<record id="create_report_form" model="ir.ui.view">
+      <field name="name">Reports</field>
+      <field name="model">generate.reports</field>
+      <field name="arch" type="xml">
+        <form string="Reports" version="7.0">
+          <sheet>
+			<div class="col-2">
+			  <group class="col-10">
+				<label string="Reports:" style="font-size:20px;"/>
+			  </group>
+			  <group>
+				 <a href="http://aszstaging.com/cornerstore/CharmsReport.xls" target="_blank">Charms Report</a><br/>
+			  </group>
+			  <group>
+				<a href="http://aszstaging.com/cornerstore/Data_Result_For_Training_Vision.xlsx" target="_blank">Data Result For Training Vision</a><br/>
+			  </group>
+			  <!--group>
+				<a href="http://www.analysis.im/uploads/seminar/pdf-sample.pdf" target="_blank">Sample Report PDF</a><br/>
+			  </group-->
+			</div>
+		  </sheet>
+		</form>
+	  </field>
+	</record>
+  
+  
+		<!-- Access Rights --> 
+	<record model="ir.actions.act_window" id="access_reports">
+      <field name="name">Reports</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">generate.reports</field>
+      <field name="view_type">form</field>
+      <field name="limit">12</field>
+      <field name="view_mode">form</field>
+	   <field name="view_id" ref="create_report_form"  	/>
+      <field name="search_view_id" ref="view_settings_filter" />
+		
+    </record>
+  
+     <menuitem name="Reports" id="menu_reports_profile" parent="menu_lis_lab" />
+		<menuitem name="Reports" id="manage_reports" parent="menu_reports_profile" action="access_reports"/>
+  
+    </data>
+</openerp>
