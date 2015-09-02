@@ -30,8 +30,10 @@ import class_info
 import test_scheduling
 import content_index_learner
 import learner
+#import client
 import class_status_dashboard
 import trainer_enrollment
+import reports
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

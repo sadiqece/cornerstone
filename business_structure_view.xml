@@ -19,8 +19,8 @@
                                 <field name = "business_code"/>
                             </h2>
 							<label for="bussiness_id" class="oe_edit_only"/>
-                            <h2 style="width:280px;">
-                                <field name = "bussiness_id"/>
+                            <h2 style="width:250px;">
+                                <field name = "bussiness_id" options="{'create': False, 'create_edit': False}"/>
                             </h2>
 						</div>
 		       </group>

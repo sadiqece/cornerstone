@@ -7,6 +7,26 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+global dupliacte_program_found
+dupliacte_program_found = False
+
+global dupliacte_people_bu_found
+dupliacte_people_bu_found = False
+
+global dupliacte_people_bu_1_found
+dupliacte_people_bu_1_found = False
+
+###############
+
+global dupliacte_program_found_create
+dupliacte_program_found_create = False
+
+global dupliacte_people_bu_found_create
+dupliacte_people_bu_found_create = False
+
+global dupliacte_people_bu_1_found_create
+dupliacte_people_bu_1_found_create = False
+
 class commisions(osv.osv):
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
@@ -68,6 +88,33 @@ class commisions(osv.osv):
 			res[line.id] = total_mod
 				
 		return res
+		
+# Room mandatory
+	def _make_mandatory1(self, cr, uid, ids, context=None):
+			pl = self.pool.get('project.value.line')
+			isFound = False
+			for progline in self.browse(cr, uid, ids, context=None):
+				if progline['pay_value'] == 'In % (By Project Value)':
+					for line in progline.project_value_line:
+						isFound = True
+					if isFound:
+						return True
+					else:
+						return False
+			return True
+
+	def _make_mandatory2(self, cr, uid, ids, context=None):
+			pl = self.pool.get('project.value.line')
+			isFound = False
+			for progline in self.browse(cr, uid, ids, context=None):
+				if progline['pay_value'] == 'In $ (By Programs)':
+					for line in progline.program_line:
+						isFound = True
+					if isFound:
+						return True
+					else:
+						return False
+			return True
 
 	_name = "commisions"
 	_description = "This table is for keeping location data"
@@ -76,7 +123,7 @@ class commisions(osv.osv):
 		'commision_id': fields.char('Id',size=20),
 		'name': fields.char('Commission Name', size=100,required=True, select=True),
 		'commision_code': fields.char('Commission Code', size=20),
-		'pay_value': fields.selection((('In $ (By Programs)','In $ (By Programs)'),('In % (By Project Value)','In % (By Project Value)')),'Pay Out Value'),
+		'pay_value': fields.selection((('In $ (By Programs)','In $ (By Programs)'),('In % (By Project Value)','In % (By Project Value)')),'Pay Out Value', required=True),
 		'pay_value_1': fields.boolean('Pay Out Value In $ (By Programs)'),
 		'pay_value_2': fields.boolean('Pay Out Value In % In % (By Project Value)'),
 		'program_line': fields.one2many('program.line', 'program_line_id', 'Program Lines'),
@@ -95,6 +142,288 @@ class commisions(osv.osv):
 	   'date_added': fields.date.context_today,
 	   'commision_status': 'Active',
 	  }
+	  
+	def create(self,cr, uid, values, context=None):
+		
+		global dupliacte_program_found_create
+		dupliacte_program_found_create = False
+
+		global dupliacte_people_bu_found_create
+		dupliacte_people_bu_found_create = False
+
+		global dupliacte_people_bu_1_found_create
+		dupliacte_people_bu_1_found_create = False
+		
+		if 'program_line' in values :
+			if values['program_line']  > 1:
+				ids_test_lear = self.pool.get('program.line').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('program.line').browse(cr,1,ids_test_lear):
+					if dd.program_line_id.id == True:
+						table_ids.append(dd.program_id.id)	
+				for x in values['program_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('program.line').browse(cr,uid,x[1])
+						deleted_ids.append(obj.program_id.id)
+					elif x[0] == 0 and 'program_id' in x[2]:
+						added_ids.append(x[2]['program_id'])
+						if x[2]['program_id'] in table_ids :
+							new_table_ids.append(dd.program_id.id)
+					elif x[0] == 1  and 'program_id' in x[2]:
+						updated_ids.append(x[2]['program_id'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_program_found_create
+					dupliacte_program_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_program_found_create
+							dupliacte_program_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_program_found_create
+						dupliacte_program_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_program_found_create
+							dupliacte_program_found_create = True
+							
+		if 'people_bu' in values :
+			if values['people_bu']  > 1:
+				ids_test_lear = self.pool.get('people.bu').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('people.bu').browse(cr,1,ids_test_lear):
+					if dd.staff_line_id.id == True:
+						table_ids.append(dd.p_line_id.id)	
+				for x in values['people_bu'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('people.bu').browse(cr,uid,x[1])
+						deleted_ids.append(obj.p_line_id.id)
+					elif x[0] == 0 and 'p_line_id' in x[2]:
+						added_ids.append(x[2]['p_line_id'])
+						if x[2]['p_line_id'] in table_ids :
+							new_table_ids.append(dd.p_line_id.id)
+					elif x[0] == 1  and 'p_line_id' in x[2]:
+						updated_ids.append(x[2]['p_line_id'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_people_bu_found_create
+					dupliacte_people_bu_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_people_bu_found_create
+							dupliacte_people_bu_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_people_bu_found_create
+						dupliacte_people_bu_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_people_bu_found_create
+							dupliacte_people_bu_found_create = True
+							
+		if 'people_bu_1' in values :
+			if values['people_bu_1']  > 1:
+				ids_test_lear = self.pool.get('people.bu.one').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('people.bu.one').browse(cr,1,ids_test_lear):
+					if dd.staff_line1_id.id == True:
+						table_ids.append(dd.p_line1_id.id)	
+				for x in values['people_bu_1'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('people.bu.one').browse(cr,uid,x[1])
+						deleted_ids.append(obj.p_line1_id.id)
+					elif x[0] == 0 and 'p_line1_id' in x[2]:
+						added_ids.append(x[2]['p_line1_id'])
+						if x[2]['p_line1_id'] in table_ids :
+							new_table_ids.append(dd.p_line1_id.id)
+					elif x[0] == 1  and 'p_line1_id' in x[2]:
+						updated_ids.append(x[2]['p_line1_id'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_people_bu_1_found_create
+					dupliacte_people_bu_1_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_people_bu_1_found_create
+							dupliacte_people_bu_1_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_people_bu_1_found_create
+						dupliacte_people_bu_1_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_people_bu_1_found_create
+							dupliacte_people_bu_1_found_create = True
+	
+		module_id = super(commisions, self).create(cr, uid, values, context=context)
+		return module_id
+	  
+	def write(self,cr, uid, ids, values, context=None):
+	
+		global dupliacte_program_found
+		dupliacte_program_found = False
+		
+		global dupliacte_people_bu_found
+		dupliacte_people_bu_found = False
+		
+		global dupliacte_people_bu_1_found
+		dupliacte_people_bu_1_found = False
+	
+		if 'program_line' in values :
+				if values['program_line']  > 1:
+					ids_test_lear = self.pool.get('program.line').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('program.line').browse(cr,1,ids_test_lear):
+						if dd.program_line_id.id == ids[0]:
+							table_ids.append(dd.program_id.id)
+					for x in values['program_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('program.line').browse(cr,uid,x[1])
+							deleted_ids.append(obj.program_id.id)
+						elif x[0] == 0 and 'program_id' in x[2]:
+							added_ids.append(x[2]['program_id'])
+						elif x[0] == 1  and 'program_id' in x[2]:
+							updated_ids.append(x[2]['program_id'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_program_found
+						dupliacte_program_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_program_found
+								dupliacte_program_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_program_found
+							dupliacte_program_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_program_found
+								dupliacte_program_found = True
+		if 'people_bu' in values :
+				if values['people_bu']  > 1:
+					ids_test_lear = self.pool.get('people.bu').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('people.bu').browse(cr,1,ids_test_lear):
+						if dd.staff_line_id.id == ids[0]:
+							table_ids.append(dd.p_line_id.id)
+					for x in values['people_bu'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('people.bu').browse(cr,uid,x[1])
+							deleted_ids.append(obj.p_line_id.id)
+						elif x[0] == 0 and 'p_line_id' in x[2]:
+							added_ids.append(x[2]['p_line_id'])
+						elif x[0] == 1  and 'p_line_id' in x[2]:
+							updated_ids.append(x[2]['p_line_id'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_people_bu_found
+						dupliacte_people_bu_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_people_bu_found
+								dupliacte_people_bu_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_people_bu_found
+							dupliacte_people_bu_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_people_bu_found
+								dupliacte_people_bu_found = True
+								
+		if 'people_bu_1' in values :
+				if values['people_bu_1']  > 1:
+					ids_test_lear = self.pool.get('people.bu.one').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('people.bu.one').browse(cr,1,ids_test_lear):
+						if dd.staff_line1_id.id == ids[0]:
+							table_ids.append(dd.p_line1_id.id)
+					for x in values['people_bu_1'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('people.bu.one').browse(cr,uid,x[1])
+							deleted_ids.append(obj.p_line1_id.id)
+						elif x[0] == 0 and 'p_line1_id' in x[2]:
+							added_ids.append(x[2]['p_line1_id'])
+						elif x[0] == 1  and 'p_line1_id' in x[2]:
+							updated_ids.append(x[2]['p_line1_id'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_people_bu_1_found
+						dupliacte_people_bu_1_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_people_bu_1_found
+								dupliacte_people_bu_1_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_people_bu_1_found
+							dupliacte_people_bu_1_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_people_bu_1_found
+								dupliacte_people_bu_1_found = True
+								
+		module_id = super(commisions, self).write(cr, uid, ids,values, context=context)
+		return module_id
 	
 	def on_change_bussiness_id(self, cr, uid, ids, bussiness_id):
 		bussiness_obj = self.pool.get('business').browse(cr, uid, bussiness_id)
@@ -128,7 +457,7 @@ class commisions(osv.osv):
 		'context': ctx,
 		}
 		
-	_constraints = [(_check_unique_name, 'Error: Commission Name Already Exists', ['Name']),(_check_unique_code, 'Error: Commission Code Already Exists', ['Commission Code'])]
+	_constraints = [(_check_unique_name, 'Error: Commission Name Already Exists', ['Name']),(_check_unique_code, 'Error: Commission Code Already Exists', ['Commission Code']),(_make_mandatory1, 'Error: Create Atleast One Schedule', ['Schedule']),(_make_mandatory2, 'Error: Select Atleast One Program', ['Program'])]
 commisions
 
 class program_line(osv.osv):
@@ -153,13 +482,12 @@ class program_line(osv.osv):
 		return True
 
 	def _check_unique_module(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.program_line_id == self_obj.program_line_id and x.program_id == self_obj.program_id:
-						return False
-		return True
+		if dupliacte_program_found == True:
+			return False
+		if dupliacte_program_found_create == True:
+			return False
+		else :
+			return True
 		
 # EOF		
 
@@ -340,13 +668,12 @@ class people_bu_1(osv.osv):
 		return res
 		
 	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.staff_line1_id == self_obj.staff_line1_id and x.p_line1_id == self_obj.p_line1_id:
-						return False
-		return True
+		if dupliacte_people_bu_1_found == True:
+			return False
+		if dupliacte_people_bu_1_found_create == True:
+			return False
+		else :
+			return True
 		
 	_name = "people.bu.one"
 	_description = "People"

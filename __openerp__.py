@@ -19,8 +19,10 @@
 		'class_info_view.xml',
 		'test_scheduling_view.xml',
 		'learner_view.xml',
+		#'client_enrollment.xml',
 		'class_status_dashboard.xml',
-		'trainer_enrollment.xml'
+		'trainer_enrollment.xml',
+		'reports_view.xml',
     ],
 'js': [
         'static/src/js/form.js',

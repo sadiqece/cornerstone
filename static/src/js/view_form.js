@@ -2911,7 +2911,7 @@ instance.web.form.FieldSelection = instance.web.form.AbstractField.extend(instan
  */
 instance.web.form.CompletionFieldMixin = {
     init: function() {
-        this.limit = 7;
+        this.limit = 20;
         this.orderer = new instance.web.DropMisordered();
     },
     /**

@@ -8,7 +8,6 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-
 import logging
 import pytz
 import re
@@ -19,7 +18,19 @@ _logger = logging.getLogger(__name__)
 
 global class_create
 class_create = False
+
+global dupliacte_found
+dupliacte_found = False
+
+global dupliacte_equip
+dupliacte_equip = False
+
+global dupliacte_equip_create
+dupliacte_equip_create = False
  
+global dupliacte_trainer_found
+dupliacte_trainer_found = False
+
 class class_info(osv.osv):
 	
 	def _property_expense_preset_expenses(self, cr, uid, ids, expenses, arg, context):
@@ -158,9 +169,7 @@ class class_info(osv.osv):
 			trainer_obj = self.pool.get("trainer.profile.info")
 			for x in trainer_obj.browse(cr, uid, learner_move_array, context=context):
 				trainer_obj.write(cr, uid, x.id,values, context=context)
-		
-		
-	
+				
 	
 	def _check_unique_code(self, cr, uid, ids, context=None):
 		new_class = self.browse(cr, uid, ids, context=context)
@@ -174,10 +183,21 @@ class class_info(osv.osv):
 				if new_class[0].parent_id  != x.id and new_class[0].class_code.lower() == x.class_code.lower() :
 					return False
 		return True
+	
+	def on_change_client_type(self, cr, uid, ids, location_type):
+		val = {}
+		val['location_type_corp'] = False
+		val['client_type_public'] = False		
+		if location_type == 'Corporate':
+			val['location_type_corp'] = True
+		elif location_type == 'Public':
+			val['client_type_public'] = True
+			
+		return {'value': val}
 
 
 	_name = "class.info"
-	_description = "This table is for keeping location data"
+	_description = "This table is for keeping Class data"
 	_columns = {
 		'class_id': fields.integer('Id',size=20),
 		'parent_id': fields.integer('Parent Id',size=20),
@@ -189,6 +209,11 @@ class class_info(osv.osv):
 		'start_date': fields.datetime('Start Date', required=True),
 		'end_date': fields.datetime('End Date'),
 		'duration': fields.float('Duration(Hrs)'),
+		#'client_type_id':fields.integer('Client Type Id'),
+		'client': fields.selection((('Public','Public'),('Corporate','Corporate')),'Client', required=True),
+		'client_type_public': fields.boolean('Public'),
+		'location_type_corp': fields.boolean('Corporate'),
+		#'client_corporate': fields.many2one('client.enroll','Corporate', ondelete='cascade', help='Manage Users', select=True,required=True),
 		'sessions_per_week': fields.integer('Number of Sessions Per Week', size=7),
 		'sessions_duration_in_hrs': fields.float('Sessions Durations in Hours'),
 		'total_hrs': fields.integer('Total Hours', readonly=1),
@@ -254,6 +279,9 @@ class class_info(osv.osv):
 	}
 	_defaults = { 
 		'status': 'Draft',
+		'room_arr': 'Default',
+		'primary': 'Binder',
+		'client': 'Public',
 	} 
 	_order = "start_date"
 	
@@ -266,8 +294,8 @@ class class_info(osv.osv):
 		if 'duration' in values and values['duration'] < 0:
 			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
 				
-		if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
-			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
+		'''if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
+			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))'''
 		
 		'''validate sessions now'''
 		include_arr_list = 0
@@ -889,12 +917,147 @@ class class_info(osv.osv):
 			elif apply_to_future == True :
 				self.apply_to_future(cr, uid, ids, values, context)
 			else:
+					
+				global dupliacte_found
+				dupliacte_found = False	
+				
+				global dupliacte_trainer_found
+				dupliacte_trainer_found = False	
+	
 				if 'delivery_mode' in values or 'binder_in_use' in values or 'tablet_in_use' in values or 'primary'in values or 'room_arr' in 	values :
 					super(class_info, self).write(cr, uid, parent_id,values, context=context)
 					if parent_id > 0:
 						prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
 						for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
 							super(class_info, self).write(cr, uid, prog_module_line.id,values, context=context)
+				elif 'learner_line' in values :
+					deleted_line_ids = []
+					for x in values['learner_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('learner.line').browse(cr,uid,x[1])
+							deleted_line_ids.append(obj.id)
+					if values['learner_line']  > 1:
+						ids_test_lear = self.pool.get('learner.line').search(cr,1,[])
+						table_ids = [] 
+						added_ids = []
+						updated_ids = []
+						deleted_ids =[]
+						for dd in self.pool.get('learner.line').browse(cr,1,ids_test_lear):
+							if dd.learner_mod_id.id == ids[0] :
+								table_ids.append(dd.learner_id.id)
+						for x in values['learner_line'] :
+							if x[0] == 2 and x[2] ==  False :
+								obj = self.pool.get('learner.line').browse(cr,uid,x[1])
+								deleted_ids.append(obj.learner_id.id)
+							elif x[0] == 0 and 'learner_id' in x[2]:
+								added_ids.append(x[2]['learner_id'])
+							elif x[0] == 1 and 'learner_id' in x[2]:
+								updated_ids.append(x[2]['learner_id'])
+								
+						'''create check'''		
+						if len(added_ids) - len(set(added_ids)) >  0 :
+							global dupliacte_found
+							dupliacte_found = True
+							_logger.info("Duplicate 1")
+						else:
+							'''check create in table'''
+							for c in added_ids :
+								if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+									global dupliacte_found
+									dupliacte_found = True
+									_logger.info("Duplicate 2")
+							'''check for update ids '''
+							if len(updated_ids) - len(set(updated_ids)) >  0 :
+								global dupliacte_found
+								dupliacte_found = True
+								_logger.info("Duplicate 3")
+							else :
+								found = 0
+								for u in updated_ids :
+									if u in table_ids and  u not in deleted_ids :
+										found = found +1
+								if found == 1 :
+									global dupliacte_found
+									dupliacte_found = True
+									_logger.info("Duplicate 4")
+					for ddd in deleted_line_ids :
+						values_obj = self.pool.get("learner.line").browse(cr,uid,ddd,context)
+						class_id = values_obj['learner_mod_id']
+						
+						parent_id = class_id['parent_id']
+						if parent_id > 0:
+							prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
+							ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
+							prog_mod_ids.append(ids_1[0])
+						else:
+							prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
+							prog_mod_ids.append(class_id.id)
+						line_ids = self.pool.get("learner.line").search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
+						for prog_module_line in self.browse(cr,uid,line_ids,context):
+							_logger.info("Unlinek  prog_module_line.id %s", prog_module_line.id)
+							self.pool.get("learner.line").unlink(cr, uid, prog_module_line.id, context=context)
+				elif 'trainers_line' in values :
+					deleted_line_ids = []
+					for x in values['trainers_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('trainers.line').browse(cr,uid,x[1])
+							deleted_line_ids.append(obj.id)
+					if values['trainers_line']  > 1:
+						ids_test_lear = self.pool.get('trainers.line').search(cr,1,[])
+						table_ids = [] 
+						added_ids = []
+						updated_ids = []
+						deleted_ids =[]
+						for dd in self.pool.get('trainers.line').browse(cr,1,ids_test_lear):
+							if dd.trainers_line_id.id == ids[0] :
+								table_ids.append(dd.trainer_id.id)
+						for x in values['trainers_line'] :
+							if x[0] == 2 and x[2] ==  False :
+								obj = self.pool.get('trainers.line').browse(cr,uid,x[1])
+								deleted_ids.append(obj.trainer_id.id)
+							elif x[0] == 0 and 'trainer_id' in x[2]:
+								added_ids.append(x[2]['trainer_id'])
+							elif x[0] == 1 and 'trainer_id' in x[2]:
+								updated_ids.append(x[2]['trainer_id'])
+								
+						'''create check'''		
+						if len(added_ids) - len(set(added_ids)) >  0 :
+							global dupliacte_trainer_found
+							dupliacte_trainer_found = True
+						else:
+							'''check create in table'''
+							for c in added_ids :
+								if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+									global dupliacte_trainer_found
+									dupliacte_trainer_found = True
+							'''check for update ids '''
+							if len(updated_ids) - len(set(updated_ids)) >  0 :
+								global dupliacte_trainer_found
+								dupliacte_trainer_found = True
+							else :
+								found = 0
+								for u in updated_ids :
+									if u in table_ids and  u not in deleted_ids :
+										found = found +1
+								if found == 1 :
+									global dupliacte_trainer_found
+									dupliacte_trainer_found = True
+					for ddd in deleted_line_ids :
+						values_obj = self.pool.get("trainers.line").browse(cr,uid,ddd,context)
+						class_id = values_obj['trainers_line_id']
+						
+						parent_id = class_id['parent_id']
+						if parent_id > 0:
+							prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
+							ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
+							prog_mod_ids.append(ids_1[0])
+						else:
+							prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
+							prog_mod_ids.append(class_id.id)
+						line_ids = self.pool.get("trainers.line").search(cr,uid,[('trainers_line_id','in',prog_mod_ids) and ('trainer_id','=',values_obj['trainer_id'].id)])
+						for prog_module_line in self.browse(cr,uid,line_ids,context):
+							self.pool.get("trainers.line").unlink(cr, uid, prog_module_line.id, context=context)
+						
 				elif 'start_date' in values :
 					t1start  = datetime.strptime(str(values['start_date']),"%Y-%m-%d %H:%M:%S")
 					if t1start  < datetime.now() :
@@ -1312,19 +1475,32 @@ move_learner
 
 class learner_mod_line(osv.osv):
 	def _check_unique_learner(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.learner_mod_id == self_obj.learner_mod_id and x.learner_id == self_obj.learner_id:
-						return False
-		return True
-		
+		if dupliacte_found == True:
+			return False
+		else :
+			return True
+			
 	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
-			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
+			
 			for ch in values:
+				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(ch['learner_id']))
+				sql="select program_learner, emp_staus, desig_detail, sponsor_ship from learner_info where id = %s " % (ch['learner_id'])
+				cr.execute(sql)
+				itm = cr.fetchall()
+				for s in itm:
+					pn = s[0]
+					es = s[1]
+					dd = s[2]
+					ss = s[3]
+				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed,
+				#obj_li=self.pool.get('learner.info').browse(cr, uid, ch['learner_id'])
+
 				vals = {
+					'program_name': pn,
+					'emp_staus': es,
+					'desig_detail': dd,
+					'sponsor_ship': ss,
 					'end_date':ed,
 					'class_id':ch['learner_id'],
 					'class_code':cc,
@@ -1335,10 +1511,11 @@ class learner_mod_line(osv.osv):
 			return True
 	
 	def create(self,cr, uid, values, context=None):
+		_logger.info("Create Called")
 		global class_create
-		if class_create == True :
-			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
-			return id
+		#if class_create == True :
+			#id = super(learner_mod_line, self).create(cr, uid, values, context=context)
+			#return id
 		id = super(learner_mod_line, self).create(cr, uid, values, context=context)
 		class_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('class.info')
@@ -1348,6 +1525,7 @@ class learner_mod_line(osv.osv):
 		sd = class_info_obj_id.start_date
 		mn = class_info_obj_id.module_id.id
 		cc = class_info_obj_id.class_code
+		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		parent_id = class_info_obj_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1356,19 +1534,23 @@ class learner_mod_line(osv.osv):
 		else:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', class_info_obj_id.id)])
 			prog_mod_ids.append(class_info_obj_id.id)
-			
+		
 		for prog_module_line in prog_mod_ids:
 			if prog_module_line != class_id:
 				new_array = values
 				new_array['learner_mod_id'] = prog_module_line
 				new_array['attendance'] = False
-				super(learner_mod_line, self).create(cr, uid, new_array, context=context)
-		#Masih
-		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
-		#Masih
+				local_id = super(learner_mod_line, self).create(cr, uid, new_array, context=context)
+				#created_line_ids.append(local_id)
+		#created_line_ids.append(local_id)
+		if class_create == True :
+			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
+			#return id		
+
 		return id
-		
+
 	def write(self,cr, uid, ids, values, context=None):
+		_logger.info("Wriet Called %s",ids)
 		id = super(learner_mod_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['learner_mod_id']
@@ -1381,7 +1563,9 @@ class learner_mod_line(osv.osv):
 		else:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
-		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids)])
+		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
+		_logger.info("Write prog_mod_ids %s",prog_mod_ids)
+		_logger.info("Write line_ids %s",line_ids)
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				if 'attendance' in values :
@@ -1394,27 +1578,6 @@ class learner_mod_line(osv.osv):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
 		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
 		
-	def unlink(self, cr, uid, ids, context=None):
-		_logger.info("Unlink Learner Line %s",ids)
-		values_obj = self.browse(cr,uid,ids,context)[0]
-		class_id = values_obj['learner_mod_id']
-		
-		parent_id = class_id['parent_id']
-		if parent_id > 0:
-			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
-			ids_1 = self.pool.get('class.info').search(cr, uid, [('id', '=', parent_id)])
-			prog_mod_ids.append(ids_1[0])
-		else:
-			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
-			prog_mod_ids.append(class_id.id)
-		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
-		_logger.info("Unlink Learner line_ids %s",line_ids)
-		for prog_module_line in self.browse(cr,uid,line_ids,context):
-			_logger.info("Unlink Learner prog_module_line %s",line_ids)
-			super(learner_mod_line, self).unlink(cr, uid, prog_module_line.id, context=context)
-			
-		id = super(learner_mod_line, self).unlink(cr, uid, ids, context=context)
-		return id
 	
 	_name = "learner.line"
 	_description = "Learner Line"
@@ -1445,26 +1608,25 @@ class session_info(osv.osv):
 	}
 session_info()
 
-global trianer_created
-trianer_created = False
+
 class trainers_line(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(trainers_line, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
 	
 	def _check_unique_trainer(self, cr, uid, ids, context=None):
-		if trianer_created == True :
-			global trianer_created
-			trianer_created = False
-			_logger.info("unique %s",ids)
-			sr_ids = self.search(cr, 1 ,[], context=context)
-			for x in self.browse(cr, uid, sr_ids, context=context):
-				_logger.info("Trainer x.trainers_line_id X %s",x.trainers_line_id.id)
-				_logger.info("Trainer x.trainer_id X %s",x.trainer_id.id)
-				if x.id != ids[0]:
-					for self_obj in self.browse(cr, uid, ids, context=context):
-						_logger.info("Trainer self_obj.trainers_line_id %s",self_obj.trainers_line_id.id )
-						_logger.info("Trainer self_obj.trainer_id %s",self_obj.trainer_id.id)
-						if x.trainers_line_id.id == self_obj.trainers_line_id.id and x.trainer_id.id == self_obj.trainer_id.id:
-							return False
-		return True
+		if dupliacte_trainer_found == True:
+			return False
+		else :
+			return True
+
 	def update_status(self,cr, uid, ids, values, context=None):
 		super(trainers_line, self).write(cr, uid, ids,values, context=context)
 	
@@ -1513,16 +1675,20 @@ class trainers_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		
-		line_ids = self.search(cr,uid,[('trainers_line_id','in',prog_mod_ids)])
+		line_ids = self.search(cr,uid,[('trainers_line_id','in',prog_mod_ids) and ('trainer_id','=',values_obj['trainer_id'].id)])
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				super(trainers_line, self).write(cr, uid, prog_module_line.id,values, context=context)
 		return id
 		
 	def trainer_confirm(self, cr, uid, ids, context=None): 
-		super(trainers_line, self).write(cr, uid, ids[0],{'t_status':'Confirmed'}, context=context)
 		self_obj  = self.browse(cr, uid, ids[0], context=context)
 		trainer_obj = self_obj['trainer_id']
+		trainer_ids = self.search(cr,uid,[('trainer_id','=',self_obj.id) and ('t_status','=','Confirmed')])
+		for iddd in self.browse(cr,uid,trainer_ids):
+			if iddd.trainers_line_id.start_date == self_obj.trainers_line_id.start_date :
+				raise osv.except_osv(_('Error!'),_("Selected trainer has other session confirmed with same date and time."))
+		super(trainers_line, self).write(cr, uid, ids[0],{'t_status':'Confirmed'}, context=context)
 		prog_mod_ids = []
 		for le_obj in trainer_obj.assignment_avaliable:
 			if le_obj.trainer_avail_id == trainer_obj.id :
@@ -1541,8 +1707,12 @@ class trainers_line(osv.osv):
 		
 		sub_lines = []
 		values = {}
+		user = self.pool.get('res.users').browse(cr, uid, uid)
+		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+		new_date_time_utc = pytz.utc.localize(datetime.strptime(class_info_obj_id.start_date,"%Y-%m-%d %H:%M:%S")).astimezone(tz)
+		_logger.info ('ccccc %s', new_date_time_utc)
 		sub_lines.append( (0,0, {'trainer':trainer_obj.name,'session_assigned':class_info_obj_id.sess_no,
-			'date_of_assignment':class_info_obj_id.start_date,'single_session':True}) )
+			'date_of_assignment':new_date_time_utc.strftime ("%Y-%m-%d %H:%M:%S"),'single_session':True}) )
 		values.update({'trainer_history': sub_lines})
 		for prog_module_line in class_info_obj.browse(cr,uid,prog_mod_ids):
 			self.pool.get("class.info").write(cr, uid, prog_module_line.id,values, context=context,holidays=True)
@@ -1646,7 +1816,7 @@ class class_moi(osv.osv):
 	
 	def unlink(self, cr, uid, ids, context=None):
 		values_obj = self.browse(cr,uid,ids,context)[0]
-		class_id = values_obj['learner_mod_id']
+		class_id = values_obj['class_moi_id']
 		
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
@@ -1656,7 +1826,7 @@ class class_moi(osv.osv):
 		else:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
-		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids)])
+		line_ids = self.search(cr,uid,[('class_moi_id','in',prog_mod_ids) and ('equip_list','=',values_obj['equip_list'].id)])
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			super(class_moi, self).unlink(cr, uid, prog_module_line.id, context=context)
 			
@@ -1666,8 +1836,8 @@ class class_moi(osv.osv):
 	_name ='class.moi'
 	_description ="People and Facilites Tab"
 	_columns = {
-	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
-	'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
+	'class_moi_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class'),
+	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments',required=True),
 	}
 	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['equip_list'])]
 class_moi()
@@ -1729,7 +1899,7 @@ class learner_asset(osv.osv):
 		return id
 	def unlink(self, cr, uid, ids, context=None):
 		values_obj = self.browse(cr,uid,ids,context)[0]
-		class_id = values_obj['learner_mod_id']
+		class_id = values_obj['learner_asset_id']
 		
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
@@ -1739,7 +1909,7 @@ class learner_asset(osv.osv):
 		else:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
-		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids)])
+		line_ids = self.search(cr,uid,[('learner_asset_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			super(learner_asset, self).unlink(cr, uid, prog_module_line.id, context=context)
 			
@@ -1752,7 +1922,7 @@ class learner_asset(osv.osv):
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'learner_asset_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, required=True),
-	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="NRIC/FIN", readonly=1, required=True),
+	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="NRIC/FIN", readonly=1),
 	'binder_issue_date':fields.date('Binder Issue Date'),
 	'tablet_type': fields.char('Tablet Type',size=20),
 	'tablet_serial_num': fields.char('Tablet Serial Number',size=20),
@@ -1803,3 +1973,14 @@ class class_history(osv.osv):
 	'changes':fields.char('Changes',size=200)
 	}
 class_history()
+
+
+'''class client_corp(osv.osv):
+	
+	_name = "client.class.info"
+	_description = "Client Class"
+	_columns = {
+	'corp_id' : fields.many2one('client.class', 'corprate'),
+	
+	}	
+client_corp()'''

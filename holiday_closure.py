@@ -14,6 +14,12 @@ import pytz
 
 _logger = logging.getLogger(__name__)
 
+global dupliacte_desc_found
+dupliacte_desc_found = False
+
+global dupliacte_desc_found_create
+dupliacte_desc_found_create = False
+
 ####################
 #HOLIDAYS
 ####################
@@ -70,16 +76,132 @@ class holidays(osv.osv):
 						return False
 		return True
 		
+# Room mandatory
+	def _make_mandatory1(self, cr, uid, ids, context=None):
+			pl = self.pool.get('holiday.line')
+			isFound = False
+			for progline in self.browse(cr, uid, ids, context=None):
+				#if progline['location_type'] == 'Permanent':
+					for line in progline.holiday_line:
+						isFound = True
+					if isFound:
+						return True
+					else:
+						return False
+			return True
+		
 #Table For Year in Holiday
 	_name = "holiday"
 	_description = "This table is for keeping location data"
 	_columns = {
 		'holiday_id': fields.char('Id',size=20),
 		'year': fields.selection(_populate_year, 'Year', required=True),
+		#'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'holiday_line': fields.one2many('holiday.line', 'holiday_line_id', 'Holiday Lines', select=True, required=True),
 		'no_of_holidays': fields.function(_calculate_total_holiday, relation="holiday",readonly=1,string='No. of Holidays',type='integer'),
 	}
-	_constraints = [(_check_unique_year, 'Error: Year Already Exists', ['year'])]
+	
+	def create(self,cr, uid, values, context=None):
+		
+		global dupliacte_desc_found_create
+		dupliacte_desc_found_create = False
+		
+		if 'holiday_line' in values :
+			if values['holiday_line']  > 1:
+				ids_test_lear = self.pool.get('holiday.line').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('holiday.line').browse(cr,1,ids_test_lear):
+					if dd.holiday_line_id.id == True:
+						table_ids.append(dd.description)	
+				for x in values['holiday_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('holiday.line').browse(cr,uid,x[1])
+						deleted_ids.append(obj.description)
+					elif x[0] == 0 and 'description' in x[2]:
+						added_ids.append(x[2]['description'])
+						if x[2]['description'] in table_ids :
+							new_table_ids.append(dd.description)
+					elif x[0] == 1  and 'description' in x[2]:
+						updated_ids.append(x[2]['description'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_desc_found_create
+					dupliacte_desc_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_desc_found_create
+							dupliacte_desc_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_desc_found_create
+						dupliacte_desc_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_desc_found_create
+							dupliacte_desc_found_create = True
+	
+		module_id = super(holidays, self).create(cr, uid, values, context=context)
+		return module_id
+	
+	def write(self,cr, uid, ids, values, context=None):
+	
+		global dupliacte_desc_found
+		dupliacte_desc_found = False
+	
+		if 'holiday_line' in values :
+				if values['holiday_line']  > 1:
+					ids_test_lear = self.pool.get('holiday.line').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('holiday.line').browse(cr,1,ids_test_lear):
+						if dd.holiday_line_id.id == ids[0]:
+							table_ids.append(dd.description)
+					for x in values['holiday_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('holiday.line').browse(cr,uid,x[1])
+							deleted_ids.append(obj.description)
+						elif x[0] == 0 and 'description' in x[2]:
+							added_ids.append(x[2]['description'])
+						elif x[0] == 1  and 'description' in x[2]:
+							updated_ids.append(x[2]['description'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_desc_found
+						dupliacte_desc_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_desc_found
+								dupliacte_desc_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_desc_found
+							dupliacte_desc_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_desc_found
+								dupliacte_desc_found = True
+								
+		module_id = super(holidays, self).write(cr, uid, ids,values, context=context)
+		return module_id
+	_constraints = [(_check_unique_year, 'Error: Year Already Exists', ['year']),(_make_mandatory1, 'Error: Atleast One Holiday should be Entered', ['Holiday']),]
 holidays
 
 #Class Holiday Line
@@ -186,13 +308,12 @@ class holiday_line(osv.osv):
 
 #Validate Unique Name	
 	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.s_no == self_obj.s_no and x.description == self_obj.description:
-						return False
-		return True
+		if dupliacte_desc_found == True:
+			return False
+		elif dupliacte_desc_found_create == True:
+			return False
+		else :
+			return True	
 		
 #Validate Unique Start Date
 	def _check_unique_start_date(self, cr, uid, ids, context=None):

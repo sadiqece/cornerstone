@@ -5,7 +5,7 @@ from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
-from datetime import datetime
+from datetime import datetime, timedelta, date
 import re
 
 _logger = logging.getLogger(__name__)
@@ -71,13 +71,6 @@ class trainer_profile_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['trainers_status']
 		return res
-
-# Display Dropdown Nationality	
-	'''def _nationality_get(self, cr, uid, ids, context=None):
-			ids = self.pool.get('res.country').search(cr, uid, [('name', '=', 'Singapore')], context=context)
-			if ids:
-				return ids[0]
-			return False'''
 			
 # Validate Email-id			
 	def ValidateEmail(self, cr, uid, ids, email_id):
@@ -158,7 +151,23 @@ class trainer_profile_info(osv.osv):
 			raise osv.except_osv(_('Warning!'),_('Email id not valid. %s') % (xcv))
 		else:
 			return True
-
+	
+	def _ass_func_1(self, cr, uid, ids, expenses, arg, context):
+		value_ids = self.pool.get('trainers.assignment.avaliable').search(cr, uid, [])
+		return_ids = []
+		for x in self.pool.get('trainers.assignment.avaliable').browse(cr,uid,value_ids) :
+			if datetime.today().date() < datetime.strptime(x.start_date_avaliable,"%Y-%m-%d %H:%M:%S").date():
+				return_ids.append(x.id)
+		return dict([(id, return_ids ) for id in ids])
+	
+	def _ass_func_2(self, cr, uid, ids, expenses, arg,  context):
+		value_ids = self.pool.get('trainers.assignment.avaliable').search(cr, uid, [])
+		return_ids = []
+		for x in self.pool.get('trainers.assignment.avaliable').browse(cr,uid,value_ids) :
+			if datetime.today().date() > datetime.strptime(x.start_date_avaliable,"%Y-%m-%d %H:%M:%S").date():
+				return_ids.append(x.id)
+		return dict([(id, return_ids ) for id in ids])
+		
 #Table For Trianer Profile 'trainer_profile_info'			
 	_name = "trainer.profile.info"
 	_description = "This table is for keeping location data"
@@ -166,8 +175,8 @@ class trainer_profile_info(osv.osv):
 	'location_id': fields.integer('Id',size=20),
 	'name': fields.char('Name:', size=100,required=True, select=True),
 	'image': fields.binary("Image"),
-	'nric_name': fields.char('Name as in NRIC/FIN:', size=20),
-	'nric': fields.char('NRIC/FIN:', size=10),
+	'nric_name': fields.char('Name as in NRIC/FIN:', size=100,required=True),
+	'nric': fields.char('NRIC/FIN:', size=12,required=True),
 	'trainers_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status', required=True, select=True),
 	'date1': fields.date('Date Created', readonly='True'),
 	'date2': fields.date('Date Created', readonly='True'),
@@ -175,20 +184,23 @@ class trainer_profile_info(osv.osv):
 	'trainer_status_display': fields.function(_trainer_status_display, readonly=1, type='char'),
 	'trainer_status_display_1': fields.function(_trainer_status_display_1, readonly=1, type='char'),
 	'assignment_avaliable': fields.one2many('trainers.assignment.avaliable','trainer_avail_id','Available', readonly=1),
-	'assignment_current': fields.one2many('trainers.assignment.current','s_no','Current', readonly=1),
-	'assignment_history': fields.one2many('trainers.assignment.history','s_no','History', readonly=1),
+	'assignment_current': fields.function(_ass_func_1,type='one2many',obj="trainers.assignment.avaliable",method=True,string='Session'),
+	'assignment_history': fields.function(_ass_func_2,type='one2many',obj="trainers.assignment.avaliable",method=True,string='Session'),
 	'trainer_module_line': fields.one2many('trainer.module.line','trainers_id','Module',),
 	#'personal_line': fields.one2many('personal.detail.module','personal_detail_id','Personal Details'),
 	'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
 	'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
+	'trainer_category': fields.selection((('Key','Key'),('Core','Core'),('Standard','Standard')),'Trainer Category'),
 	'race':fields.many2one('race', 'Race'),
 	'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
 	'Religion': fields.char('Religion', size=10),
 	'No_of_Children':fields.integer('No of Children', size=2),
 	'email_id': fields.char('Email', size=30),
-	'addr_1': fields.text('Address', size=100),
+	'addr_1': fields.char('Address Line 1'),
+	'addr_2': fields.char('Address Line 2'),
+	'postal_code': fields.char('Postal Code', size=6),
 	'mobile_no': fields.integer('Mobile', size=9),
-	'landline_no': fields.integer('Landline', size=9),
+	'landline_no': fields.integer('Home', size=9),
 	'office_no': fields.integer('Office', size=9),
 	'qualification_line': fields.one2many('qualification.trainer.module','qualify_id','Qualification'),
 	'work_exp_line': fields.one2many('work.exp.module','work_id','Work Experience',),
@@ -214,6 +226,8 @@ class trainer_profile_info(osv.osv):
 	_defaults = { 
 	   'date1': fields.date.context_today,
 	   'date2': fields.date.context_today,
+	   'trainers_status': 'Active',
+	   'nationality': 'Singapore',
     }
 	_constraints = [(_check_unique_trainer_name, 'Error: Trainer Already Exists', ['Trainer Name']),(_check_unique_name_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_nric_fin, 'Error: Trainer NRIC/FIN Already Exists', ['NRIC/FIN']),(_check_unique_id, 'Error: Email Already Exist', ['Email']),(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_no_children, 'Error: Number of childrens Cannot be Negative', ['Children']), (_check_email, 'Error! Email is invalid.', ['work_email'])]
 trainer_profile_info()
@@ -250,31 +264,6 @@ class avaliable(osv.osv):
 	'status':fields.char('Status',size=10),
 	}
 avaliable	()
-
-class current(osv.osv):
-	_name ='trainers.assignment.current'
-	_description ="Assignment Current Tab"
-	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'class':fields.char('Class',size=25),
-	'class_code_current':fields.char('Class Code',size=25),
-	'start_date_current':fields.date('Start Date'),
-	'end_date_current':fields.date('End Date'),
-	}
-current	()
-
-class assign_history(osv.osv):
-	_name ='trainers.assignment.history'
-	_description ="Assignment History Tab"
-	_columns = {
-	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'class':fields.char('Class',size=25),
-	'class_code_history':fields.char('Class Code',size=25),
-	'start_date_history':fields.date('Start Date'),
-	'end_date_history':fields.date('End Date'),
-	}
-assign_history	()
-
 
 # Module Tab
 class trainer_module(osv.osv):
@@ -416,6 +405,15 @@ class work_exp(osv.osv):
 				return False
 		return True
 		
+	def _year_from_from_one(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.work_id == self_obj.work_id and self_obj.year_from < x.year_from:
+						return False
+		return True
+		
 	def _check_unique_year_from(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -433,21 +431,44 @@ class work_exp(osv.osv):
 					if x.work_id == self_obj.work_id and x.year_to == self_obj.year_to:
 						return False
 		return True
+		
+	def _check_all_range(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, uid ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.work_id == self_obj.work_id and x.year_to == self_obj.year_to and x.year_from == self_obj.year_from:
+						return False
+					elif x.work_id == self_obj.work_id and self_obj.year_from > x.year_from and self_obj.year_from < x.year_to:
+						return False
+					elif x.work_id == self_obj.work_id and self_obj.year_to > x.year_from and self_obj.year_to < x.year_to:
+						return False
+		return True
+		
+	def import_file(self, cr, uid, ids, context=None):
+		fileobj = TemporaryFile('w+')
+		fileobj.write(base64.decodestring(data)) 
+	 # your treatment
+		return
 
 	_name = "work.exp.module"
 	_description = "Work Experience Tab"
 	_columns = {
-	'work_id' : fields.integer('Id',size=20),
+	'work_id' : fields.many2one('trainer.profile.info', 'Work Experience', ondelete='cascade', help='Trainer Profile', select=True, readonly=1),
 	's_no' : fields.integer('S.No',size=20,readonly=1),	
-	'company':fields.char('Company',size=25),
+	'company':fields.char('Company',size=25, required=True),
 	'industry':fields.char('Industry',size=25),
 	'position':fields.char('Position',size=25),
-	'year_from':fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year From'),
-	'year_to': fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year To'),
+	'year_from':fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year From', required=True),
+	'year_to': fields.selection([(num, str(num)) for num in range(1900, (datetime.now().year)+1 )], 'Year To', required=True),
 	'key_responsibility':fields.char('Key Responsibilities'),
 	'trg_specific':fields.boolean('Trg Specific'),
+	'upl_resume': fields.binary('Upload Documents'),
+	'datas_fname': fields.char('File Name'),
+	'file_type': fields.char('Content Type'),
+	'index_content': fields.text('Indexed Content'),
 	}
-	_constraints = [(_year_from_to, 'Error: Year To should be greater than Year From', ['Year']), (_check_unique_year_from, 'Error: Year From Already Exists', ['Year From']), (_check_unique_year_to, 'Error: Year To Already Exists', ['Year To'])]
+	_constraints = [(_year_from_to, 'Error: Year To should be greater than Year From', ['Year']), (_check_unique_year_from, 'Error: Year From Already Exists', ['Year From']), (_check_unique_year_to, 'Error: Year To Already Exists', ['Year To']), (_check_all_range, 'Error: Years already Exists', ['Check Years']), (_year_from_from_one, 'Error: Year From should not be less than Pervious Year', ['Check Years'])]
 work_exp()
 
 # Invoice Tab
@@ -473,25 +494,6 @@ invoice()
 ###############
 
 class panel_info(osv.osv):
-		
-	def views_settings(self,cr,uid,ids,context=None):
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'setting_panel_form')
-		view_id = view_ref and view_ref[1] or False
-		ctx = dict(context)
-		self_obj  = self.browse(cr, uid, ids[0], context=context)
-		
-		return {
-			'type': 'ir.actions.act_window',
-			'name': 'Settings',
-			'view_mode': 'form',
-			'view_type': 'form',
-			'view_id': view_id,
-			'res_model': 'setting.line',
-			'res_id':0, # this will open particular product,
-			'nodestroy': True,
-			'target':'new',
-			'context': ctx,
-		}
 
 	_name = "panel.info"
 	_description = "This table is for keeping location data"
@@ -499,7 +501,6 @@ class panel_info(osv.osv):
 	'trainer_line': fields.one2many('trainer.line','trainer_id','Trainers',ondelete='cascade', help='Class Calendar', select=True),
 	'asssign_schedule_line': fields.one2many('assign.schedule.line','sche_id','Assignment Schedules'),
 	'assigned_line': fields.one2many('assignment.schedule','assigned_id','Assignment Schedule',ondelete='cascade', help='Class Calendar', select=True),
-	#'setting_panel_line': fields.one2many('setting.line','setting_id','Settings'),
 	'trainer_ids' : fields.one2many('trainer.profile.info', 'trainer_id', 'Trainer', ondelete='cascade', help='Class Calendar', select=True),
 	'name': fields.related('trainer_ids','name', string='Status', type="char", relation="trainer.profile.info", readonly=1),
 	'all_trainer':fields.many2one('trainer.profile.info', 'All Trainer',ondelete='cascade', help='Program', select=True),
@@ -510,18 +511,18 @@ class panel_info(osv.osv):
 	}
 	
 #Trainer Schedule Details	
-	def onchange_trainer_hist(self, cr, uid, ids, i_trainer, i_class, i_mod, context=None):
+	def onchange_trainer_hist(self, cr, uid, ids, i_trainer, i_class, context=None):
 		val ={}
 		sub_lines = []
 		#raise osv.except_osv(_('Warning!'),_('Email id not valid. %s %s %s') % (i_trainer, i_class, i_mod))
-		val.update({'scheduled_date':''})
-		if i_trainer and i_class:
-			sql  ="select distinct c.start_date from class_info c, cs_module cs, trainers_line t, trainer_profile_info tp where c.module_id = cs.id and c.id = t.trainers_line_id and t.trainer_id = tp.id and tp.id = %s and c.id = %s" % (i_trainer, i_class)
+		val.update({'assigned_line':''})
+		if i_trainer:
+			sql  ="select distinct c.name, c.module_id, c.start_date from class_info c, cs_module cs, trainers_line t, trainer_profile_info tp where c.module_id = cs.id and c.id = t.trainers_line_id and t.trainer_id = tp.id and tp.id = %s" % (i_trainer)
 			cr.execute(sql)
 			itm = cr.fetchall()
 			
 			for s in itm:
-				sub_lines.append({'scheduled_date': s[0]})
+				sub_lines.append({'name': s[0], 'mod_sched': s[1], 'scheduled_date': s[2]})
 					
 				val.update({'assigned_line': sub_lines})
 			
@@ -534,62 +535,53 @@ class assignment_schedule(osv.osv):
 	_name = "assignment.schedule"
 	_description = "Assignment Schedule"
 	_columns = {
-		'assigned_id': fields.many2one('panel.info',ondelete='cascade', help='Class Calendar', select=True),
-		'session_no' : fields.integer('Session No', size=10, readonly=1),
-		'week_no' : fields.integer('Week No', size=20, readonly=1),
+		'assigned_id': fields.many2one('panel.info','ID',ondelete='cascade', help='Class Calendar', readonly=1),
+		'name': fields.char('Class Name', size=20, readonly=1),
+		'mod_sched' : fields.many2one('cs.module', 'Module Name', size=20, readonly=1),
 		'scheduled_date': fields.date('Scheduled Date', readonly=1),
-	}		
+	}
 assignment_schedule()
 
 #Settings
 ###############
 
 class setting_panel(osv.osv):
+
+	def _class_start_notice(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.class_start_notice < 0:
+				return False
+		return True
 		
-	def save_settings(self, cr, uid, ids, context=None): 
-		obj = self.browse(cr,uid,ids)
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'setting_panel_form')
-		view_id = view_ref and view_ref[1] or False,
+	def _class_outstanding_notice(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.class_outstanding_noitce < 0:
+				return False
+		return True
 		
-		return {
-			'type': 'ir.actions.act_window',
-			'name': 'Test',
-			'view_mode': 'form',
-			'view_type': 'form',
-			'view_id': False,
-			'res_model': 'panel.info',
-			'res_id':obj[0]['setting_id'].id,
-			'nodestroy': True,
-			'target':'current',
-			'context': context,
-		}
+	def _trainer_min_avail(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.trainer_min_avail < 0:
+				return False
+		return True
 		
-	def cancel_settings(self, cr, uid, ids, context=None): 
-		obj = self.browse(cr,uid,ids)
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'setting_panel_form')
-		view_id = view_ref and view_ref[1] or False,
-		
-		return {
-			'type': 'ir.actions.act_window',
-			'name': 'Test',
-			'view_mode': 'form',
-			'view_type': 'form',
-			'view_id': False,
-			'res_model': 'panel.info',
-			'res_id':obj[0]['setting_id'].id,
-			'nodestroy': True,
-			'target':'current',
-			'context': context,
-		}
+	def _base_rate(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.base_rate < 0:
+				return False
+		return True
 
 	_name = "setting.line"
 	_description = "Settings"
 	_columns = {
-	'setting_id' : fields.many2one('panel.info', 'Panel',ondelete='cascade', help='Class Calendar', select=True),
 	'class_start_notice': fields.integer('Class Start Notice', size=5),
 	'class_outstanding_noitce': fields.integer('Class Outstanding Notice', size=5),
 	'trainer_min_avail': fields.integer('Trainer Min Avaliablity (%)', size=5),
 	'base_rate': fields.integer('Base Rate ($ per hr)', size=4),
 	}
-	#_constraints = [(_class_start_notice, 'Error: Class Start Notice Cannot be Negative', ['Start Notice']),(_class_outstanding_notice, 'Error: Class Outstanding Notice Cannot be Negative', ['Outstanding Notice']),(_trainer_min_avail, 'Error: Trainer Min Avaliablity (%) Cannot be Negative', ['Avaliablity']),(_base_rate, 'Error: Base Rate ($ per hr) Cannot be Negative', ['Base Rate'])]
+	_constraints = [(_class_start_notice, 'Error: Class Start Notice Cannot be Negative', ['Start Notice']),(_class_outstanding_notice, 'Error: Class Outstanding Notice Cannot be Negative', ['Outstanding Notice']),(_trainer_min_avail, 'Error: Trainer Min Avaliablity (%) Cannot be Negative', ['Avaliablity']),(_base_rate, 'Error: Base Rate ($ per hr) Cannot be Negative', ['Base Rate'])]
 setting_panel()

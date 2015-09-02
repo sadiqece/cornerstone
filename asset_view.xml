@@ -9,28 +9,27 @@
         <form string="test" version="7.0">
             <sheet>
                 <group>
-      <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
-                            <h1 style="width:380px;">
-                                <field name = "name"/>
-                            </h1>
-							<label for="asset_code" class="oe_edit_only"/>
-                            <h2 style="width:280px;">
-                                <field name = "asset_code"/>
-                            </h2>
-      </div>
-         </group>
+				<div class="oe_title">
+					<label for="name" class="oe_edit_only"/>
+					<h1 style="width:380px;">
+						<field name = "name"/>
+					</h1>
+					<label for="asset_code" class="oe_edit_only"/>
+					<h2 style="width:280px;">
+						<field name = "asset_code"/>
+					</h2>
+				</div>
+				</group>
       <field name='asset_line'  nolabel='1'>
 	  <field name="priority">6</field>
 		 <tree string='List' editable="bottom">
 		   <field name ="sr_no"/>
 		   <field name='brand'/>
 		   <field name='model'/>
+		   <field name='serial_number'/>
 		   <field name='specs'/>
-		   <!-- Zeya 9-1-15 -->
 		   <field name='date_issue' on_change="onchange_issuedate(date_issue, date_stopped)"/>
 		   <field name='date_stopped' on_change="onchange_stopeddate(date_stopped, date_issue)"/>
-		   <!-- EOF -->
 		</tree>
     </field>
    </sheet>
@@ -72,13 +71,13 @@
    <field name="search_view_id" ref="view_asset_filter"/>
       <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new asset.
+                Click to define a new Asset.
               </p>
             </field>
         </record>
 
 
-<menuitem name = "Asset" id = "asset" parent = "menu_sub2" action = "action_asset" />
+<menuitem name = "Asset Screens" id = "asset" parent = "menu_sub2" action = "action_asset" />
 
 </data> 
 </openerp>

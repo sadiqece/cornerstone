@@ -48,7 +48,7 @@
               <div class="oe_title">
                 <label for="name" class="oe_edit_only" />
                 <h1 style="width:380px;">
-                  <field name="name" />
+                  <field name="name" position="replace" help="Change the user password."/>
                 </h1>
                 <label for="program_code" class="oe_edit_only" />
                 <h2>
@@ -91,7 +91,7 @@
             <!-- ========== Min/Max ========== -->
             <div class="col-3">
               <label for="max_program_duration" />
-              <field name="max_program_duration" readonly="1" string="Max. Duration" />
+              <field name="max_program_duration" readonly="1" string="Max. Duration"/>
               <label for="min_program_duration" />
               <field name="min_program_duration" readonly="1" string="Min. Duration" />
             </div>
@@ -166,7 +166,7 @@
                     <field name="set_module_block_1" invisible="1" />
                     <field name="set_module_select_1" invisible="1" />
                     <label for="set_module_as_1" class="oe_edit_only" />
-                    <field name="set_module_as_1" on_change="onchange_set_module_as_1(set_module_as_1)" class="oe_edit_only" />
+                    <field name="set_module_as_1" on_change="onchange_set_module_as_1(set_module_as_1)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','1')]}" />, <!--'readonly':[('set_module_as_1','!=',False)] -->
                     <div attrs="{'invisible': [('set_module_block_1', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_1" />
@@ -212,8 +212,8 @@
                   <div class="box">
                     <field name="set_module_block_2" invisible="1" />
                     <field name="set_module_select_2" invisible="1" />
-                    <label for="set_module_as_2" class="oe_edit_only" />
-                    <field name="set_module_as_2" on_change="onchange_set_module_as_2(set_module_as_2)" class="oe_edit_only" />
+                    <label for="set_module_as_2"/>
+                    <field name="set_module_as_2" on_change="onchange_set_module_as_2(set_module_as_2)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','2')]}"/> <!--, 'readonly':[('set_module_as_2','!=',False)]}"/>-->
                     <div attrs="{'invisible': [('set_module_block_2', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_2" />
@@ -260,7 +260,7 @@
                     <field name="set_module_block_3" invisible="1" />
                     <field name="set_module_select_3" invisible="1" />
                     <label for="set_module_as_3"  class="oe_edit_only" />
-                    <field name="set_module_as_3" on_change="onchange_set_module_as_3(set_module_as_3)"  class="oe_edit_only" />
+                    <field name="set_module_as_3" on_change="onchange_set_module_as_3(set_module_as_3)"  class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','3')]}"/> <!--'readonly':[('set_module_as_3','!=',False)]-->
                     <div attrs="{'invisible': [('set_module_block_3', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_3" />
@@ -308,7 +308,7 @@
                     <field name="set_module_block_4" invisible="1" />
                     <field name="set_module_select_4" invisible="1" />
                     <label for="set_module_as_4" class="oe_edit_only" />
-                    <field name="set_module_as_4" on_change="onchange_set_module_as_4(set_module_as_4)" class="oe_edit_only" />
+                    <field name="set_module_as_4" on_change="onchange_set_module_as_4(set_module_as_4)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','4')]}"/> <!-- 'readonly':[('set_module_as_4','!=',False)]-->
                     <div attrs="{'invisible': [('set_module_block_4', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_4" />
@@ -355,7 +355,7 @@
                     <field name="set_module_block_5" invisible="1" />
                     <field name="set_module_select_5" invisible="1" />
                     <label for="set_module_as_5" class="oe_edit_only" />
-                    <field name="set_module_as_5" on_change="onchange_set_module_as_5(set_module_as_5)" class="oe_edit_only" />
+                    <field name="set_module_as_5" on_change="onchange_set_module_as_5(set_module_as_5)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','5')]}"/> <!--'readonly':[('set_module_as_5','!=',False)]-->
                     <div attrs="{'invisible': [('set_module_block_5', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_5" />
@@ -402,7 +402,7 @@
                     <field name="set_module_block_6" invisible="1" />
                     <field name="set_module_select_6" invisible="1" />
                     <label for="set_module_as_6" class="oe_edit_only" />
-                    <field name="set_module_as_6" on_change="onchange_set_module_as_6(set_module_as_6)" class="oe_edit_only" />
+                    <field name="set_module_as_6" on_change="onchange_set_module_as_6(set_module_as_6)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','6')]}"/> <!--'readonly':[('set_module_as_6','!=',False)]-->
                     <div attrs="{'invisible': [('set_module_block_6', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_6" />
@@ -523,7 +523,7 @@
                     <field name="name" />
                     <field name="module_code" string="Module Code" />
                     <field name="pre_test" string="Pre-Test" />
-                    <field name="in_class_test" string="In Class" />
+                    <field name="in_class_test" string="In-Class" />
                     <field name="post_test" string="Post-Test" />
                   </tree>
                 </field>
@@ -598,7 +598,7 @@
                       <tree string="Alert Order Lines" editable="bottom" class="grey_border">
                         <field name="s_no" />
                         <field name="program_alert_list" on_change="on_change_master_program_alerts(program_alert_list)" />
-                        <field name="time" widget="float_time" />
+                        <field name="time" />
                         <field name="befor_after" />
                         <field name="min_max" />
                         <field name="value_per" />
@@ -628,7 +628,7 @@
                   <label string="History" readonly="context.get('ctx', False)" />
                 </h3>
                 <field name="program_history_line">
-                  <tree string="History Order Lines" create="false" delete="false" class="grey_borde">
+                  <tree string="History Order Lines" create="false" delete="false">
                     <field name="s_no" />
                     <field name="date_created" />
                     <field name="created_by" />
@@ -705,8 +705,8 @@
         <form string="Req Order Lines" version="7.0">
           <group>
             <field name="name" />
-            <field name="per_fee_mod" />
-            <field name="ver_req" />
+            <!--field name="per_fee_mod" />
+            <field name="ver_req" /-->
           </group>
         </form>
       </field>
@@ -938,7 +938,7 @@
                   <tree string="Alert Order Lines" editable="bottom" class="grey_border">
                     <field name="s_no" />
                     <field name="alert_list" on_change="on_change_master_module_alerts(alert_list,mod_id)" />
-                    <field name="time" widget="float_time" />
+                    <field name="time" />
                     <field name="befor_after" />
                     <field name="min_max" />
                     <field name="value_per" />
@@ -952,7 +952,7 @@
                 <h3>
                   <label string="History" />
                 </h3>
-                <field name="history_line" readonly="context.get('ctx', False)" class="history_line">
+                <field name="history_line">
                   <tree string="History Order Lines" create="false" delete="false" class="grey_border">
                     <field name="s_no" />
                     <field name="date_created" />
@@ -1014,7 +1014,7 @@
     <!-- ===========================Menu Settings=========================== -->
     <menuitem name="Corner Stone" id="menu_lis_lab" />
     <menuitem name="Offerings" id="menu_sub" parent="menu_lis_lab" />
-    <menuitem name="Fulfilment" id="menu_sub1" parent="menu_lis_lab" />
+    <!--menuitem name="Fulfilment" id="menu_sub1" parent="menu_lis_lab" /-->
     <menuitem name="Definitions" id="menu_sub2" parent="menu_lis_lab" />
     <menuitem name="Scheduling and Information" id="menu_sub3" parent="menu_lis_lab" />
     <menuitem name="Test Scheduling" id="menu_sub6" parent="menu_lis_lab" />

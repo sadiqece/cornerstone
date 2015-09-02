@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
+<data noupdate="1">
+    <!-- Sequences for location -->
+    <record id="seq_type_location" model="ir.sequence.type">
+      <field name="name">location seq</field>
+      <field name="code">location</field>
+    </record>
+    <record id="seq_location" model="ir.sequence">
+      <field name="name">Location Seq</field>
+      <field name="code">location</field>
+      <field name="prefix" />
+      <field name="padding">1</field>
+      <field name="company_id" eval="False" />
+    </record>
+  </data>
 <data>
 <!-- ===================== This is location form layout =============================-->
 <record id="location_form" model="ir.ui.view">
@@ -31,6 +45,10 @@
 					
 						<group attrs="{'invisible': [('location_type_permanent', '=' , True)]}">
 							<field name='location_type_temporary' invisible="1"/>
+						</group>
+						
+						<group attrs="{'invisible': [('location_type_permanent', '=' , True)]}">
+							<field name='location_type_external' invisible="1"/>
 						</group>
 					</div>
 				</group>
@@ -190,7 +208,7 @@
         </record>
 
 
-<menuitem name = "Location" id = "location" parent = "menu_sub1" action = "action_location" />
+<menuitem name = "Location" id = "location" parent = "menu_sub2" action = "action_location" />
 
 </data> 
 </openerp>

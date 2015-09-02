@@ -15,6 +15,7 @@
 							<field name = "test_def_id"  options="{'create': False, 'create_edit': False}" on_change="on_change_test_definition(test_def_id,context)" attrs="{'readonly':[('t_status','=','Edit')]}"/>
 							<field name = "status"  invisible="1"/>
 							<field name = "t_status"  invisible="1"/>
+							<field name = "test_status"  invisible="1"/>
 			        </group>
 					<div>
 							<group col="4">
@@ -64,7 +65,7 @@
 					</group>
 					<group>
 							<field name = "module_ids" invisible="1"/>
-                            <field name = "module_id" on_change="on_change_module_id(module_id,test_def_id,context)" options="{'create': False, 'create_edit': False}" string="Module Name"/>
+                            <field name = "module_id" on_change="on_change_module_id(module_id, test_def_id, context)" options="{'create': False, 'create_edit': False}" string="Module Name"/>
                             <field name = "module_code" string="Module Code" />
 							<field name = "test_type_id" invisible="1" />
 							<field name = "test_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',1)]}"  />
@@ -97,7 +98,7 @@
 							<field name='test_modality' nolabel='1'>
 									<tree string='List' editable="bottom">
 										<field name='master_modality' />
-										<field name='active'/>
+										<field name='m_active'/>
 									</tree>
 							</field>
 						</page>
@@ -206,17 +207,6 @@
         </record>
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	<!-- ========================= Action Layout ============================= -->
 	
 	
@@ -260,10 +250,8 @@
             <field name="model">test.info</field>
             <field name="arch" type="xml">
                 <search string="Test Scheduling">
-                    <field name="name" string="Test"/>
-					<field name="test_code" string="Code"/>
+
 	           </search>
-	          
             </field>
         </record>
 		
@@ -272,7 +260,6 @@
 			<field name="type">ir.actions.act_window</field>
             <field name="res_model">test.info</field>
             <field name="view_type">form</field>
-			<field name="limit">10</field>
             <field name="view_mode">calendar,tree,form</field>
 			<field name="view_id" ref="test_listing_page_tree"/>
 			<field name="search_view_id" ref="view_test_listing_filter"/>

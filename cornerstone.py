@@ -7,6 +7,38 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+global dupliacte_req_found
+dupliacte_req_found = False
+
+global dupliacte_equip_found
+dupliacte_equip_found = False
+
+global dupliacte_pretest_found
+dupliacte_pretest_found = False
+
+global dupliacte_inclasstest_found
+dupliacte_inclasstest_found = False
+
+global dupliacte_posttest_found
+dupliacte_posttest_found = False
+
+####################################
+
+global dupliacte_req_found_create
+dupliacte_req_found_create = False
+
+global dupliacte_equip_found_create
+dupliacte_equip_found_create = False
+
+global dupliacte_pretest_found_create
+dupliacte_pretest_found_create = False
+
+global dupliacte_inclasstest_found_create
+dupliacte_inclasstest_found_create = False
+
+global dupliacte_posttest_found_create
+dupliacte_posttest_found_create = False
+
 ####################
 #PROGRAMS
 ####################
@@ -17,87 +49,90 @@ _logger = logging.getLogger(__name__)
 class program(osv.osv):
 
 # Module Item Mandatory
+
     def _make_mandatory1(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
         for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_1'] == 'Selectable':
+            group_val1 = progline.no_module_box1
+
+            #raise osv.except_osv(_('Error!'),_("sdsdsdc %s %s")%(group_val1, group_val2))
+            if group_val1:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
                 for line in progline.program_mod_line:
-                    isFound = True
-                if isFound:
                     return True
-                else:
-                    return False
-        return True
-		
-    def _make_mandatory2(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
-        for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_2'] == 'Selectable':
-                for line in progline.program_mod_line_2:
-                    isFound = True
-                if isFound:
-                    return True
-                else:
-                    return False
+                return False
+            else:
+                return True
+
         return True
 
+    def _make_mandatory2(self, cr, uid, ids, context=None):
+        for progline in self.browse(cr, uid, ids, context=None):
+            group_val2 = progline.no_module_box2
+
+            if group_val2:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
+                for line in progline.program_mod_line_2:
+                    return True
+                return False
+            else:
+                return True
+
+        return True
 
     def _make_mandatory3(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
         for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_3'] == 'Selectable':
-                for line in progline.program_mod_line_3:
-                    isFound = True
-                if isFound:
-                    return True
-                else:
-                    return False
-        return True
+            group_val3 = progline.no_module_box3
 
+            if group_val3:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
+                for line in progline.program_mod_line_3:
+                    return True
+                return False
+            else:
+                return True
+
+        return True
 
     def _make_mandatory4(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
         for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_4'] == 'Selectable':
-                for line in progline.program_mod_line_4:
-                    isFound = True
-                if isFound:
-                    return True
-                else:
-                    return False
-        return True
+            group_val4 = progline.no_module_box4
 
+            if group_val4:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
+                for line in progline.program_mod_line_4:
+                    return True
+                return False
+            else:
+                return True
+
+        return True	
 
     def _make_mandatory5(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
         for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_5'] == 'Selectable':
-                for line in progline.program_mod_line_5:
-                    isFound = True
-                if isFound:
-                    return True
-                else:
-                    return False
-        return True
+            group_val5 = progline.no_module_box5
 
+            if group_val5:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
+                for line in progline.program_mod_line_5:
+                    return True
+                return False
+            else:
+                return True
+
+        return True	
 
     def _make_mandatory6(self, cr, uid, ids, context=None):
-        pl = self.pool.get('program.module.line')
-        isFound = False
         for progline in self.browse(cr, uid, ids, context=None):
-            if progline['set_module_as_6'] == 'Selectable':
+            group_val6 = progline.no_module_box6
+
+            if group_val6:
+                #raise osv.except_osv(_('Error!'),_("ddddddd %s")%(7))
                 for line in progline.program_mod_line_6:
-                    isFound = True
-                if isFound:
                     return True
-                else:
-                    return False
-        return True		
+                return False
+            else:
+                return True
+				
 #Dropdown to Show no. of module groups
 
     def onchange_no_of_mod_gp(self, cr, uid, ids, no_of_mod_gp):
@@ -109,9 +144,23 @@ class program(osv.osv):
         val.update({'no_module_box4': False})
         val.update({'no_module_box5': False})
         val.update({'no_module_box6': False})
+        
         if no_of_mod_gp == '1':
+            #raise osv.except_osv(_('Error!'),_("sdasdadasdas %s")%(12121))
             #val['no_module_box1'] = True
             val.update({'no_module_box1': True})
+            
+            #delete lines
+            pl = self.pool.get('program.module.line')
+            for progline in self.browse(cr, uid, ids, context=None):
+                line_ids = [line.id for line in progline.program_mod_line_2]
+                pl.unlink(cr, uid, line_ids, context=None)
+
+            val.update({'min_no_modules_2': ''})
+            val.update({'max_no_modules_2': ''})
+            val.update({'mod_gp_name_2': ''})
+            val.update({'set_module_as_2': 'Block'})
+
             val.update({'program_mod_line_2': sub_lines})
             val.update({'program_mod_line_3': sub_lines})
             val.update({'program_mod_line_4': sub_lines})
@@ -125,6 +174,22 @@ class program(osv.osv):
             val.update({'program_mod_line_5': sub_lines})
             val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '3':
+		
+            #raise osv.except_osv(_('Error!'),_("sdasdadasdas %s")%(12121))
+            #val['no_module_box1'] = True
+            val.update({'no_module_box3': True})
+            
+            #delete lines
+            pl = self.pool.get('program.module.line')
+            for progline in self.browse(cr, uid, ids, context=None):
+                line_ids = [line.id for line in progline.program_mod_line_3]
+                pl.unlink(cr, uid, line_ids, context=None)
+
+            val.update({'min_no_modules_3': ''})
+            val.update({'max_no_modules_3': ''})
+            val.update({'mod_gp_name_3': ''})
+            val.update({'set_module_as_3': 'Block'})
+		
             val.update({'no_module_box1': True})
             val.update({'no_module_box2': True})
             val.update({'no_module_box3': True})
@@ -132,6 +197,22 @@ class program(osv.osv):
             val.update({'program_mod_line_5': sub_lines})
             val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '4':
+		
+            #raise osv.except_osv(_('Error!'),_("sdasdadasdas %s")%(12121))
+            #val['no_module_box1'] = True
+            val.update({'no_module_box4': True})
+            
+            #delete lines
+            pl = self.pool.get('program.module.line')
+            for progline in self.browse(cr, uid, ids, context=None):
+                line_ids = [line.id for line in progline.program_mod_line_4]
+                pl.unlink(cr, uid, line_ids, context=None)
+
+            val.update({'min_no_modules_4': ''})
+            val.update({'max_no_modules_4': ''})
+            val.update({'mod_gp_name_4': ''})
+            val.update({'set_module_as_4': 'Block'})
+		
             val.update({'no_module_box1': True})
             val.update({'no_module_box2': True})
             val.update({'no_module_box3': True})
@@ -139,6 +220,22 @@ class program(osv.osv):
             val.update({'program_mod_line_5': sub_lines})
             val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '5':
+		
+            #raise osv.except_osv(_('Error!'),_("sdasdadasdas %s")%(12121))
+            #val['no_module_box1'] = True
+            val.update({'no_module_box5': True})
+            
+            #delete lines
+            pl = self.pool.get('program.module.line')
+            for progline in self.browse(cr, uid, ids, context=None):
+                line_ids = [line.id for line in progline.program_mod_line_5]
+                pl.unlink(cr, uid, line_ids, context=None)
+
+            val.update({'min_no_modules_5': ''})
+            val.update({'max_no_modules_5': ''})
+            val.update({'mod_gp_name_5': ''})
+            val.update({'set_module_as_5': 'Block'})
+		
             val.update({'no_module_box1': True})
             val.update({'no_module_box2': True})
             val.update({'no_module_box3': True})
@@ -146,6 +243,22 @@ class program(osv.osv):
             val.update({'no_module_box5': True})
             val.update({'program_mod_line_6': sub_lines})
         elif no_of_mod_gp == '6':
+		
+            #raise osv.except_osv(_('Error!'),_("sdasdadasdas %s")%(12121))
+            #val['no_module_box1'] = True
+            val.update({'no_module_box6': True})
+            
+            #delete lines
+            pl = self.pool.get('program.module.line')
+            for progline in self.browse(cr, uid, ids, context=None):
+                line_ids = [line.id for line in progline.program_mod_line_6]
+                pl.unlink(cr, uid, line_ids, context=None)
+
+            val.update({'min_no_modules_6': ''})
+            val.update({'max_no_modules_6': ''})
+            val.update({'mod_gp_name_6': ''})
+            val.update({'set_module_as_6': 'Block'})
+		
             val.update({'no_module_box1': True})
             val.update({'no_module_box2': True})
             val.update({'no_module_box3': True})
@@ -245,7 +358,7 @@ class program(osv.osv):
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids)])
        return dict([(id, value_ids) for id in ids])
 
-    def _load_prog_mod_show_do_line(self, cr, uid, ids, field_names, args,  context=None):
+    def _load_prog_mod_show_do_line(self, cr, uid, ids, field_names, args, context=None):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
        module_ids =[]
@@ -340,28 +453,121 @@ class program(osv.osv):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
-       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])]) 
        module_ids =[]
+       module_ids_in_loop =[]
        res = {}
+       fee_list = []
+       new_fee_list = []
        min_fee = 0.00
+	   #1
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
            if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
-               module_ids.append(prog_module_line['module_id'].id)
+              if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+              elif lis_program['set_module_as_1'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_1']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val]
            #2
-           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
-               module_ids.append(prog_module_line['module_id_2'].id)
-           #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and lis_program['set_group_as_sel_2'] == False:
+              if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+              elif lis_program['set_module_as_2'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_2'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_2']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val] 
+          #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
            if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+              if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+              elif lis_program['set_module_as_3'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_3'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_3']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val] 
            #4
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
            if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+              if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+              elif lis_program['set_module_as_4'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_4'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_4']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val] 
            #5
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
            if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+              if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+              elif lis_program['set_module_as_5'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_5'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_5']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val] 
            #6
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
            if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
-               module_ids.append(prog_module_line['module_id_6'].id)
+              if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+              elif lis_program['set_module_as_6'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_6'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['min_no_modules_6']):
+                  min_fee_val = min(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(min_fee_val)
+                  del module_fee_pair[min_fee_val] 
+
        mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
            min_fee += value_ids['module_fee']
@@ -374,28 +580,86 @@ class program(osv.osv):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
-       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])       
        module_ids =[]
        res = {}
+       k1 =0 
+       k2 =0 
+       k3 =0 
+       k4 =0 
+       k5 =0 
+       k6 = 0
+       
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
            if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
-               module_ids.append(prog_module_line['module_id'].id)
-           #2
-           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
-               module_ids.append(prog_module_line['module_id_2'].id)
+             if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+             elif lis_program['set_module_as_1'] == 'Selectable':
+                i = lis_program['min_no_modules_1'] 
+                if i > k1 :
+                   module_ids.append(prog_module_line['module_id'].id)
+                k1 = k1+1
+     
+	 #2
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and lis_program['set_group_as_sel_2'] == False:
+             if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+             elif lis_program['set_module_as_2'] == 'Selectable':
+                i = lis_program['min_no_modules_2'] 
+                _logger.info("Value of i k %s %s ",i, k2 )
+                if i > k2 :
+                   _logger.info("Value of prog_module_line['module_id_2'].id %s ",prog_module_line['module_id_2'].id)
+                   module_ids.append(prog_module_line['module_id_2'].id)
+                k2 = k2+1
+       _logger.info("Value of mod id 2 %s ",module_ids )
            #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
            if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+             if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+             elif lis_program['set_module_as_3'] == 'Selectable':
+                i = lis_program['min_no_modules_3'] 
+                if i > k3 :
+                   module_ids.append(prog_module_line['module_id_3'].id)
+                k3 = k3+1
+       _logger.info("Value of mod id 3 %s ",module_ids )
            #4
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
            if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+             if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+             else:
+                i = lis_program['min_no_modules_4'] 
+                if i > k4 :
+                   module_ids.append(prog_module_line['module_id_4'].id)
+                k4 = k4+1
            #5
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
            if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+             if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+             elif lis_program['set_module_as_5'] == 'Selectable':
+                i = lis_program['min_no_modules_5'] 
+                if i > k5 :
+                   module_ids.append(prog_module_line['module_id_5'].id)
+                k5 = k5+1
            #6
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
            if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
-               module_ids.append(prog_module_line['module_id_6'].id)
-
+             if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+             elif lis_program['set_module_as_6'] == 'Selectable':
+                i = lis_program['min_no_modules_6'] 
+                if i > k6 :
+                   module_ids.append(prog_module_line['module_id_6'].id)
+                k6 = k6+1
+          
        value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        min_mod = len(value_ids)
        res[ids[0]] = min_mod
@@ -407,27 +671,81 @@ class program(osv.osv):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
-       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])       
        module_ids =[]
        res = {}
+       k1 =0 
+       k2 =0 
+       k3 =0 
+       k4 =0 
+       k5 =0 
+       k6 = 0
+	   #1
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
            if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
-               module_ids.append(prog_module_line['module_id'].id)
-           #2
+             if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+             elif lis_program['set_module_as_1'] == 'Selectable':
+                i = lis_program['max_no_modules_1'] 
+                if i > k1 :
+                   module_ids.append(prog_module_line['module_id'].id)
+                k1 = k1+1
+           #2 
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
            if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
-               module_ids.append(prog_module_line['module_id_2'].id)
+             if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+             elif lis_program['set_module_as_2'] == 'Selectable':
+                i = lis_program['max_no_modules_2'] 
+                if i > k2 :
+                   module_ids.append(prog_module_line['module_id_2'].id)
+                k2 = k2+1
            #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
            if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+             if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+             elif lis_program['set_module_as_3'] == 'Selectable':
+                i = lis_program['max_no_modules_3'] 
+                if i > k3 :
+                   module_ids.append(prog_module_line['module_id_3'].id)
+                k3 = k3+1
+       _logger.info("Value of mod id 3 %s ",module_ids )
            #4
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
            if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+             if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+             else:
+                i = lis_program['max_no_modules_4'] 
+                if i > k4 :
+                   module_ids.append(prog_module_line['module_id_4'].id)
+                k4 = k4+1
            #5
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
            if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+             if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+             elif lis_program['set_module_as_5'] == 'Selectable':
+                i = lis_program['max_no_modules_5'] 
+                if i > k5 :
+                   module_ids.append(prog_module_line['module_id_5'].id)
+                k5 = k5+1
            #6
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
            if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
-               module_ids.append(prog_module_line['module_id_6'].id)
+             if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+             elif lis_program['set_module_as_6'] == 'Selectable':
+                i = lis_program['max_no_modules_6'] 
+                if i > k6 :
+                   module_ids.append(prog_module_line['module_id_6'].id)
+                k6 = k6+1
 
        value_ids = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        max_mod = len(value_ids)
@@ -475,27 +793,123 @@ class program(osv.osv):
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
        prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])]) 
        module_ids =[]
+       module_ids_in_loop =[]
        res = {}
+       dur_list = []
+       new_dur_list = []
        min_dur = 0.00
+
+	   #1
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
            if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
-               module_ids.append(prog_module_line['module_id'].id)
+              if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+              elif lis_program['set_module_as_1'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_1']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val]
            #2
-           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and  lis_program['set_group_as_sel_2'] == False:
-               module_ids.append(prog_module_line['module_id_2'].id)
-           #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and lis_program['set_group_as_sel_2'] == False:
+              if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+              elif lis_program['set_module_as_2'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_2'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_2']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val] 
+          #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
            if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+              if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+              elif lis_program['set_module_as_3'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_3'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_3']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val] 
            #4
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
            if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+              if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+              elif lis_program['set_module_as_4'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_4'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_4']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val] 
            #5
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
            if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+              if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+              elif lis_program['set_module_as_5'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_5'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_5']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val] 
            #6
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
            if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
-               module_ids.append(prog_module_line['module_id_6'].id)
+              if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+              elif lis_program['set_module_as_6'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_6'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['min_no_modules_6']):
+                  min_dur_val = min(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(min_dur_val)
+                  del module_dur_pair[min_dur_val] 
+			   
+
        mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
            min_dur += value_ids['module_duration']
@@ -574,8 +988,77 @@ class program(osv.osv):
             'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
        values.update({'program_history_line': sub_lines})
        module_id = super(program, self).create(cr, uid, values, context=context)
+
+       sql="select count(ml.module_id)-lp.min_no_modules_1 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id \
+             and lp.id = %s group by lp.min_no_modules_1" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+			 
+#===2====
+       sql="select count(ml.module_id_2)-lp.min_no_modules_2 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_2 \
+             and lp.id = %s group by lp.min_no_modules_2" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+       #self.write(cr, uid, ids, context=context) 
+	   
+#===3====
+       sql="select count(ml.module_id_3)-lp.min_no_modules_3 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_3 \
+             and lp.id = %s group by lp.min_no_modules_3" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+			 
+#===4====
+       sql="select count(ml.module_id_4)-lp.min_no_modules_4 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_4 \
+             and lp.id = %s group by lp.min_no_modules_4" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+			 
+#===5====
+       sql="select count(ml.module_id_5)-lp.min_no_modules_5 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_5 \
+             and lp.id = %s group by lp.min_no_modules_5" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+			 
+#===6====
+       sql="select count(ml.module_id_6)-lp.min_no_modules_6 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_6 \
+             and lp.id = %s group by lp.min_no_modules_6" % (module_id)
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
        return module_id  
-    
+       self._mod_subsidy(cr, uid, ids, id)
+       return id
+
+
     def write(self,cr, uid, ids, values, context=None):
        sub_lines = []
        
@@ -608,6 +1091,221 @@ class program(osv.osv):
             'last_update':fields.date.today(),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
        values.update({'program_history_line': sub_lines})
        module_id = super(program, self).write(cr, uid, ids,values, context=context)
+#===1====
+       sql="select count(ml.module_id)-lp.min_no_modules_1 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id \
+             and lp.id = %s group by lp.min_no_modules_1" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_1 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id, lp.set_module_as_1 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_1': i[0],
+             'module_id': i[1],
+             'check_module_select_1': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
+  
+#===2====
+       sql="select count(ml.module_id_2)-lp.min_no_modules_2 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_2 \
+             and lp.id = %s group by lp.min_no_modules_2" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_2 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id_2, lp.set_module_as_2 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id_2 \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_2': i[0],
+             'module_id_2': i[1],
+             'check_module_select_2': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
+  
+#===3====
+       sql="select count(ml.module_id_3)-lp.min_no_modules_3 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_3 \
+             and lp.id = %s group by lp.min_no_modules_3" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_3 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id_3, lp.set_module_as_3 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id_3 \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_3': i[0],
+             'module_id_3': i[1],
+             'check_module_select_3': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
+  
+#===4====
+       sql="select count(ml.module_id_4)-lp.min_no_modules_4 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_4 \
+             and lp.id = %s group by lp.min_no_modules_4" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_4 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id_4, lp.set_module_as_4 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id_4 \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_4': i[0],
+             'module_id_4': i[1],
+             'check_module_select_4': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
+  
+#===5====
+       sql="select count(ml.module_id_5)-lp.min_no_modules_5 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_5 \
+             and lp.id = %s group by lp.min_no_modules_5" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_5 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id_5, lp.set_module_as_5 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id_5 \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_5': i[0],
+             'module_id_5': i[1],
+             'check_module_select_5': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
+  
+#===6====
+       sql="select count(ml.module_id_6)-lp.min_no_modules_6 from lis_program lp, program_module_line ml \
+             where lp.id = ml.prog_mod_id_6 \
+             and lp.id = %s group by lp.min_no_modules_6" % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          if i[0] < 0:
+             raise osv.except_osv(_('Error!'),_("Minimum Modules should be equal or greater than below table"))
+
+       sql="select li.id from lis_program lp, learner_info li where li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       recs = cr.fetchall()
+       obj_ml = self.pool.get('learner.mode.line')
+       for i in recs:
+          sql="delete from learner_mode_line where qualification_module_id_6 = %s " % (i[0])
+          cr.execute(sql)
+
+       sql="select distinct li.id, ml.module_id_6, lp.set_module_as_6 from lis_program lp, program_module_line ml, \
+          learner_info li where lp.id = ml.prog_mod_id_6 \
+          and li.program_learner = lp.id and lp.id = %s " % (ids[0])
+       cr.execute(sql)
+       itm=cr.fetchall()
+       for i in itm:
+          if i[2] != 'Selectable':
+             isTrue=False
+          else:
+             isTrue=True
+          vals = {
+             'qualification_module_id_6': i[0],
+             'module_id_6': i[1],
+             'check_module_select_6': isTrue
+          }
+          obj_ml.create(cr, uid, vals, context=context)
        return module_id
     def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
        
@@ -694,6 +1392,45 @@ class program(osv.osv):
             if self_obj.min_no_modules_6 < 0 or self_obj.max_no_modules_6 < self_obj.min_no_modules_6:
                 return False
         return True
+		
+    def _mod_subsidy(self, cr, uid, values, p_id, context=None):
+		obj_res_hist = self.pool.get('checklist.module')
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(p_id))
+		for ch in values:
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(p_id))
+			sql="select m.name ,per_fee_mod, i.program_learner from lis_program l \
+				inner join learner_info i \
+				on i.program_learner = l.id \
+				left join subsidy_module s \
+				on l.id = s.program_id \
+				left join program_show_do_module d \
+				on l.id = d.program_id \
+				inner join master_show_do m \
+				on m.id = d.master_show_do \
+				where l.id = %s " % (p_id)
+			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(p_id))
+			cr.execute(sql)
+			itm = cr.fetchall()			
+			for s in itm:				
+				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(p_id))
+				vals = {
+					'item': s[0],
+					'subsidy_fee':s[1],
+					'checklist_id':s[2]
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+		return True
+		
+    def name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=100):
+		if not args:
+			args = []
+		if context is None:
+			context = {}
+		ids = []
+		name = name + '%'
+		cr.execute("SELECT id FROM lis_program WHERE name like %s", (name,))
+		ids = cr.dictfetchall()
+		return self.name_get(cr, uid, ids, context)
 
 #Table For Class Program 'lis_program'
     _name = "lis.program"
@@ -701,21 +1438,21 @@ class program(osv.osv):
     _columns = {
         'program_id': fields.char('Id',size=20),
         's_no': fields.char('S.No',size=20),
-        'name': fields.char('Program Name', size=100,required=True, select=True),
-        'program_code': fields.char('Program Code', size=20),
+        'name': fields.char('Program Name', size=100,required=True, select=True, help='Name of the Program'),
+        'program_code': fields.char('Program Code', size=20, help='Code for Program'),
 		'qualification_module_id':fields.many2one('qualification.module', 'Qualification Module'),
-		'program_level': fields.selection((('Beginner','Beginner'),('Intermediate','Intermediate'),('Advanced','Advanced')),'Level'),
+		'program_level': fields.many2one('program.level', 'Level'),
 	    'program_category':fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
 	    'program_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
 		#Max Min
-		'max_program_duration': fields.function(_calculate_total_duration_max, relation="lis.program",readonly=1,string='Max Program Duration',type='float', required=True),
-		'min_program_duration': fields.function(_calculate_total_duration_min, relation="lis.program",readonly=1,string='Min Program Duration',type='float', required=True),
-		'max_program_mod': fields.function(_calculate_total_mod_max, relation="lis.program",readonly=1,string='Max Modules',type='integer'),
-		'min_program_mod': fields.function(_calculate_total_mod_min, relation="lis.program",readonly=1,string='Min Modules',type='integer'),
-		'max_program_fee': fields.function(_calculate_total_fee_max, relation="lis.program",readonly=1,string='Max Program Fee',type='float'),
-		'min_program_fee': fields.function(_calculate_total_fee_min, relation="lis.program",readonly=1,string='Min Program Fee',type='float'),
+		'max_program_duration': fields.function(_calculate_total_duration_max, relation="lis.program",readonly=1,string='Max Program Duration',type='float', required=True, help='Maximum Program Duration Taken.'),
+		'min_program_duration': fields.function(_calculate_total_duration_min, relation="lis.program",readonly=1,string='Min Program Duration',type='float', required=True, help='Minimum Program Duration Taken.'),
+		'max_program_mod': fields.function(_calculate_total_mod_max, relation="lis.program",readonly=1,string='Max Modules',type='integer', help='Maximum Modules in this Program.'),
+		'min_program_mod': fields.function(_calculate_total_mod_min, relation="lis.program",readonly=1,string='Min Modules',type='integer', help='Minimum Modules in this Program.'),
+		'max_program_fee': fields.function(_calculate_total_fee_max, relation="lis.program",readonly=1,string='Max Program Fee',type='float', help='Maximum Fee.'),
+		'min_program_fee': fields.function(_calculate_total_fee_min, relation="lis.program",readonly=1,string='Min Program Fee',type='float', help='Minimum Fee.'),
 		'program_tot_credit': fields.function(_calculate_total_credit, relation="lis.program",readonly=1,string='Total Credit',type='integer'),
-		'program_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status',required=True, select=True),
+		'program_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status',required=True, select=True, help='Status show wheather the Program is on going.'),
 		'program_center': fields.selection((('Hougang','Hougang'),('Jurong','Jurong'),('Tampines','Tampines'),('Woodlands','Woodlands')),'Select Center'),
 		'select_module': fields.selection((('Module 1','Module 1'),('Module 2','Module 2'),('Module 3','Module 3'),('Module 4','Module 4')),'Select Module'),
 		'program_audience': fields.selection((('LWW','LWW'),('LWW','LWW')),'Target Audience'),
@@ -823,33 +1560,45 @@ class program(osv.osv):
 	   'set_group_as_sel_5': True,
 	   'set_group_as_sel_6': True,
     }
-    _constraints = [(_make_mandatory1, 'Error: Select Atleast One Item for Group 1', ['module item']),(_make_mandatory2, 'Error: Select Atleast One Item for Group 2', ['module item']),
-	(_make_mandatory3, 'Error: Select Atleast One Item for Group 3', ['module item']),(_make_mandatory4, 'Error: Select Atleast One Item for Group 4', ['module item']),
-	(_make_mandatory5, 'Error: Select Atleast One Item for Group 5', ['module item']),(_make_mandatory6, 'Error: Select Atleast One Item for Group 6', ['module item']),
-	(_check_unique_name, 'Error: Program Name Already Exists', ['Program Name']),(_check_unique_code, 'Error: Program Code Already Exists', ['Program Code']),
-	(_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['Module Group Name']),(_check_min_max_1, 'Error: Invalid Min/Max Values', ['Module Group 1']),
-	(_check_min_max_2, 'Error: Invalid Min/Max Values', ['Module Group 2']),(_check_min_max_3, 'Error: Invalid Min/Max Values', ['Module Group 3']),
-	(_check_min_max_4, 'Error: Invalid Min/Max Values', ['Module Group 4']),(_check_min_max_5, 'Error: Invalid Min/Max Values', ['Module Group 5']),
-	(_check_min_max_6, 'Error: Invalid Min/Max Values', ['Module Group 6'])]
+    _constraints = [(_check_unique_name, 'Error: Program Name Already Exists', ['Program Name']),(_check_unique_code, 'Error: Program Code Already Exists', ['Program Code']),
+    (_check_unique_group, 'Error: Module Group Names Cannot Be Same', ['Module Group Name']),(_check_min_max_1, 'Error: Invalid Min/Max Values', ['Module Group 1']),
+    (_check_min_max_2, 'Error: Invalid Min/Max Values', ['Module Group 2']),(_check_min_max_3, 'Error: Invalid Min/Max Values', ['Module Group 3']),
+    (_check_min_max_4, 'Error: Invalid Min/Max Values', ['Module Group 4']),(_check_min_max_5, 'Error: Invalid Min/Max Values', ['Module Group 5']),
+    (_check_min_max_6, 'Error: Invalid Min/Max Values', ['Module Group 6']),
+    (_make_mandatory1, 'Error: Select Atleast One Item for Group 1', ['Module Item']), (_make_mandatory2, 'Error: Select Atleast One Item for Group 2', ['Module Item']),
+    (_make_mandatory3, 'Error: Select Atleast One Item for Group 3', ['Module Item']), (_make_mandatory4, 'Error: Select Atleast One Item for Group 4', ['Module Item']),
+    (_make_mandatory5, 'Error: Select Atleast One Item for Group 5', ['Module Item']), (_make_mandatory6, 'Error: Select Atleast One Item for Group 6', ['Module Item']),]
 program()
 
+#Class Program Level
+###############
+
+class prg_level(osv.osv):
+
+	def _check_prg_level(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+
+	_name ='program.level'
+	_description ="Program Level"
+	_columns = {
+		'name':fields.char('Level'),
+	}
+	_constraints = [(_check_prg_level, 'Error: Program Level Already Exists', ['Program Level'])]
+prg_level()
 
 #Class program_mod_line
 ###############
 
 globvar = 0
 class program_mod_line(osv.osv):
-
-#Modules Required
-	'''def unlink(self, cr, uid, ids, context=None):
-		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
-		test_checked =  self.pool.get('cs.module').browse(cr, uid, mod_id.id, context=context).pre_test
-		if test_checked:
-			sr_ids = super(pre_test, self).search(cr, uid, [('mod_id', '=', mod_id.id)],context=context)
-			final_val = len(sr_ids) - len(ids)
-			if final_val == 0: 
-				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
-		return super(pre_test, self).unlink(cr, uid, ids, context=context)'''
 
 #Validate Unique Modules
 	def _check_unique_module(self, cr, uid, ids, context=None):
@@ -1083,7 +1832,7 @@ class master_subsidy(osv.osv):
 				return False
 		return True
 	_name ='master.subsidy'
-	_description ="People and Facilites Tab"
+	_description ="Master Subsidy Module Tab"
 	_columns = {
 	'name':fields.char('Description',size=20, required=True),
 	'per_fee_mod':fields.integer('% Of Module Fee',size=3),
@@ -1127,8 +1876,9 @@ class program_subsidy(osv.osv):
 			if self_obj.per_fee_mod < 0:
 				return False
 		return True
+		
 	_name ='subsidy.module'
-	_description ="People and Facilites Tab"
+	_description ="Subsidy Module Tab"
 	_columns = {
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'cost_id':fields.integer('Id',size=20),
@@ -1198,9 +1948,9 @@ class program_alerts(osv.osv):
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'alert_id':fields.integer('Id',size=20),
 	'program_alert_list':fields.many2one('master.program.alerts', 'Description', ondelete='cascade', help='Description', select=True, required=True),
-	'time':fields.float('Time',size=3),
-	'befor_after':fields.boolean('Before/After'),
-	'min_max':fields.boolean('Min/Max Value'),
+	'time':fields.integer('Days', size=3),
+	'befor_after':fields.selection((('Before','Before'),('After','After')),'Before/After'),
+	'min_max':fields.selection((('Min Value','Min Value'),('Max Value','Max Value')),'Min/Max Value'),
 	'value_per':fields.integer('Value in %',size=3),
 	'action':fields.char('Action',size=100),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
@@ -1225,9 +1975,9 @@ class master_program_alerts(osv.osv):
 	_description ="People and Facilites Tab"
 	_columns = {
 	'name':fields.char('Test Descripton',size=20),
-	'time':fields.char('Time',size=3),
-	'befor_after':fields.boolean('Before/After'),
-	'min_max':fields.boolean('Min/Max Value'),
+	'time':fields.integer('Days', size=3),
+	'befor_after':fields.selection((('Before','Before'),('After','After')),'Before/After'),
+	'min_max':fields.selection((('Min Value','Min Value'),('Max Value','Max Value')),'Min/Max Value'),
 	'value_per':fields.integer('Value in %',size=3),
 	'action':fields.char('Action',size=100)
 	}
@@ -1275,116 +2025,826 @@ class cs_module(osv.osv):
 
 #History
     def create(self,cr, uid, values, context=None):
-        if 'pre_test' in values and values['pre_test']:
-            if len(values['pre_test_line']) == 0:
-                raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
-        if 'in_class_test' in values and values['in_class_test']:
-            if len(values['in_class_test_line']) == 0:
-                raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
-        if 'post_test' in values and values['post_test']:
-            if len(values['post_test_line']) == 0:
-                raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-        sub_lines = []
-        current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
-        sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
-             'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
-        values.update({'history_line': sub_lines})
-        module_id = super(cs_module, self).create(cr, uid, values, context=context)
-        return module_id  
+	
+		global dupliacte_req_found_create
+		dupliacte_req_found_create = False
+
+		global dupliacte_equip_found_create
+		dupliacte_equip_found_create = False
+
+		global dupliacte_pretest_found_create
+		dupliacte_pretest_found_create = False
+
+		global dupliacte_inclasstest_found_create
+		dupliacte_inclasstest_found_create = False
+
+		global dupliacte_posttest_found_create
+		dupliacte_posttest_found_create = False
+		
+		if 'req_line' in values :
+			if values['req_line']  > 1:
+				ids_test_lear = self.pool.get('req.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('req.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.master_req.id)	
+				for x in values['req_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('req.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.master_req.id)
+					elif x[0] == 0 and 'master_req' in x[2]:
+						added_ids.append(x[2]['master_req'])
+						if x[2]['master_req'] in table_ids :
+							new_table_ids.append(dd.master_req.id)
+					elif x[0] == 1  and 'master_req' in x[2]:
+						updated_ids.append(x[2]['master_req'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_req_found_create
+					dupliacte_req_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_req_found_create
+							dupliacte_req_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_req_found_create
+						dupliacte_req_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_req_found_create
+							dupliacte_req_found_create = True
+							
+		if 'pf_line' in values :
+			if values['pf_line']  > 1:
+				ids_test_lear = self.pool.get('pf.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('pf.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.equip_list.id)	
+				for x in values['pf_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('pf.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.equip_list.id)
+					elif x[0] == 0 and 'equip_list' in x[2]:
+						added_ids.append(x[2]['equip_list'])
+						if x[2]['equip_list'] in table_ids :
+							new_table_ids.append(dd.equip_list.id)
+					elif x[0] == 1  and 'equip_list' in x[2]:
+						updated_ids.append(x[2]['equip_list'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_equip_found_create
+					dupliacte_equip_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_equip_found_create
+							dupliacte_equip_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_equip_found_create
+						dupliacte_equip_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_equip_found_create
+							dupliacte_equip_found_create = True
+							
+		if 'pre_test_line' in values :
+			if values['pre_test_line']  > 1:
+				ids_test_lear = self.pool.get('pre.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.test_list.id)	
+				for x in values['pre_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.test_list.id)
+					elif x[0] == 0 and 'test_list' in x[2]:
+						added_ids.append(x[2]['test_list'])
+						if x[2]['test_list'] in table_ids :
+							new_table_ids.append(dd.test_list.id)
+					elif x[0] == 1  and 'test_list' in x[2]:
+						updated_ids.append(x[2]['test_list'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_pretest_found_create
+					dupliacte_pretest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_pretest_found_create
+							dupliacte_pretest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_pretest_found_create
+						dupliacte_pretest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_pretest_found_create
+							dupliacte_pretest_found_create = True
+							
+		if 'pre_test_line' in values :
+			if values['pre_test_line']  > 1:
+				ids_test_lear = self.pool.get('pre.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.order_priority)	
+				for x in values['pre_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.order_priority)
+					elif x[0] == 0 and 'order_priority' in x[2]:
+						added_ids.append(x[2]['order_priority'])
+						if x[2]['order_priority'] in table_ids :
+							new_table_ids.append(dd.order_priority)
+					elif x[0] == 1  and 'order_priority' in x[2]:
+						updated_ids.append(x[2]['order_priority'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_pretest_found_create
+					dupliacte_pretest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_pretest_found_create
+							dupliacte_pretest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_pretest_found_create
+						dupliacte_pretest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_pretest_found_create
+							dupliacte_pretest_found_create = True
+							
+		if 'in_class_test_line' in values :
+			if values['in_class_test_line']  > 1:
+				ids_test_lear = self.pool.get('in.class.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.test_list.id)	
+				for x in values['in_class_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.test_list.id)
+					elif x[0] == 0 and 'test_list' in x[2]:
+						added_ids.append(x[2]['test_list'])
+						if x[2]['test_list'] in table_ids :
+							new_table_ids.append(dd.test_list.id)
+					elif x[0] == 1  and 'test_list' in x[2]:
+						updated_ids.append(x[2]['test_list'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_inclasstest_found_create
+					dupliacte_inclasstest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_inclasstest_found_create
+							dupliacte_inclasstest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_inclasstest_found_create
+						dupliacte_inclasstest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_inclasstest_found_create
+							dupliacte_inclasstest_found_create = True
+							
+		if 'in_class_test_line' in values :
+			if values['in_class_test_line']  > 1:
+				ids_test_lear = self.pool.get('in.class.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.order_priority)	
+				for x in values['in_class_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.order_priority)
+					elif x[0] == 0 and 'order_priority' in x[2]:
+						added_ids.append(x[2]['order_priority'])
+						if x[2]['order_priority'] in table_ids :
+							new_table_ids.append(dd.order_priority)
+					elif x[0] == 1  and 'order_priority' in x[2]:
+						updated_ids.append(x[2]['order_priority'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_inclasstest_found_create
+					dupliacte_inclasstest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_inclasstest_found_create
+							dupliacte_inclasstest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_inclasstest_found_create
+						dupliacte_inclasstest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_inclasstest_found_create
+							dupliacte_inclasstest_found_create = True
+							
+		if 'post_test_line' in values :
+			if values['post_test_line']  > 1:
+				ids_test_lear = self.pool.get('post.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.test_list.id)	
+				for x in values['post_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.test_list.id)
+					elif x[0] == 0 and 'test_list' in x[2]:
+						added_ids.append(x[2]['test_list'])
+						if x[2]['test_list'] in table_ids :
+							new_table_ids.append(dd.test_list.id)
+					elif x[0] == 1  and 'test_list' in x[2]:
+						updated_ids.append(x[2]['test_list'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_posttest_found_create
+					dupliacte_posttest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_posttest_found_create
+							dupliacte_posttest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_posttest_found_create
+						dupliacte_posttest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_posttest_found_create
+							dupliacte_posttest_found_create = True
+							
+		if 'post_test_line' in values :
+			if values['post_test_line']  > 1:
+				ids_test_lear = self.pool.get('post.test.module').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == True:
+						table_ids.append(dd.order_priority)	
+				for x in values['post_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.order_priority)
+					elif x[0] == 0 and 'order_priority' in x[2]:
+						added_ids.append(x[2]['order_priority'])
+						if x[2]['order_priority'] in table_ids :
+							new_table_ids.append(dd.order_priority)
+					elif x[0] == 1  and 'order_priority' in x[2]:
+						updated_ids.append(x[2]['order_priority'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_posttest_found_create
+					dupliacte_posttest_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_posttest_found_create
+							dupliacte_posttest_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_posttest_found_create
+						dupliacte_posttest_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_posttest_found_create
+							dupliacte_posttest_found_create = True
+	
+		if 'pre_test' in values and values['pre_test']:
+			if len(values['pre_test_line']) == 0:
+				raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
+		if 'in_class_test' in values and values['in_class_test']:
+			if len(values['in_class_test_line']) == 0:
+				raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
+		if 'post_test' in values and values['post_test']:
+			if len(values['post_test_line']) == 0:
+				raise osv.except_osv(_('Error!'),_("Please add Post Test"))
+		sub_lines = []
+		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+		sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+				'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
+		values.update({'history_line': sub_lines})
+		module_id = super(cs_module, self).create(cr, uid, values, context=context)
+		return module_id
+		_logger.info("Create Values %s",values)
+		module_id = super(cs_module, self).create(cr, uid, values, context=context)
+		return module_id
     
     def write(self,cr, uid, ids, values, context=None):
-        sub_lines = []
-        
-        current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
-        for line in self.browse(cr, uid, ids, context=context):
-          history_line_id = self.browse(cr, uid, ids[0], context=context).history_line or []
+	
+		global dupliacte_req_found
+		dupliacte_req_found = False	
+		
+		global dupliacte_equip_found
+		dupliacte_equip_found = False
+		
+		global dupliacte_pretest_found
+		dupliacte_pretest_found = False
+		
+		global dupliacte_inclasstest_found
+		dupliacte_inclasstest_found = False
+		
+		global dupliacte_posttest_found
+		dupliacte_posttest_found = False
+	
+		if 'req_line' in values :
+				if values['req_line']  > 1:
+					ids_test_lear = self.pool.get('req.module').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('req.module').browse(cr,1,ids_test_lear):
+						if dd.mod_id.id == ids[0]:
+							table_ids.append(dd.master_req.id)
+					for x in values['req_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('req.module').browse(cr,uid,x[1])
+							deleted_ids.append(obj.master_req.id)
+						elif x[0] == 0 and 'master_req' in x[2]:
+							added_ids.append(x[2]['master_req'])
+						elif x[0] == 1  and 'master_req' in x[2]:
+							updated_ids.append(x[2]['master_req'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_req_found
+						dupliacte_req_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_req_found
+								dupliacte_req_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_req_found
+							dupliacte_req_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_req_found
+								dupliacte_req_found = True
+		if 'pf_line' in values :
+				if values['pf_line']  > 1:
+					ids_test_lear = self.pool.get('pf.module').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('pf.module').browse(cr,1,ids_test_lear):
+						if dd.mod_id.id == ids[0]:
+							table_ids.append(dd.equip_list.id)
+					for x in values['pf_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('pf.module').browse(cr,uid,x[1])
+							deleted_ids.append(obj.equip_list.id)
+						elif x[0] == 0 and 'equip_list' in x[2]:
+							added_ids.append(x[2]['equip_list'])
+						elif x[0] == 1  and 'equip_list' in x[2]:
+							updated_ids.append(x[2]['equip_list'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_equip_found
+						dupliacte_equip_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_equip_found
+								dupliacte_equip_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_equip_found
+							dupliacte_equip_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_equip_found
+								dupliacte_equip_found = True
+		if 'pre_test_line' in values :
+			if values['pre_test_line']  > 1:
+				ids_test_lear = self.pool.get('pre.test.module').search(cr,1,[])
+				table_ids = [] 
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == ids[0]:
+						table_ids.append(dd.test_list.id)
+				for x in values['pre_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.test_list.id)
+					elif x[0] == 0 and 'test_list' in x[2]:
+						added_ids.append(x[2]['test_list'])
+					elif x[0] == 1  and 'test_list' in x[2]:
+						updated_ids.append(x[2]['test_list'])
+				'''create check'''		
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_pretest_found
+					dupliacte_pretest_found = True
+				else:
+					'''check create in table'''
+					for c in added_ids :
+						if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_pretest_found
+							dupliacte_pretest_found = True
+					'''check for update ids '''
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_pretest_found
+						dupliacte_pretest_found = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_pretest_found
+							dupliacte_pretest_found = True
+		if 'pre_test_line' in values :
+			if values['pre_test_line']  > 1:
+				ids_test_lear = self.pool.get('pre.test.module').search(cr,1,[])
+				table_ids = [] 
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == ids[0]:
+						table_ids.append(dd.order_priority)
+				for x in values['pre_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.order_priority)
+					elif x[0] == 0 and 'order_priority' in x[2]:
+						added_ids.append(x[2]['order_priority'])
+					elif x[0] == 1  and 'order_priority' in x[2]:
+						updated_ids.append(x[2]['order_priority'])
+				'''create check'''		
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_pretest_found
+					dupliacte_pretest_found = True
+				else:
+					'''check create in table'''
+					for c in added_ids :
+						if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_pretest_found
+							dupliacte_pretest_found = True
+					'''check for update ids '''
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_pretest_found
+						dupliacte_pretest_found = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_pretest_found
+							dupliacte_pretest_found = True
+		if 'in_class_test_line' in values :
+				if values['in_class_test_line']  > 1:
+					ids_test_lear = self.pool.get('in.class.test.module').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
+						if dd.mod_id.id == ids[0]:
+							table_ids.append(dd.test_list.id)
+					for x in values['in_class_test_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
+							deleted_ids.append(obj.test_list.id)
+						elif x[0] == 0 and 'test_list' in x[2]:
+							added_ids.append(x[2]['test_list'])
+						elif x[0] == 1  and 'test_list' in x[2]:
+							updated_ids.append(x[2]['test_list'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_inclasstest_found
+						dupliacte_inclasstest_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_inclasstest_found
+								dupliacte_inclasstest_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_inclasstest_found
+							dupliacte_inclasstest_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_inclasstest_found
+								dupliacte_inclasstest_found = True
+		if 'in_class_test_line' in values :
+				if values['in_class_test_line']  > 1:
+					ids_test_lear = self.pool.get('in.class.test.module').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
+						if dd.mod_id.id == ids[0]:
+							table_ids.append(dd.order_priority)
+					for x in values['in_class_test_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
+							deleted_ids.append(obj.order_priority)
+						elif x[0] == 0 and 'order_priority' in x[2]:
+							added_ids.append(x[2]['order_priority'])
+						elif x[0] == 1  and 'order_priority' in x[2]:
+							updated_ids.append(x[2]['order_priority'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_mod_found
+						dupliacte_mod_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_mod_found
+								dupliacte_mod_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_mod_found
+							dupliacte_mod_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_mod_found
+								dupliacte_mod_found = True
+		if 'post_test_line' in values :
+			if values['post_test_line']  > 1:
+				ids_test_lear = self.pool.get('post.test.module').search(cr,1,[])
+				table_ids = [] 
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == ids[0]:
+						table_ids.append(dd.test_list.id)
+				for x in values['post_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.test_list.id)
+					elif x[0] == 0 and 'test_list' in x[2]:
+						added_ids.append(x[2]['test_list'])
+					elif x[0] == 1  and 'test_list' in x[2]:
+						updated_ids.append(x[2]['test_list'])
+				'''create check'''		
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_posttest_found
+					dupliacte_posttest_found = True
+				else:
+					'''check create in table'''
+					for c in added_ids :
+						if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_posttest_found
+							dupliacte_posttest_found = True
+					'''check for update ids '''
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_posttest_found
+						dupliacte_posttest_found = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_posttest_found
+							dupliacte_posttest_found = True
+		if 'post_test_line' in values :
+			if values['post_test_line']  > 1:
+				ids_test_lear = self.pool.get('post.test.module').search(cr,1,[])
+				table_ids = [] 
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
+					if dd.mod_id.id == ids[0]:
+						table_ids.append(dd.order_priority)
+				for x in values['post_test_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
+						deleted_ids.append(obj.order_priority)
+					elif x[0] == 0 and 'order_priority' in x[2]:
+						added_ids.append(x[2]['order_priority'])
+					elif x[0] == 1  and 'order_priority' in x[2]:
+						updated_ids.append(x[2]['order_priority'])
+				'''create check'''		
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_mod_found
+					dupliacte_mod_found = True
+				else:
+					'''check create in table'''
+					for c in added_ids :
+						if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_mod_found
+							dupliacte_mod_found = True
+					'''check for update ids '''
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_mod_found
+						dupliacte_mod_found = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_mod_found
+							dupliacte_mod_found = True
+	
+		sub_lines = []
+		
+		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+		for line in self.browse(cr, uid, ids, context=context):
+			history_line_id = self.browse(cr, uid, ids[0], context=context).history_line or []
 
-        num_of_his = len(history_line_id)-1 
-        staus_changed_by =   history_line_id[num_of_his]['status_change_by']
-        staus_changed_date =   history_line_id[num_of_his]['date_status_change']
+		num_of_his = len(history_line_id)-1 
+		staus_changed_by =   history_line_id[num_of_his]['status_change_by']
+		staus_changed_date =   history_line_id[num_of_his]['date_status_change']
  
-        if 'module_status' in values:
-           staus_changed_date = fields.date.today()
-           staus_changed_by  = current_user['name']
-           values['date1'] = fields.date.today()
-           values['date2'] = fields.date.today()
+		if 'module_status' in values:
+			staus_changed_date = fields.date.today()
+			staus_changed_by  = current_user['name']
+			values['date1'] = fields.date.today()
+			values['date2'] = fields.date.today()
 
         
-        if 'pre_test' in values and values['pre_test']:
-            if 'pre_test_line' in values: 
-                if len(values['pre_test_line']) == 0:
-                   raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
-            else:
-                test_line_id =  self.browse(cr, uid, ids[0], context=context).pre_test_line or []
-                if len(test_line_id) == 0:
-                    raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
-        else:
-            test_checked =  self.browse(cr, uid, ids[0], context=context).pre_test
-            if test_checked :
-                if 'pre_test_line' in values: 
-                   if len(values['pre_test_line']) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
-                else:
-                   test_line_id =  self.browse(cr, uid, ids[0], context=context).pre_test_line or []
-                   if len(test_line_id) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
+		if 'pre_test' in values and values['pre_test']:
+			if 'pre_test_line' in values: 
+				if len(values['pre_test_line']) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
+			else:
+				test_line_id =  self.browse(cr, uid, ids[0], context=context).pre_test_line or []
+				if len(test_line_id) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
+		else:
+			test_checked =  self.browse(cr, uid, ids[0], context=context).pre_test
+			if test_checked :
+				if 'pre_test_line' in values: 
+					if len(values['pre_test_line']) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
+				else:
+					test_line_id =  self.browse(cr, uid, ids[0], context=context).pre_test_line or []
+					if len(test_line_id) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add Pre Test"))
             
-        if 'in_class_test' in values and values['in_class_test']:
-            if 'in_class_test_line' in values: 
-                if len(values['in_class_test_line']) == 0:
-                   raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
-            else:
-                test_line_id =  self.browse(cr, uid, ids[0], context=context).in_class_test_line or []
-                if len(test_line_id) == 0:
-                    raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
-        else:
-            test_checked =  self.browse(cr, uid, ids[0], context=context).in_class_test
-            if test_checked :
-                if 'in_class_test_line' in values: 
-                   if len(values['in_class_test_line']) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
-                else:
-                   test_line_id =  self.browse(cr, uid, ids[0], context=context).in_class_test_line or []
-                   if len(test_line_id) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
+		if 'in_class_test' in values and values['in_class_test']:
+			if 'in_class_test_line' in values: 
+				if len(values['in_class_test_line']) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
+			else:
+				test_line_id =  self.browse(cr, uid, ids[0], context=context).in_class_test_line or []
+				if len(test_line_id) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
+		else:
+			test_checked =  self.browse(cr, uid, ids[0], context=context).in_class_test
+			if test_checked :
+				if 'in_class_test_line' in values: 
+					if len(values['in_class_test_line']) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
+				else:
+					test_line_id =  self.browse(cr, uid, ids[0], context=context).in_class_test_line or []
+					if len(test_line_id) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add In Class Test"))
      
-        if 'post_test' in values and values['post_test']:
-            if 'post_test_line' in values: 
-                if len(values['post_test_line']) == 0:
-                   raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-            else:
-                test_line_id =  self.browse(cr, uid, ids[0], context=context).post_test_line or []
-                if len(test_line_id) == 0:
-                    raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-        else:
-            test_checked =  self.browse(cr, uid, ids[0], context=context).post_test
-            if test_checked :
-                if 'post_test_line' in values: 
-                   if len(values['post_test_line']) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-                else:
-                   test_line_id =  self.browse(cr, uid, ids[0], context=context).post_test_line or []
-                   if len(test_line_id) == 0:
-                       raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-        changes = values.keys()
-        module_list ={'name':'Module Name','module_code':'Module Code','module_crscode':'CRS Code','module_certification':'Certification Achieved','module_level':'Level',
-           'module_category':'Category','module_pathway':'Pathway','module_credit_value':'Credit Hours','synopsis':'Synopsis','outline':'Outline','module_duration':'Duration',
-           'module_fee':'Fee','module_status':'Status','module_center':'Center','description':'Description','delivery_mode':'Delivery Mode','binder_in_use':'Binder',
-           'tablet_in_use':'Tablet','primary':'Primary','modalities_in_use':'Modalities In Use','max_num_ppl_class':'Max Number of People in a Class','room_arr':'Room Arrangment',
-           'pre_test':'Pre Test Required','in_class_test':'In Class Test Required','post_test':'Post Test Required','module_fee_gst':'Module Fee w/o GST',
-           'total_duration':'Total Duration in Hours','min_hr_session':'Minimum Hours Per Session','max_hr_session':'Maximum Hours Per Session',
-           'max_session_week':'Maximum Sessions Per Week','req_line':'Requirments','pf_line':'Equipment List','pre_test_line':'Pre Test','in_class_test_line':'In Class',
-           'post_test_line':'Post Test','show_do_line':'Show Do','alert_line':'Alerts','show_do_verification':'Verification Required'}
-        arr={}
-        for i in range(len(changes)):
-          if changes[i] in module_list:
-             arr[i] = module_list[changes[i]]
+		if 'post_test' in values and values['post_test']:
+			if 'post_test_line' in values: 
+				if len(values['post_test_line']) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add Post Test"))
+			else:
+				test_line_id =  self.browse(cr, uid, ids[0], context=context).post_test_line or []
+				if len(test_line_id) == 0:
+					raise osv.except_osv(_('Error!'),_("Please add Post Test"))
+		else:
+			test_checked =  self.browse(cr, uid, ids[0], context=context).post_test
+			if test_checked :
+				if 'post_test_line' in values: 
+					if len(values['post_test_line']) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add Post Test"))
+				else:
+					test_line_id =  self.browse(cr, uid, ids[0], context=context).post_test_line or []
+					if len(test_line_id) == 0:
+						raise osv.except_osv(_('Error!'),_("Please add Post Test"))
+		changes = values.keys()
+		module_list ={'name':'Module Name','module_code':'Module Code','module_crscode':'CRS Code','module_certification':'Certification Achieved','module_level':'Level',
+			'module_category':'Category','module_pathway':'Pathway','module_credit_value':'Credit Hours','synopsis':'Synopsis','outline':'Outline','module_duration':'Duration',
+			'module_fee':'Fee','module_status':'Status','module_center':'Center','description':'Description','delivery_mode':'Delivery Mode','binder_in_use':'Binder',
+			'tablet_in_use':'Tablet','primary':'Primary','modalities_in_use':'Modalities In Use','max_num_ppl_class':'Max Number of People in a Class','room_arr':'Room Arrangment',
+			'pre_test':'Pre Test Required','in_class_test':'In Class Test Required','post_test':'Post Test Required','module_fee_gst':'Module Fee w/o GST',
+			'total_duration':'Total Duration in Hours','min_hr_session':'Minimum Hours Per Session','max_hr_session':'Maximum Hours Per Session',
+			'max_session_week':'Maximum Sessions Per Week','req_line':'Requirments','pf_line':'Equipment List','pre_test_line':'Pre Test','in_class_test_line':'In Class',
+			'post_test_line':'Post Test','show_do_line':'Show Do','alert_line':'Alerts','show_do_verification':'Verification Required'}
+		arr={}
+		for i in range(len(changes)):
+			if changes[i] in module_list:
+				arr[i] = module_list[changes[i]]
 
-        sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
-             'last_update':fields.date.today(),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
-        values.update({'history_line': sub_lines})
-        module_id = super(cs_module, self).write(cr, uid, ids,values, context=context)
-        return module_id
+		sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
+				'last_update':fields.date.today(),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
+		values.update({'history_line': sub_lines})
+		module_id = super(cs_module, self).write(cr, uid, ids,values, context=context)
+		return module_id
+		module_id = super(cs_module, self).write(cr, uid, ids,values, context=context)
+		return module_id
 
 #Calculates Module Attributes
     def _calculate_modalities_in_use(self, cr, uid, ids, field_names, args,  context=None):
@@ -1522,7 +2982,7 @@ class cs_module(osv.osv):
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.module_credit_value < 0:
                 return False
-        return True
+        return True	
 
 #Table For cs Modules		
     _name = "cs.module"
@@ -1532,15 +2992,15 @@ class cs_module(osv.osv):
 	   's_no': fields.integer('S.No',size=20),
        'name': fields.char('Module Name', size=128, required=True, select=True),
        'module_code': fields.char('Module Code', size=20),
-	   'module_crscode': fields.char('CRS Code', size=20),
+	   'module_crscode': fields.char('CRS Code', size=80),
 	   'module_certification': fields.char('Certification Achieved (if any)', size=100),
-	   'module_level': fields.selection((('L1','L1'),('L2','L2'),('L3','L3'),('L4','L4'),('L5','L5')),'Level'),
+	   'module_level': fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level'),
 	   'module_category': fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
 	   'module_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
-	   'module_credit_value': fields.integer('Credit Hours', size=4),
+	   'module_credit_value': fields.integer('Credits', size=4),
 	   'orientation': fields.selection((('Yes','Yes'),('No','No')),'Orientation'),
-	   'synopsis':fields.text('Synopsis', size=100),
-	   'outline':fields.text('Outline', size=100),
+	   'synopsis':fields.text('Synopsis', size=500),
+	   'outline':fields.text('Outline'),
 	   'module_duration': fields.float('Duration in hours', size=4),
 	   'module_fee': fields.float('Fee $',size=9),
 	   'module_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status', required=True, select=True),
@@ -1553,7 +3013,7 @@ class cs_module(osv.osv):
 	   'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet'),('Blended','Blended')),'Primary'),
 	   'modalities_in_use' : fields.function(_calculate_modalities_in_use, relation="cs.module",string='Modalities In Use',readonly=1,type='char',store=True),
 	   'max_num_ppl_class': fields.integer('Max Number of People in a Class', size=3),
-	   'room_arr': fields.selection((('Default','Default'),('Active','Active')),'Room Arrangment'),
+	   'room_arr': fields.selection((('Default','Default'),('Active','Active'),('Cluster','Cluster'),('U-Shape','U-Shape'),('Lecture','Lecture'),('Theater','Theater'),('Classroom','Classroom')),'Room Arrangment'),
 	   'pre_test': fields.boolean('Pre Test Required'),
 	   'in_class_test': fields.boolean('In Class Test Required'),
 	   'post_test': fields.boolean('Post Test Required'),
@@ -1600,8 +3060,11 @@ class cs_module(osv.osv):
 	   'limit': 5,
 	   'module_duration': 0.00,
 	   'orientation': 'No',
+	   'room_arr': 'Default',
+	   'module_status': 'Incomplete',
     }
     _order='name'
+
     _constraints = [(_check_unique_name, 'Error: Module Name Already Exists', ['Module Name']),(_check_unique_code, 'Error: Module Code Already Exists', ['Module Code']),(_check_neg_duration, 'Error: Duration Cannot be negative value', ['Duration']),(_check_neg_fee, 'Error: Fee Cannot be negative value', ['Fee']),(_check_neg_credit_value, 'Error: Credit Value Cannot be negative', ['Credit']),(_check_neg_no_ppl, 'Error: No. of People Cannot be negative value', ['People'])]
 
 cs_module()
@@ -1610,13 +3073,12 @@ cs_module()
 ###############
 class requirments(osv.osv):
 	def _check_unique_req(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.master_req == self_obj.master_req:
-						return False
-		return True
+		if dupliacte_req_found == True:
+			return False
+		elif dupliacte_req_found_create == True:
+			return False
+		else :
+			return True
 	def views(self,cr,uid,ids,context=None):
 		global globvar
 		globvar = 1
@@ -1664,7 +3126,7 @@ class requirments(osv.osv):
 	_columns = {
 	#'req_id':fields.integer('S.No',size=20),
 	'master_req':fields.many2one('master.req', 'Label', ondelete='cascade', help='Requirements', select=True,required=True),
-	'description':fields.char('Description',size=20),
+	'description':fields.text('Description',size=50),
 	'musthave':fields.boolean('Must Have'),
 	'verification':fields.boolean('Verification'),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
@@ -1691,7 +3153,7 @@ class master_req(osv.osv):
 	_description ="People and Facilites Tab"
 	_columns = {
 	'name':fields.char('Label',size=20,required=True),
-	'description':fields.char('Description',size=100),
+	'description':fields.text('Description',size=50),
 	'musthave':fields.boolean('Must Have'),
 	'verification':fields.boolean('Verification'),
 	}
@@ -1744,13 +3206,12 @@ master_tests()
 ###############
 class peoplefac(osv.osv):
 	def _check_unique_equp(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.equip_list == self_obj.equip_list:
-						return False
-		return True
+		if dupliacte_equip_found == True:
+			return False
+		elif dupliacte_equip_found_create == True:
+			return False
+		else :
+			return True
 	_name ='pf.module'
 	_description ="People and Facilites Tab"
 	_columns = {
@@ -1765,13 +3226,12 @@ peoplefac()
 ###############
 class pre_test(osv.osv):
 	def _check_unique_pre_test(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.test_list == self_obj.test_list:
-						return False
-		return True
+		if dupliacte_pretest_found == True:
+			return False
+		elif dupliacte_pretest_found_create == True:
+			return False
+		else :
+			return True
 	def unlink(self, cr, uid, ids, context=None):
 		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
 		test_checked =  self.pool.get('cs.module').browse(cr, uid, mod_id.id, context=context).pre_test
@@ -1782,13 +3242,12 @@ class pre_test(osv.osv):
 				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
 		return super(pre_test, self).unlink(cr, uid, ids, context=context)
 	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
-						return False
-		return True
+		if dupliacte_pretest_found == True:
+			return False
+		elif dupliacte_pretest_found_create == True:
+			return False
+		else :
+			return True
 		
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
@@ -1825,22 +3284,20 @@ class in_class_test(osv.osv):
 				raise osv.except_osv(_('Error!'),_("Atleast One In Class Test Required"))
 		return super(in_class_test, self).unlink(cr, uid, ids, context=context)
 	def _check_unique_in_class_test(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.test_list == self_obj.test_list:
-						return False
-		return True
+		if dupliacte_inclasstest_found == True:
+			return False
+		elif dupliacte_inclasstest_found_create == True:
+			return False
+		else :
+			return True
 
 	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
-						return False
-		return True
+		if dupliacte_inclasstest_found == True:
+			return False
+		elif dupliacte_inclasstest_found_create == True:
+			return False
+		else :
+			return True
 		
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
@@ -1875,22 +3332,20 @@ class post_test(osv.osv):
 				raise osv.except_osv(_('Error!'),_("Atleast One Post Test Required"))
 		return super(post_test, self).unlink(cr, uid, ids, context=context)
 	def _check_unique_post_test(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.test_list == self_obj.test_list:
-						return False
-		return True
+		if dupliacte_posttest_found == True:
+			return False
+		elif dupliacte_posttest_found_create == True:
+			return False
+		else :
+			return True
 		
 	def _check_unique_order(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
-						return False
-		return True
+		if dupliacte_posttest_found == True:
+			return False
+		elif dupliacte_posttest_found_create == True:
+			return False
+		else :
+			return True
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -1928,7 +3383,7 @@ class master_alerts(osv.osv):
 	_description ="People and Facilites Tab"
 	_columns = {
 	'name':fields.char('Test Descripton',size=20),
-	'time':fields.char('Time',size=3),
+	'time':fields.integer('Time',size=3),
 	'befor_after':fields.boolean('Before/After'),
 	'min_max':fields.boolean('Min/Max Value'),
 	'value_per':fields.integer('Value in %',size=3),
@@ -1994,9 +3449,9 @@ class alerts(osv.osv):
 	'alert_id' : fields.integer('Id',size=20), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
 	'alert_list':fields.many2one('master.module.alerts', 'Description', ondelete='cascade', help='Description', select=True,required=True),
-	'time':fields.float('Time',size=3),
-	'befor_after':fields.boolean('Before/After'),
-	'min_max':fields.boolean('Min/Max Value'),
+	'time':fields.integer('Days', size=3),
+	'befor_after':fields.selection((('Before','Before'),('After','After')),'Before/After'),
+	'min_max':fields.selection((('Min Value','Min Value'),('Max Value','Max Value')),'Min/Max Value'),
 	'value_per':fields.integer('Value in %',size=3),
 	'action':fields.char('Action',size=100),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module'),

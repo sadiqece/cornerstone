@@ -7,7 +7,23 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+global dupliacte_name_found
+dupliacte_name_found = False
+
+global dupliacte_code_found
+dupliacte_code_found = False
+
+global dupliacte_name_found_create
+dupliacte_name_found_create = False
+
+global dupliacte_code_found_create
+dupliacte_code_found_create = False
+
 class location(osv.osv):
+	#Sl No for List View
+	'''def create(self, cr, uid, vals, context=None):
+		vals['s_no'] = self.pool.get('ir.sequence').get(cr, uid, 'location')
+		return super(location, self).create(cr, uid, vals, context=context)'''
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
 		res = super(location, self).read(cr, uid,ids, fields, context, load)
@@ -57,9 +73,12 @@ class location(osv.osv):
 	def on_change_location_type(self, cr, uid, ids, location_type):
 		val = {}
 		val['location_type_permanent'] = False
-		val['location_type_temporary'] = False		
+		val['location_type_temporary'] = False
+		val['location_type_external'] = False		
 		if location_type == 'Permanent':
 			val['location_type_permanent'] = True
+		if location_type == 'External/3rd party':
+			val['location_type_external'] = True
 		elif location_type == 'Temporary':
 			val['location_type_temporary'] = True
 			
@@ -80,27 +99,234 @@ class location(osv.osv):
 			if self_obj.location_contact_no < 0:
 				return False
 		return True		
-
-
+		
+		
+# Room mandatory
+	def _make_mandatory1(self, cr, uid, ids, context=None):
+			pl = self.pool.get('room')
+			isFound = False
+			for progline in self.browse(cr, uid, ids, context=None):
+				if progline['location_type'] == 'Permanent':
+					for line in progline.location_room_line:
+						isFound = True
+					if isFound:
+						return True
+					else:
+						return False
+			return True 		
 		
 	_name = "location"
-	_description = "This table is for keeping location data"
+	_description = "Location Main Table"
 	_columns = {
 		's_no': fields.integer('S.No', size=100),
 		'location_id': fields.char('Id',size=20),
 		'name': fields.char('Location Name', size=100,required=True, select=True),
 		'location_code': fields.char('Location Code', size=20),
-		'location_type': fields.selection((('Permanent','Permanent'),('Temporary','Temporary')),'Type'),
+		'location_type': fields.selection((('Permanent','Permanent'),('Temporary','Temporary'),('External/3rd party','External/3rd party')),'Type',required=True),
 		'location_type_permanent': fields.boolean('Permanent'),
 		'location_type_temporary': fields.boolean('Temporary'),
+		'location_type_external': fields.boolean('External/3rd party'),
 		'location_address':fields.text('Location', size=150, select=True),
 		'location_postal_code':fields.integer('Postal Code', size=6, select=True),
 		'location_contact_no':fields.integer('Contact', size=9, select=True),
 		'location_room_line': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
 		'no_of_rooms': fields.function(_calculate_total_room, relation="room", readonly=1, string='Number of Rooms', type='integer'),
 	}
+	
+	def create(self,cr, uid, values, context=None):
+	
+		global dupliacte_name_found_create
+		dupliacte_name_found_create = False
+
+		global dupliacte_code_found_create
+		dupliacte_code_found_create = False
+		
+		if 'location_room_line' in values :
+			if values['location_room_line']  > 1:
+				ids_test_lear = self.pool.get('room').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('room').browse(cr,1,ids_test_lear):
+					if dd.location_id.id == True:
+						table_ids.append(dd.name)	
+				for x in values['location_room_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('room').browse(cr,uid,x[1])
+						deleted_ids.append(obj.name)
+					elif x[0] == 0 and 'name' in x[2]:
+						added_ids.append(x[2]['name'])
+						if x[2]['name'] in table_ids :
+							new_table_ids.append(dd.name)
+					elif x[0] == 1  and 'name' in x[2]:
+						updated_ids.append(x[2]['name'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_name_found_create
+					dupliacte_name_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_name_found_create
+							dupliacte_name_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_name_found_create
+						dupliacte_name_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_name_found_create
+							dupliacte_name_found_create = True
+							
+		if 'location_room_line' in values :
+			if values['location_room_line']  > 1:
+				ids_test_lear = self.pool.get('room').search(cr,1,[])
+				table_ids = []
+				new_table_ids = []
+				added_ids = []
+				deleted_ids =[]
+				updated_ids = []
+				for dd in self.pool.get('room').browse(cr,1,ids_test_lear):
+					if dd.location_id.id == True:
+						table_ids.append(dd.room_number)	
+				for x in values['location_room_line'] :
+					if x[0] == 2 and x[2] ==  False :
+						obj = self.pool.get('room').browse(cr,uid,x[1])
+						deleted_ids.append(obj.room_number)
+					elif x[0] == 0 and 'room_number' in x[2]:
+						added_ids.append(x[2]['room_number'])
+						if x[2]['room_number'] in table_ids :
+							new_table_ids.append(dd.room_number)
+					elif x[0] == 1  and 'room_number' in x[2]:
+						updated_ids.append(x[2]['room_number'])
+
+				if len(added_ids) - len(set(added_ids)) >  0 :
+					global dupliacte_code_found_create
+					dupliacte_code_found_create = True
+				else:
+
+					for c in added_ids :
+						if (c in new_table_ids and c not in deleted_ids) or (c in updated_ids):
+							global dupliacte_code_found_create
+							dupliacte_code_found_create = True
+
+					if len(updated_ids) - len(set(updated_ids)) >  0 :
+						global dupliacte_code_found_create
+						dupliacte_code_found_create = True
+					else :
+						found = 0
+						for u in updated_ids :
+							if u in new_table_ids and  u not in deleted_ids :
+								found = found +1
+						if found == 1 :
+							global dupliacte_code_found_create
+							dupliacte_code_found_create = True
+	
+	
+		module_id = super(location, self).create(cr, uid, values, context=context)
+		return module_id
+	
+	def write(self,cr, uid, ids, values, context=None):
+	
+		global dupliacte_name_found
+		dupliacte_name_found = False
+
+		global dupliacte_code_found
+		dupliacte_code_found = False
+	
+		if 'location_room_line' in values :
+				if values['location_room_line']  > 1:
+					ids_test_lear = self.pool.get('room').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('room').browse(cr,1,ids_test_lear):
+						if dd.location_id.id == ids[0]:
+							table_ids.append(dd.name)
+					for x in values['location_room_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('room').browse(cr,uid,x[1])
+							deleted_ids.append(obj.name)
+						elif x[0] == 0 and 'name' in x[2]:
+							added_ids.append(x[2]['name'])
+						elif x[0] == 1  and 'name' in x[2]:
+							updated_ids.append(x[2]['name'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_name_found
+						dupliacte_name_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_name_found
+								dupliacte_name_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_name_found
+							dupliacte_name_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_name_found
+								dupliacte_name_found = True
+		if 'location_room_line' in values :
+				if values['location_room_line']  > 1:
+					ids_test_lear = self.pool.get('room').search(cr,1,[])
+					table_ids = [] 
+					added_ids = []
+					deleted_ids =[]
+					updated_ids = []
+					for dd in self.pool.get('room').browse(cr,1,ids_test_lear):
+						if dd.location_id.id == ids[0]:
+							table_ids.append(dd.room_number)
+					for x in values['location_room_line'] :
+						if x[0] == 2 and x[2] ==  False :
+							obj = self.pool.get('room').browse(cr,uid,x[1])
+							deleted_ids.append(obj.room_number)
+						elif x[0] == 0 and 'room_number' in x[2]:
+							added_ids.append(x[2]['room_number'])
+						elif x[0] == 1  and 'room_number' in x[2]:
+							updated_ids.append(x[2]['room_number'])
+					'''create check'''		
+					if len(added_ids) - len(set(added_ids)) >  0 :
+						global dupliacte_code_found
+						dupliacte_code_found = True
+					else:
+						'''check create in table'''
+						for c in added_ids :
+							if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
+								global dupliacte_code_found
+								dupliacte_code_found = True
+						'''check for update ids '''
+						if len(updated_ids) - len(set(updated_ids)) >  0 :
+							global dupliacte_code_found
+							dupliacte_code_found = True
+						else :
+							found = 0
+							for u in updated_ids :
+								if u in table_ids and  u not in deleted_ids :
+									found = found +1
+							if found == 1 :
+								global dupliacte_code_found
+								dupliacte_code_found = True
+								
+		module_id = super(location, self).write(cr, uid, ids,values, context=context)
+		return module_id
+	
 	_constraints = [(_check_postal_code, 'Error: Postal Code Cannot be Negative value', ['Postal Code']),(_check_contact_no, 'Error: Contact No Cannot be Negative value', ['Contact no.']),
-	(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
+	(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_make_mandatory1, 'Error: Create Atleast One Room', ['room']), (_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
 location() 
 
 
@@ -116,22 +342,20 @@ class room(osv.osv):
 		return res
 		
 	def _check_unique_room_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.location_id == self_obj.location_id and x.name == self_obj.name:
-						return False
-		return True
+		if dupliacte_name_found == True:
+			return False
+		elif dupliacte_name_found_create == True:
+			return False
+		else :
+			return True
 		
 	def _check_unique_room_code(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.location_id == self_obj.location_id and x.room_number == self_obj.room_number:
-						return False
-		return True
+		if dupliacte_code_found == True:
+			return False
+		elif dupliacte_code_found_create == True:
+			return False
+		else :
+			return True
 		
 	def on_change_location_id(self, cr, uid, ids, location_id):
 		location_obj = self.pool.get('location').browse(cr, uid, location_id)
@@ -172,7 +396,7 @@ class room(osv.osv):
 		's_no': fields.integer('S.No', size=100),
 		'room_id': fields.integer('Id',size=20),
 		'name': fields.char('Room Name', size=100,required=True, select=True),
-		'room_number': fields.char('Room Number', size=20),
+		'room_number': fields.char('Room Number', size=20, required=True),
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, readonly=1),
 		'location_name': fields.function(_load_loc_line, relation="location_room_line",readonly=1,type='one2many', string='Module'),
 		'room_setup':fields.selection((('Cluster','Cluster'),('Class Room','Class Room'),('Theater','Theater'),('Test Only Room','Test Only Room')),'Setup', required=True),
