@@ -46,7 +46,7 @@
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">learner.info</field>
       <field name="view_type">form</field>
-	  <field name="view_id" ref="enroll_form"/>
+	  <field name="view_id" ref="enroll_tree"/>
       <field name="view_mode">tree,form</field>
       <field name="search_view_id" ref="view_enrollment_filter" />
     </record>
@@ -470,7 +470,7 @@
 				  <label string="Select Date" />
                     <field name="sch_date" on_change="onchange_populate_schedule2(select_center, select_module2, sch_date)" options="{'create': False, 'create_edit': False}"/>
 					<field name="sch_date2" invisible="1"/>
-					<field name="t_status" invisible="1"/>
+					<!--field name="t_status" invisible="1"/-->
 					
 				  <group>
 				  </group>
