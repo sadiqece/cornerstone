@@ -18,10 +18,14 @@
                             <h2 style="width:280px;">
                                 <field name = "business_code"/>
                             </h2>
-							<label for="bussiness_id" class="oe_edit_only"/>
-                            <h2 style="width:250px;">
-                                <field name = "bussiness_id" options="{'create': False, 'create_edit': False}"/>
-                            </h2>
+							<div class="col-2" >
+								<label for = "bussiness_id" />
+								<field name = "bussiness_id" />
+							</div>
+							<div class="col-2">
+								<label for = "segment_code" />
+								<field name = "segment_code" />
+							</div>
 						</div>
 		       </group>
 			   <group col="4">
@@ -94,7 +98,6 @@
               </p>
             </field>
         </record>
-
 
 <menuitem name = "Business Structure" id = "business" parent = "menu_sub2" action = "action_business" />
 

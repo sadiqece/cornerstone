@@ -35,19 +35,19 @@
 						</div>
 		       </group>
 				<group style="width:280px;">
-					<field name='location_type' attrs="{'readonly':[('location_type','!=',False)]}" on_change="on_change_location_type(location_type)"/> 
+					<field name='location_type' on_change="on_change_location_type(location_type)"/> 
 				</group>
 				<group>
 			 		<div>	
-						<group attrs="{'invisible': [('location_type_temporary', '=' , True)]}">
+						<group attrs="{'invisible': [('location_type_temporary', '=' , True) or ('location_type_external', '=' , True)]}">
 							<field name='location_type_permanent' invisible="1"/>
 						</group>
 					
-						<group attrs="{'invisible': [('location_type_permanent', '=' , True)]}">
+						<group attrs="{'invisible': [('location_type_permanent', '=' , True) or ('location_type_external', '=' , True)]}">
 							<field name='location_type_temporary' invisible="1"/>
 						</group>
 						
-						<group attrs="{'invisible': [('location_type_permanent', '=' , True)]}">
+						<group attrs="{'invisible': [('location_type_temporary', '=' , True) or ('location_type_permanent', '=' , True)]}">
 							<field name='location_type_external' invisible="1"/>
 						</group>
 					</div>
@@ -57,6 +57,36 @@
 					<field name = "location_postal_code"/>
 					<field name = "location_contact_no" />
 		        </group>
+				<div attrs="{'invisible': [('location_type_temporary', '=' , False)]}">
+				<notebook colspan="5" col="10">
+                    <page string="Rooms">
+					<field name='location_room_line_two' nolabel='1'>
+						<tree string="Room Lines" nolabel='1'  >
+							<field name = "s_no"/>
+							<field name = "name" string="Rooms"/> 
+							<field name = "room_floor_area" string="Size(SqM)" />
+							<field name = "room_max_cap" string="Max Capacity" />
+							<field name = "room_setup" string="Default Setup"/>
+						</tree>				
+					</field>
+					</page>
+                </notebook>
+				</div>
+				<div attrs="{'invisible': [('location_type_external', '=' , False)]}">
+				<notebook colspan="5" col="10">
+                    <page string="Rooms">
+					<field name='location_room_line_one' nolabel='1'>
+						<tree string="Room Lines" nolabel='1'  >
+							<field name = "s_no"/>
+							<field name = "name" string="Rooms"/> 
+							<field name = "room_floor_area" string="Size(SqM)" />
+							<field name = "room_max_cap" string="Max Capacity" />
+							<field name = "room_setup" string="Default Setup"/>
+						</tree>				
+					</field>
+					</page>
+                </notebook>
+				</div>
 				<div attrs="{'invisible': [('location_type_permanent', '=' , False)]}">
 				<notebook colspan="5" col="10">
                     <page string="Rooms">
@@ -67,7 +97,6 @@
 							<field name = "room_floor_area" string="Size(SqM)" />
 							<field name = "room_max_cap" string="Max Capacity" />
 							<field name = "room_setup" string="Default Setup"/>
-						<!--	<button name="views" string="View Room" icon="view_room" type="object"/>  -->
 						</tree>				
 					</field>
 					</page>
@@ -83,13 +112,13 @@
             <field name="model">location</field>
             <field name="arch" type="xml">
                 <tree string="Location">
-					<field name='location_type_temporary' invisible="1"/>
+					<!--field name='location_type_temporary' invisible="1"/-->
 					<field name = "s_no"/>
 					<field name = "name"/>
 					<field name = "location_code"/>
 					<field name = "location_type"/>
 					<field name = "location_contact_no"/>
-					<field name = "no_of_rooms" attrs="{'invisible': [('location_type_temporary', '=' , True)]}"/>
+					<field name = "no_of_rooms"/>
 		        </tree>
             </field>
         </record>
@@ -190,8 +219,6 @@
             </field>
         </record>
 	
-
-
 		<record model="ir.actions.act_window" id="action_room">   <!-- <record model="ir.actions.act_window" id="action_room">  -->
             <field name="name">Room</field>
 			<field name="type">ir.actions.act_window</field>
@@ -206,7 +233,6 @@
               </p>
             </field>
         </record>
-
 
 <menuitem name = "Location" id = "location" parent = "menu_sub2" action = "action_location" />
 

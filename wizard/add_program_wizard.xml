@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+	<record model="ir.actions.act_window" id="wizard_with_step_form">
+		<field name="name">wizard.with.step.form</field>
+		<field name="model">wizard.with.step</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+			  <form string="Wizard with step" version="7.0">
+				   <field invisible="1" name="state" />             
+
+					  <group states="step1">
+					  <field name="name1" />                
+					  </group>
+
+					  <group states="step2">
+					  <field name="name2" />                
+					  </group>
+
+					  <footer states="step1">
+						<button name="action_next" string="Next" type="object" />
+					  </footer>
+
+					  <footer states="step2">
+						<button name="action_previous" string="Previous" type="object" />
+					  </footer>
+			  </form>
+		</field>
+	</record>
+	
+	<record id="wizard_with_step_form" model="ir.actions.act_window">
+		<field name="name">wizard_with_step</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">wizard.with.step</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">form</field>
+		<field name="target">new</field>
+		<field name="key2">field_id</field>
+	</record>
+	
+</data>
+</openerp>

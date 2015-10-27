@@ -45,8 +45,6 @@ class location(osv.osv):
 			res[line.id] = total_mod
 				
 		return res
-		
-		
 
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -106,7 +104,7 @@ class location(osv.osv):
 			pl = self.pool.get('room')
 			isFound = False
 			for progline in self.browse(cr, uid, ids, context=None):
-				if progline['location_type'] == 'Permanent':
+				if progline['location_type'] == 'Permanent' or 'External/3rd party' or 'Temporary':
 					for line in progline.location_room_line:
 						isFound = True
 					if isFound:
@@ -130,6 +128,8 @@ class location(osv.osv):
 		'location_postal_code':fields.integer('Postal Code', size=6, select=True),
 		'location_contact_no':fields.integer('Contact', size=9, select=True),
 		'location_room_line': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
+		'location_room_line_one': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
+		'location_room_line_two': fields.one2many('room', 'location_id', 'Room Lines', select=True, required=True),
 		'no_of_rooms': fields.function(_calculate_total_room, relation="room", readonly=1, string='Number of Rooms', type='integer'),
 	}
 	
@@ -326,7 +326,7 @@ class location(osv.osv):
 		return module_id
 	
 	_constraints = [(_check_postal_code, 'Error: Postal Code Cannot be Negative value', ['Postal Code']),(_check_contact_no, 'Error: Contact No Cannot be Negative value', ['Contact no.']),
-	(_check_unique_name, 'Error: Location Name Already Exists', ['name']),(_make_mandatory1, 'Error: Create Atleast One Room', ['room']), (_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
+	(_check_unique_name, 'Error: Location Name Already Exists', ['name']), (_check_unique_code, 'Error: Location Code Already Exists', ['Location Code'])]
 location() 
 
 
@@ -530,7 +530,6 @@ class equip(osv.osv):
 		
 		return res
 		
-
 	'''def _check_unique_equp(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):

@@ -219,91 +219,94 @@ class holiday_line(osv.osv):
 
 #Validate Date For Past		
 	def months_between1(self, date1, date2):
-		#current_date = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT),
-		#print "\n\n====current_date===", current_date
-		#date11 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
-		#date12 = datetime.strptime(date2, '%Y-%m-%d')
 		r = relativedelta.relativedelta(date1, date2)
 		return r.days
 		
 	def months_between2(self, date1, date2):
-		date11 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
-		date12 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S')
+		date11 = datetime.strptime(date1, '%d-%m-%Y %H:%M:%S')
+		date12 = datetime.strptime(date2, '%d-%m-%Y %H:%M:%S')
 		r = relativedelta.relativedelta(date12, date11)
 		return r.days
 
 #Validate Start Date: Past Date and Year Match
 	def onchange_start_date_past(self, cr, uid, ids, start_date, eofdate, year2, context=None):
 		res = {'value':{}}
-			
-		chng_year = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-		today = time.strftime('%Y-%m-%d %H:%M:%S')
-		current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')
-		if chng_year.year and year2:
-			if str(chng_year.year) != str(year2):
-				res['value']['date_start'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
-				return res
-			d = self.months_between1(chng_year, current_date) 
-			if d < 0:
-				res['value']['date_start'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
-				return res
-			'''elif eofdate and start_date:
-				c = self.months_between2(str(start_date), str(eofdate))
-				#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s')%(c))
-				if c < 0:
-					res['value']['date_start'] = ''
-					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date.')}})
-					return res'''
-			return start_date
-		else:
-			return False
+		chng_year = False
+		if start_date:		
+			chng_year = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+			user = self.pool.get('res.users').browse(cr, uid, uid)
+			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+			ran = pytz.utc.localize(chng_year).astimezone(tz)
+			_logger.info("Ran Value %s",ran)
+			today = time.strftime('%d-%m-%Y %H:%M:%S')
+			current_date = datetime.strptime(today, '%d-%m-%Y %H:%M:%S')
+			if ran.year and year2:
+				_logger.info("Change Year %s",ran)
+				if str(ran.year) != str(year2):
+					_logger.info("Year2 %s",year2)
+					#res['value']['date_start'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year ' + str(year2))}})
+					return res
+				d = self.months_between1(chng_year, current_date) 
+				if d < 0:
+					#res['value']['date_start'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed. Date selected is ' + str(start_date))}})
+					return res
+				return start_date
+			else:
+				return False
+		raise osv.except_osv(_('Warning!'),_('Please Enter Start Date')%())
 
 			
 #Validate End Date : Past Date and Year Match
 	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year2, context=None):
 		res = {'value':{}}
-		#chng_year = datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
-		chng_year = datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
-		today = time.strftime('%Y-%m-%d %H:%M:%S')
-		current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')				
-		if not start_date and eofdate:
-			res['value']['date_end'] = ''
-			res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter start date first.')}})
-			return res
+		chng_year = False
+		if eofdate:
+			chng_year = datetime.strptime(eofdate, "%Y-%m-%d %H:%M:%S")
+			user = self.pool.get('res.users').browse(cr, uid, uid)
+			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+			ran = pytz.utc.localize(chng_year).astimezone(tz)
+			today = time.strftime('%Y-%m-%d %H:%M:%S')
+			current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')				
+			if not start_date and eofdate:
+				#res['value']['date_end'] = ''
+				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter start date first.')}})
+				return res
 
-		if chng_year.year and year2:
-			if str(chng_year.year) != str(year2):
-				res['value']['date_end'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year.')}})
-				return res
-			
-			#d = self.months_between1(eofdate, str(datetime.now().date()))
-			d = self.months_between1(chng_year, current_date) 
-			#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s %s')%(d, eofdate))
-			if d < 0:
-				res['value']['date_end'] = ''
-				res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed.')}})
-				return res
-			'''elif eofdate and start_date:
-				c = self.months_between2(str(eofdate), str(start_date))
-				d = self.months_between1(start_date, str(datetime.now().date())) 
-				if c < 0:
-					res['value']['date_end'] = ''
-					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
-					return res'''
-			return eofdate
-		else:
-			return False	
+			if ran.year and year2:
+				if str(ran.year) != str(year2):
+					#res['value']['date_end'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year ' + str(year2))}})
+					return res
+				
+				#d = self.months_between1(eofdate, str(datetime.now().date()))
+				d = self.months_between1(chng_year, current_date) 
+				#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s %s')%(d, eofdate))
+				if d < 0:
+					#res['value']['date_end'] = ''
+					res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed. Date selected is ' + str(start_date))}})
+					return res
+				'''elif eofdate and start_date:
+					c = self.months_between2(str(eofdate), str(start_date))
+					d = self.months_between1(start_date, str(datetime.now().date())) 
+					if c < 0:
+						res['value']['date_end'] = ''
+						res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
+						return res'''
+				return eofdate
+			else:
+				return False
+		raise osv.except_osv(_('Warning!'),_('Please Enter End Date')%())
 		
 
 #Validate Start/End Date	
 	def _date_start_end_validate(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
+			xcv = self_obj['description']
 			if self_obj.date_start >= self_obj.date_end:
-				return False
+				raise osv.except_osv(_('Error:'),_('Entered Invalid Date or Time in: %s')%(xcv))
 		return True
 
 #Validate Unique Name	
@@ -398,5 +401,5 @@ class holiday_line(osv.osv):
 		'date_end': fields.datetime('Date End', required=True),
 		'holiday_line_id': fields.many2one('holiday', 'Holidays', ondelete='cascade', help='Holiday', select=True),
 	}
-	_constraints = [(_check_unique_start_date, 'Error: Start Date Already Exists', ['Start Date']),(_check_unique_end_date, 'Error: End Date Already Exists', ['End Date']),(_check_unique_name, 'Error: Description Already Exists', ['Description']),(_date_start_end_validate, 'Error: Invalid Date', ['Date'])]
+	_constraints = [(_check_unique_start_date, 'Error: Start Date Already Exists', ['Start Date']),(_check_unique_end_date, 'Error: End Date Already Exists', ['End Date']),(_check_unique_name, 'Error: Description Already Exists', ['Description']),(_date_start_end_validate, 'Error!:Entered Invalid Date or Time', ['date_start','date_end'])]
 holiday_line
