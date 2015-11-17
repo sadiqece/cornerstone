@@ -19,23 +19,8 @@
 #
 ##############################################################################
 
-import cornerstone
-import location
-import test
-import asset
-import holiday_closure
-import business_structure
-import commisions
-import class_info
-import test_scheduling
-import content_index_learner
-import learner
-import class_status_dashboard
-import trainer_enrollment
-import client
-#import user_profile
-import reports
-#import wizard
-
+import request_payment
+import purchase_report
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+

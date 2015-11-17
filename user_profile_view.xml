@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+  
+	<!-- ===================== Create User List View ============================= -->
+  
+	<record id="create_user_tree" model="ir.ui.view">
+      <field name="name">Users</field>
+      <field name="model">manage.users</field>
+      <field name="arch" type="xml">
+        <tree string="Users">
+          <field name="name" />
+          <field name="login_name" />
+		  <field name="active" />
+        </tree>
+      </field>
+    </record>
+
+	<!-- ========================= Create Users ============================= -->
+	<record id="create_user_form" model="ir.ui.view">
+      <field name="name">Create Users</field>
+      <field name="model">manage.users</field>
+      <field name="arch" type="xml">
+        <form string="User" version="7.0">
+          <sheet>
+			<!-- <field name="image_medium" widget="image"  /> -->
+              <div class="oe_title">
+                <label for="name" class="oe_edit_only"/>
+                <h1 style="width:380px;">
+                  <field name="name" />
+                </h1>
+              </div>
+			  
+			  <group style="width:280px;">
+                  <field name="login_name" />
+			   </group>
+			   
+			   <group style="width:280px;">
+                  <field name="password" />
+			   </group>
+			   
+			   <group style="width:280px;">
+                  <field name="active" />
+			   </group>
+		  </sheet>
+		</form>
+	  </field>
+	</record>
+  
+	<!-- ===================== User Management List View ============================= -->
+  
+	<record id="user_panel_tree" model="ir.ui.view">
+      <field name="name">User Access Rights</field>
+      <field name="model">user.manage</field>
+      <field name="arch" type="xml">
+        <tree string="Users">
+          <field name="user_group" />
+          <field name="users" />
+        </tree>
+      </field>
+    </record>
+  
+  
+	<!-- ========================= User Management Form View ============================= -->
+	<record id="user_panel_form" model="ir.ui.view">
+      <field name="name">Settings</field>
+      <field name="model">user.manage</field>
+      <field name="arch" type="xml">
+        <form string="User" version="7.0" create="false" delete="false">
+          <sheet>
+			<div class="col-2">
+			  <group>
+				<field name="user_group" style="width:250px;" />
+			  </group>
+			</div>
+			<div class="col-2">
+			  <group>
+				<field name="users" style="width:250px;" options="{'create': False, 'create_edit': False}"/>
+			  </group>
+			</div>
+			<!--div attrs="{'invisible': [('users', '=' , False)]}"-->
+			<notebook colspan="5" col="10">
+			
+			   <page string="Access Rights">
+                <field name="user_line" nolabel="1">
+                  <tree string="List" editable="bottom">
+					<!--field name='module_list' /-->
+					<field name="id" />
+					<field name="name" />
+					<field name="model_id:id" />
+					<field name="group_id:id" />
+                    <field name="perm_read" />
+                    <field name="perm_write" />
+                    <field name="perm_create" />
+                    <field name="perm_unlink" />
+                  </tree>
+                </field>
+				<!--field name="model_access">
+					<tree string="Access Rules" editable="top">
+						<field name="name"/>
+						<field name="model_id"/>
+						<field name="group_id"/>
+						<field name="perm_read"/>
+						<field name="perm_write"/>
+						<field name="perm_create"/>
+						<field name="perm_unlink"/>
+					</tree>
+				</field-->
+              </page>
+			
+			</notebook>
+			<!--/div-->
+			
+		  </sheet>
+		</form>
+	  </field>
+	</record>
+  
+	<!-- ========================= Action Tabs ============================= -->
+	
+	<!-- Create Users -->
+	<record model="ir.actions.act_window" id="create_users">
+      <field name="name">User Groups</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">manage.users</field>
+      <field name="view_type">form</field>
+      <field name="limit">12</field>
+      <field name="view_mode">tree,form</field>
+	   <field name="view_id" ref="create_user_tree" />
+      <field name="search_view_id" ref="view_settings_filter" />
+		<field name="help" type="html">
+		<p class="oe_view_nocontent_create">
+			Click to create a user.
+		</p>
+		</field>
+    </record>
+
+	<!-- Access Rights --> 
+	<record model="ir.actions.act_window" id="access_rights">
+      <field name="name">User Groups</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">user.manage</field>
+      <field name="view_type">form</field>
+      <field name="limit">12</field>
+      <field name="view_mode">tree,form</field>
+	   <field name="view_id" ref="user_panel_tree" />
+      <field name="search_view_id" ref="view_settings_filter" />
+		<field name="help" type="html">
+		<p class="oe_view_nocontent_create">
+			Click to define user access rights.
+		</p>
+		</field>
+    </record>
+  
+  
+    <menuitem name="User Profile" id="menu_user_profile" parent="menu_lis_lab" />
+     <!--menuitem name="Manage User Groups" id="user_groups" parent="menu_user_profile" action="create_groups" /-->
+	 <menuitem name="Manage Users " id="manage_users" parent="menu_user_profile" action="create_users" />
+	 <menuitem name="Manage Access Rights" id="manage_access_rights" parent="menu_user_profile" action="access_rights"/>
+  </data>
+</openerp>

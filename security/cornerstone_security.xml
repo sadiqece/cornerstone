@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+
+<!-- ==================================== Admins ======================================= -->
+
+<record model="ir.module.category" id="module_category_name_test">
+    <field name="name">C-Stone Admin</field> 
+    <field name="sequence">7</field>
+</record>
+
+<record id="group_name_test_user" model="res.groups">
+    <field name="name" >Program</field>
+</record>
+
+<record id="group_name_module" model="res.groups">
+    <field name="name">Module</field>
+</record>
+
+<record id="group_name_location" model="res.groups">
+    <field name="name">Location</field>
+</record>
+
+<record id="group_name_test" model="res.groups">
+    <field name="name">Test</field>
+</record>
+
+<record id="group_name_asset" model="res.groups">
+    <field name="name">Asset</field>
+</record>
+
+<record id="group_name_holiday_closures" model="res.groups">
+    <field name="name">Holiday and Closure</field>
+</record>
+
+<record id="group_name_business_structure" model="res.groups">
+    <field name="name">Business Structure</field>
+</record>
+
+<record id="group_name_commissions" model="res.groups">
+    <field name="name">Commissions</field>
+</record>
+
+<record id="group_name_class_calendar" model="res.groups">
+    <field name="name">Class Calendar</field>
+</record>
+
+<record id="group_name_test_calendar" model="res.groups">
+    <field name="name">Test Calendar</field>
+</record>
+
+<record id="group_name_learner_enrollment" model="res.groups">
+    <field name="name">Learner Enrollment</field>
+</record>
+
+<record id="group_name_client_enrollment" model="res.groups">
+    <field name="name">Client Enrollment</field>
+</record>
+
+<record id="group_name_trainer_enrollment" model="res.groups">
+    <field name="name">Trainer Enrollment</field>
+</record>
+
+<record id="group_name_assignment_schedule" model="res.groups">
+    <field name="name">Assignment Schedule</field>
+</record>
+
+<record id="group_name_test_manager" model="res.groups">
+    <field name="name">Settings</field>
+    <!--field name="category_id" ref="module_category_name_test"/>
+    <field name="implied_ids" eval="[(4, ref('group_name_test_user'))]"/>
+    <field name="users" eval="[(4, ref('base.user_root'))]"/-->
+</record>
+
+<!-- ==================================== Users ======================================= -->
+
+<record model="ir.module.category" id="module_category_name_test_user">
+    <field name="name">C-Stone User</field> 
+    <field name="sequence">7</field>
+</record>
+
+<record id="group_name_program_user" model="res.groups">
+    <field name="name" >Program</field>
+</record>
+
+<record id="group_name_module_user" model="res.groups">
+    <field name="name">Module</field>
+</record>
+
+<record id="group_name_location_user" model="res.groups">
+    <field name="name">Location</field>
+</record>
+
+<record id="group_name_test_user_user" model="res.groups">
+    <field name="name">Test</field>
+</record>
+
+<record id="group_name_asset_user" model="res.groups">
+    <field name="name">Asset</field>
+</record>
+
+<record id="group_name_holiday_closures_user" model="res.groups">
+    <field name="name">Holiday and Closure</field>
+</record>
+
+<record id="group_name_business_structure_user" model="res.groups">
+    <field name="name">Business Structure</field>
+</record>
+
+<record id="group_name_commissions_user" model="res.groups">
+    <field name="name">Commissions</field>
+</record>
+
+<record id="group_name_class_calendar_user" model="res.groups">
+    <field name="name">Class Calendar</field>
+</record>
+
+<record id="group_name_test_calendar_user" model="res.groups">
+    <field name="name">Test Calendar</field>
+</record>
+
+<record id="group_name_learner_enrollment_user" model="res.groups">
+    <field name="name">Learner Enrollment</field>
+</record>
+
+<record id="group_name_client_enrollment_user" model="res.groups">
+    <field name="name">Client Enrollment</field>
+</record>
+
+<record id="group_name_trainer_enrollment_user" model="res.groups">
+    <field name="name">Trainer Enrollment</field>
+</record>
+
+<record id="group_name_assignment_schedule_user" model="res.groups">
+    <field name="name">Assignment Schedule</field>
+</record>
+
+<record id="group_name_test_manager_user" model="res.groups">
+    <field name="name">Settings</field>
+</record>
+
+<!-- ================================= Sales ========================================== -->
+
+<record model="ir.module.category" id="module_category_name_test_sales">
+    <field name="name">C-Stone Sales</field> 
+    <field name="sequence">7</field>
+</record>
+
+<record id="group_name_program_sales" model="res.groups">
+    <field name="name" >Program</field>
+</record>
+
+<record id="group_name_module_sales" model="res.groups">
+    <field name="name">Module</field>
+</record>
+
+<record id="group_name_class_calendar_sales" model="res.groups">
+    <field name="name">Class Calendar</field>
+</record>
+
+<record id="group_name_test_calendar_sales" model="res.groups">
+    <field name="name">Test Calendar</field>
+</record>
+
+<record id="group_name_learner_enrollment_sales" model="res.groups">
+    <field name="name">Learner Enrollment</field>
+</record>
+
+
+    </data>
+</openerp>
+

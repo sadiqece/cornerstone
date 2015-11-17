@@ -500,7 +500,8 @@ class test_modality(osv.osv):
 	_description ="Trainer Learner Tab"
 	_columns = {
 	'test_modality_id' :  fields.many2one('test.info', 'Test', ondelete='cascade', help='Test', select=True),
-	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),	'm_active':fields.boolean('Active'),
+	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),	
+	'm_active':fields.boolean('Active'),
 
 	}
 	_constraints = [(_check_unique_test_modality, 'Error: Item Already Exists', ['master_modality'])]
@@ -643,7 +644,16 @@ class test_learner(osv.osv):
 			scores_obj = self.pool.get('test.scores')
 			scores_obj_id = scores_obj.search(cr,uid,[('learner_id','=',learner_obj['learner_id'].id)])
 			scores_obj.write(cr,uid,scores_obj_id,values)
+		#Masih
+		test_id = values['learner_mod_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		ed = class_info_obj_id.test_def_id.id
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.test_status
+		cc = class_info_obj_id.test_code
 		id = super(test_learner, self).write(cr, uid, ids,values, context=context)
+		self._test_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		return id
 
 	def unlink(self, cr, uid, ids, context=None):

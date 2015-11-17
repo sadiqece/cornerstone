@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report auto="False" id="report_print_payment" model="learner.info" 
+                name="print.payment" rml="cornerstone/report/request_payment.rml"
+                string="Request for Payment"/>
+    </data>
+</openerp>

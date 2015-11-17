@@ -7,7 +7,6 @@ from lxml import etree
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
-from datetime import datetime
 import re
 
 _logger = logging.getLogger(__name__)
@@ -48,16 +47,17 @@ class test(osv.osv):
 		
 	def create(self,cr, uid, values, context=None):
 		sub_lines = []
+		today = datetime.date.today()
 		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
-		sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
-			'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
+		sub_lines.append( (0,0, {'date_created':today.strftime('%d-%m-%Y'),'created_by':current_user['name'],
+			'last_update':'-','last_update_by':'-','date_status_change':today.strftime('%d-%m-%Y'),'status_change_by':current_user['name']}) )
 		values.update({'history_line': sub_lines})
 		name = super(test, self).create(cr, uid, values, context=context)
 		return name
 		
 	def write(self,cr, uid, ids, values, context=None):
 		sub_lines = []
-		
+
 		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
 		for line in self.browse(cr, uid, ids, context=context):
 			history_line_id = self.browse(cr, uid, ids[0], context=context).history_line or []
@@ -71,15 +71,14 @@ class test(osv.osv):
 			staus_changed_by  = current_user['name']
 
 		changes = values.keys()
-		test_list ={'name': 'Test Name','test_code': 'Test Code','test_fee':'Test Fee','test_max_Pax':'Max Pppl',
-				'test_status': 'Status','test_description': 'Description','modality_line':'Modalities','history_line': 'History', 'delivery_mode': 'Delivery Mode' }
+		test_list ={'name': 'Test Name','test_code': 'Test Code','modality_line':'Modalities','history_line': 'History', 'delivery_mode': 'Delivery Mode' }
 		arr={}
 		for i in range(len(changes)):
 			if changes[i] in test_list:
 				arr[i] = test_list[changes[i]]
-  
+		today = datetime.date.today()  
 		sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
-			'last_update':fields.date.today(),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
+			'last_update':today.strftime('%d-%m-%Y'),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
 		values.update({'history_line': sub_lines})
 		name = super(test, self).write(cr, uid, ids,values, context=context)
 		return name
@@ -149,27 +148,26 @@ class test(osv.osv):
 		's_no': fields.integer('S.No',size=3),
 		'name': fields.char('Test Name', size=100,required=True, select=True),
 		'test_code': fields.char('Test Code', size=20),
-		'test_fee': fields.float('Test Fee', size=6),
-		'test_max_Pax':fields.integer('Max Pppl', size=4),
+		#'test_fee': fields.float('Test Fee', size=6),
+		#'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
-		'test_description': fields.text('Description'),
+		#'test_description': fields.text('Description'),
 		#'test_modules': fields.many2one('test.module.line', ondelete='cascade', help='Module', select=True, required=True),
 		#'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
+		#'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
-		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
+		#'delivery_mode': fields.selection((('English','English'),('Mandarin','Mandarin'),('Bilingual','Bilingual'),('Malay','Malay'),('Others','Others')),'Delivery Mode'),
 		'test_type': fields.char('Test Type'),
 		'modules_applied': fields.function(_modules_applied, 'Modules Applied', type="one2many"),
 	}
 	_defaults = {
 		'test_status': 'Active'
 	}
-	_constraints = [(_check_test_fee, 'Error: Test Fee Cannot be Negative', ['Test Fee']),(_check_test_max_Pax, 'Error: Max Pppl Cannot be Negative', ['Max People']),
-	(_check_unique_name, 'Error: Test Name Already Exists', ['Name']),(_check_unique_code, 'Error: Test Code Already Exists', ['Test Code'])]
+	_constraints = [(_check_unique_name, 'Error: Test Name Already Exists', ['Name']),(_check_unique_code, 'Error: Test Code Already Exists', ['Test Code'])]
 test()
 
-class test_mod_line(osv.osv):
+'''class test_mod_line(osv.osv):
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
@@ -235,7 +233,7 @@ class test_mod_line(osv.osv):
 		'context': ctx,
 		}
 	
-test_mod_line()
+test_mod_line()'''
 
 
 class modalities(osv.osv):
@@ -249,19 +247,19 @@ class modalities(osv.osv):
 		
 		return res
 		
-	def _check_level(self, cr, uid, ids, context=None):
+	'''def _check_level(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.level < 0:
 				return False
-		return True		
+		return True	'''	
 		
 	def _check_unique_test(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.modality_id == self_obj.modality_id and x.modal_list == self_obj.modal_list:
+					if x.modality_id == self_obj.modality_id and x.modality == self_obj.modality:
 						return False
 		return True
 		
@@ -270,14 +268,15 @@ class modalities(osv.osv):
 	_columns = {
 	'modality_id' : fields.integer('Id',size=20), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'modal_list':fields.many2one('master.modalities', 'Test Modality', ondelete='cascade', help='Description', select=True,required=True),
-	'level':fields.integer('Minimum Level',size=3),
+	'modality':fields.many2one('master.modality', 'Test Modality', ondelete='cascade', help='Description', required=True),
+	'cost': fields.float('Cost($)', size=7),
+	#'level':fields.integer('Minimum Level',size=1),
 	'store_results':fields.boolean('Store Result'),
 	'store_level':fields.boolean('Store Level'),
 	'store_scores':fields.boolean('Store Scores'),
 	'store_outcome':fields.boolean('Store Outcome'),
 	}
-	_constraints = [(_check_level, 'Error: Minimum Level Cannot be negative', ['Level']),(_check_unique_test, 'Error: Test Modality Already Exists', ['Name'])]
+	_constraints = [(_check_unique_test, 'Error: Test Modality Already Exists', ['Name'])]
 modalities	()
 
 class master_modalities(osv.osv):
