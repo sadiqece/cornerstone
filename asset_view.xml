@@ -20,18 +20,54 @@
 					</h2>
 				</div>
 				</group>
+	<notebook colspan="5" col="10">
+    <page string="Asset Info">
       <field name='asset_line'  nolabel='1'>
 	  <field name="priority">6</field>
 		 <tree string='List' editable="bottom">
 		   <field name ="sr_no"/>
 		   <field name='brand'/>
 		   <field name='model'/>
-		   <field name='serial_number'/>
+		   <field name='cost'/>
+		   <field name='vendor'/>
 		   <field name='specs'/>
 		   <field name='date_issue' on_change="onchange_issuedate(date_issue, date_stopped)"/>
 		   <field name='date_stopped' on_change="onchange_stopeddate(date_stopped, date_issue)"/>
 		</tree>
     </field>
+	</page>
+
+    <page string="Stock Level">
+	<div>
+	<group>
+	  <field name="choose_asset_model" readonly="context.get('ctx', False)" style="width:180px;" options="{'create': False, 'create_edit': False}"/>
+	</group>
+	 <field name='stock_line'  nolabel='1' >
+		 <tree string='List' editable="bottom">
+		   <field name ="s_no"/>
+		   <field name='location' options="{'create': False, 'create_edit': False}"/>
+		   <field name='stock_level_date'/>
+		   <field name='update_by'/>
+		   <field name='current_stock'/>
+		</tree>
+    </field>
+	</div>
+	</page>
+	<page string="History">
+		<field name="history_line" readonly="context.get('ctx', False)" class="history_line">
+			<tree string="History Order Lines" create="false" delete="false">
+				<field name = "s_no"/>
+				<field name = "date_created"/>
+				<field name = "created_by"/>
+				<field name = "last_update"/>
+				<field name = "last_update_by"/>
+				<field name = "date_status_change"/>
+				<field name = "status_change_by"/>
+				<field name = "changes"/>
+			</tree>
+		</field>
+	</page>
+	</notebook>
    </sheet>
         </form>
    </field>
@@ -75,7 +111,6 @@
               </p>
             </field>
         </record>
-
 
 <menuitem name = "Asset Screens" id = "asset" parent = "menu_sub2" action = "action_asset" />
 
