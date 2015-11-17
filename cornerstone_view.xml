@@ -107,10 +107,6 @@
               <label for="min_program_mod" />
               <field name="min_program_mod" readonly="1" />
             </div>
-			<div class="col-3">
-				<label for="program_duration" />
-				<field name="program_duration" />
-			</div>
             <div class="clear" />
             <div class="col-4">
               <label for="program_cert_achevied" />
@@ -170,7 +166,7 @@
                     <field name="set_module_block_1" invisible="1" />
                     <field name="set_module_select_1" invisible="1" />
                     <label for="set_module_as_1" class="oe_edit_only" />
-                    <field name="set_module_as_1" on_change="onchange_set_module_as_1(set_module_as_1)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','1')]}" /> <!--'readonly':[('set_module_as_1','!=',False)] -->
+                    <field name="set_module_as_1" on_change="onchange_set_module_as_1(set_module_as_1)" class="oe_edit_only" attrs="{'required':[('no_of_mod_gp','&gt;=','1')]}" />, <!--'readonly':[('set_module_as_1','!=',False)] -->
                     <div attrs="{'invisible': [('set_module_block_1', '=' , False)]}" class="border_box">
                       <span>
                         <field name="allow_as_block_1" />
@@ -505,15 +501,14 @@
                 <h3>
                   <label string="Mode of Instruction" readonly="context.get('ctx', False)" />
                 </h3>
-                <field name="program_modality_line" nolabel="1" >
+                <field name="program_modality_line" nolabel="1" create="false" delete="false">
                   <tree string="Req Order Lines" class="grey_border">
-                    <!--field name="s_no" /-->
-                    <field name="module_name" />
+                    <field name="s_no" />
+                    <field name="name" />
                     <field name="module_code" string="Module Code" />
                     <field name="delivery_mode" string="Medium of Instruction" />
-					<field name="mode" string="Mode" />
                     <field name="primary" string="Primary Mode" />
-                    <field name="in_use" string="Modes In use" />
+                    <field name="modalities_in_use" string="Modes In use" />
                   </tree>
                 </field>
               </page>
@@ -683,7 +678,7 @@
     </record>
     <record id="matser_req_form" model="ir.ui.view">
       <field name="name">Master Equipment</field>
-      <field name="model">master.modality</field>
+      <field name="model">master.tests</field>
       <field name="arch" type="xml">
         <form string="Req Order Lines" version="7.0">
           <group>
@@ -794,7 +789,7 @@
             <div class="clear" />
             <div class="col-3">
               <label for="module_status" />
-              <field name="module_status" options="{'create': False, 'create_edit': False}"/>
+              <field name="module_status" widget="selection/" readonly="context.get('ctx', False)" />
             </div>
             <div class="col-3">
               <label for="module_credit_value" />
@@ -802,7 +797,7 @@
             </div>
             <div class="col-3">
               <label for="module_level" />
-              <field name="module_level" widget="selection/" readonly="context.get('ctx', False)"/>
+              <field name="module_level" widget="selection/" readonly="context.get('ctx', False)" />
             </div>
             <div class="clear" />
             <div class="col-3">
@@ -869,26 +864,21 @@
                 <group>
                   <div>
                     <group>
-                      <field name="delivery_mode" string="Medium Of Instruction" style="width:180px;" />
+                      <field name="delivery_mode" string="Medium Of Instruction" readonly="context.get('ctx', False)" />
+                      <field name="binder_in_use" readonly="context.get('ctx', False)" />
+                      <field name="tablet_in_use" readonly="context.get('ctx', False)" />
+                      <field name="primary" readonly="context.get('ctx', False)" />
                     </group>
-					<field name="mode_of_instr" readonly="context.get('ctx', False)">
-                        <tree editable="bottom" delete="false" >
-                          <field name="mode" required="True"/>
-						  <field name="in_use"  />
-						  <field name="primary"  />
-                        </tree>
-                      </field>
                   </div>
                   <div>
                     <group>
-                      <field name="room_arr"  style="width:180px;" />
-                    </group>
-					<field name="pf_line" readonly="context.get('ctx', False)">
-                        <tree editable="bottom" >
-						  <field name="s_no" />
+                      <field name="room_arr" readonly="context.get('ctx', False)" />
+                      <field name="pf_line" readonly="context.get('ctx', False)">
+                        <tree string="PF Order Lines" editable="bottom" class="grey_border">
                           <field name="equip_list" required="True" />
                         </tree>
                       </field>
+                    </group>
                   </div>
                   <div class="clear" />
                 </group>
@@ -907,8 +897,7 @@
                       <field name="pre_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="Pre Order Lines" editable="bottom">
                           <field name="order_priority" />
-                          <field name="modality" options="{'create': False, 'create_edit': False}" />
-						  <field name="modality_link" />
+                          <field name="test_list" />
                         </tree>
                       </field>
                     </div>
@@ -921,8 +910,7 @@
                       <field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="In Class Order Lines" editable="bottom">
                           <field name="order_priority" />
-                          <field name="modality" options="{'create': False, 'create_edit': False}" />
-						  <field name="modality_link" />
+                          <field name="test_list" />
                         </tree>
                       </field>
                     </div>
@@ -935,28 +923,13 @@
                       <field name="post_test_line" nolabel="1" readonly="context.get('ctx', False)">
                         <tree string="Post Order Lines" editable="bottom">
                           <field name="order_priority" />
-                          <field name="modality" options="{'create': False, 'create_edit': False}"/>
-						  <field name="modality_link" />
+                          <field name="test_list" />
                         </tree>
                       </field>
                     </div>
                   </div>
                 </group>
               </page>
-			  <!-- ============ Mod Educator Requirments ============ >
-              <page string="Educator Requirments">
-                <h3>
-                  <label string="Educator Requirments" />
-                </h3>
-                <field name="eductor_requirment_line" readonly="context.get('ctx', False)">
-                  <tree string="Alert Order Lines" editable="bottom" class="grey_border">
-                    <field name="educator_lable" />
-                    <field name="eductor_description"/>
-                    <field name="educator_must_have" />
-                    <field name="educator_verification" />
-                  </tree>
-                </field>
-              </page-->
               <!-- ============ Mod Alerts ============ -->
               <page string="Alerts">
                 <h3>
@@ -1033,6 +1006,7 @@
       <field name="res_model">cs.module</field>
       <field name="view_type">form</field>
       <field name="limit">10</field>
+      <field name="view_mode">tree,form,calendar</field>
       <field name="view_mode">tree,form</field>
       <field name="search_view_id" ref="view_module_filter" />
       <field name="help" type="html">
@@ -1049,6 +1023,5 @@
     <menuitem name="Enrollment" id="menu_sub5" parent="menu_lis_lab" />
     <menuitem name="Program" id="lab_program" parent="menu_sub" action="action_program" />
     <menuitem name="Module" id="lab_module" parent="menu_sub" action="action_module" />
-    
   </data>
 </openerp>

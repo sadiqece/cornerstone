@@ -6,7 +6,7 @@
       <field name="name">Reports</field>
       <field name="model">generate.reports</field>
       <field name="arch" type="xml">
-        <form string="Reports" version="7.0" create="false" edit="false">
+        <form string="Reports" version="7.0">
           <sheet>
 			<div class="col-2">
 			  <group class="col-10">

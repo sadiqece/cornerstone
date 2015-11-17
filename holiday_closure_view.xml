@@ -64,5 +64,6 @@
 
 <!-- ===================== Menu =============================-->
 <menuitem name = "Holidays &amp; Closures" id = "holiday" parent = "menu_sub2" action = "action_holiday" />
+
 </data> 
 </openerp>

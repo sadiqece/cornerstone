@@ -13,16 +13,12 @@
 							<field name = "parent_id" invisible='1'/>
                             <label for="name" class="oe_edit_only"/>
                             <h1 style="width:380px;">
-                                <field name = "name" attrs="{'readonly':[('parent_id','!=',0)]}"/>
+                                <field name = "name"  attrs="{'readonly':[('parent_id','!=',0)]}"/>
                             </h1>
 						    <label for="class_code" class="oe_edit_only"/>
                             <h2 style="width:280px;">
-                                <field name = "class_code" />
+                                <field name = "class_code"  attrs="{'readonly':[('parent_id','!=',0)]}"/>
                             </h2>
-							<label for="segment_code" class="oe_edit_only"/>
-                            <h2 style="width:280px;">
-                                <field name = "segment_code"/>
-                            </h2>	
 						</div>
 		       
 						<div>
@@ -50,7 +46,7 @@
 							</group>
 						</div>
 				</group>
-			    <group col="9">
+			    <group col="9">					
 					<field name = "module_id" attrs="{'readonly':[('status','=','Edit')]}" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
 					<field name = "location_id" on_change="on_change_location_id(location_id)" options="{'create': False, 'create_edit': False}"/>
 					<field name = "room_id" on_change="on_change_room_id(room_id)" domain="[('location_id','=',location_id)]" options="{'create': False, 'create_edit': False}"/>
@@ -60,9 +56,7 @@
 					<group col="6">
 						<field name = "start_date" readonly="context.get('ctx', False)" string="Start Date" on_change="onchange_dates(start_date,duration,False,total_hrs)"/>
 						<field name = "duration" widget="float_time"  on_change="onchange_dates(start_date,duration,False,total_hrs)" />
-						<field name = "end_date" readonly="1"  />
-						<field name = "start_time" readonly="1" invisible="1" />
-						<field name = "end_time" readonly="1" invisible="1"/>
+						<field name = "end_date" readonly="1" />
 							<field name = "apply_all" class="oe_edit_only" attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_all(apply_all)"/>
 							<field name = "apply_to_future" class="oe_edit_only"  attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_future(apply_to_future)"/>
 					</group>
@@ -406,7 +400,7 @@
             <field name="arch" type="xml">
                 <tree string="Location">
 					<field name = "start_date"/>
-					<!--field name = "name"/-->
+					<field name = "name"/>
 					<field name = "class_code"/>
 					<field name = "sess_no"/>
 			    </tree>
@@ -418,7 +412,7 @@
             <field name="type">search</field>
             <field name="arch" type="xml">
                 <search string="Class">
-                    <!--field name="name" string="Class"/-->
+                    <field name="name" string="Class"/>
 					<field name="class_code" string="Code"/>
 					<field name="start_date" string="Start Date"/>
 					<field name="location_id" string="Location" />
@@ -435,7 +429,7 @@
 			<field name="auto_refresh">1</field>
             <field name="arch" type="xml">			
 				<calendar string="Calendar" date_start="start_date" date_stop="end_date" color="class_code">
-					<!--field name = "name" string="Class"/-->
+					<field name = "name" string="Class"/>
 					<field name = "class_code" string="Code"/>
 					<field name = "module_id" on_change="on_change_module_id(module_id)"/>
 					<field name = "location_id" on_change="on_change_location_id(location_id)"/>
@@ -457,7 +451,7 @@
 			<field name="search_view_id" ref="view_class_filter"/>
 		    <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new Class Calendar.
+                Click to define a new location.
               </p>
             </field>
         </record>
@@ -488,7 +482,7 @@
 				</form>
 		   </field>
 		</record>
-
+		
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
 
 </data> 
