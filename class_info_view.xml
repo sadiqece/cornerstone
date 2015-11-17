@@ -11,34 +11,34 @@
                 <group>
 						<div class="oe_title">
 							<field name = "parent_id" invisible='1'/>
-                            <label for="name" class="oe_edit_only"/>
+                            <label for="name" class="oe_edit_only" invisible="1"/>
                             <h1 style="width:380px;">
-                                <field name = "name"  attrs="{'readonly':[('parent_id','!=',0)]}"/>
+                                <field name = "name"  invisible="1" attrs="{'readonly':[('parent_id','!=',0)]}"/>
                             </h1>
 						    <label for="class_code" class="oe_edit_only"/>
                             <h2 style="width:280px;">
                                 <field name = "class_code"  attrs="{'readonly':[('parent_id','!=',0)]}"/>
                             </h2>
 						</div>
-		       
+
 						<div>
 							<group>
 								<tree string="Program Status Order Lines" create="false" delete="false">
 									<div class="openerp oe_form_readonly schedule_status_box">
-										<div class="no_learners">	
+										<div class="no_learners">
 												No. of Learner
 										</div>
-										<div class="learner_box">	
+										<div class="learner_box">
 												<field name = "no_of_learners"/>
 										</div>
 									</div>
 								</tree>
 								<tree string=" Program Status Order Lines" create="false" delete="false">
 								<div class="openerp oe_form_readonly schedule_status_box_1">
-									<div class="no_learners_1">	
+									<div class="no_learners_1">
 											Status
 									</div>
-									<div class="learner_box_1">	
+									<div class="learner_box_1">
 											In Progress
 									</div>
 								</div>
@@ -46,7 +46,7 @@
 							</group>
 						</div>
 				</group>
-			    <group col="9">					
+			    <group col="9">
 					<field name = "module_id" attrs="{'readonly':[('status','=','Edit')]}" on_change="on_change_module_id(module_id)"  options="{'create': False, 'create_edit': False}"/>
 					<field name = "location_id" on_change="on_change_location_id(location_id)" options="{'create': False, 'create_edit': False}"/>
 					<field name = "room_id" on_change="on_change_room_id(room_id)" domain="[('location_id','=',location_id)]" options="{'create': False, 'create_edit': False}"/>
@@ -65,7 +65,7 @@
 					<group>
 					<field name = "client" on_change="on_change_client_type(client)" style="width:220px;" />
 					</group>
-							<div>	
+							<div>
 								<div attrs="{'invisible': [('client_type_public', '=' , True)]}">
 									<field name='location_type_corp' invisible="1"/>
 								</div>
@@ -73,14 +73,14 @@
 									<field name='client_type_public' invisible="1"/>
 								</div>
 							</div>
-						<div attrs="{'invisible': [('location_type_corp', '=' , False)]}">	
+						<div attrs="{'invisible': [('location_type_corp', '=' , False)]}">
 						<group>
 							<field name = "client_corporate" style="width:220px;" options="{'create': False, 'create_edit': False}"/>
 						</group>
 						</div>
 
 				</group-->
-						
+
 			<notebook colspan="5" col="10">
 					<page string="Schedule">
 							<div>
@@ -279,7 +279,7 @@
 											<field name = "date_of_assignment"/>
 											<field name = "single_session"/>
 										</tree>
-									</field>							
+									</field>
 							</div>
 						</group>
 					</page>
@@ -317,7 +317,7 @@
 									<button name="close_class"  string="Close Class" type="object" class="oe_edit_only" />
 								</group>
 						<field name='learner_line' nolabel='1'>
-								
+
 									<tree string='List' editable="bottom">
 										<field name='learner_mod_id' invisible="1" />
 										<field name='learner_id' on_change="on_change_learner_id(learner_id)"
@@ -326,7 +326,7 @@
 										('learner_mod_line_3.module_id_3','=',parent.module_id),'|',
 										('learner_mod_line_4.module_id_4','=',parent.module_id),'|',
 										('learner_mod_line_5.module_id_5','=',parent.module_id),'|',
-										('learner_mod_line_6.module_id_6','=',parent.module_id)]" /> 
+										('learner_mod_line_6.module_id_6','=',parent.module_id)]" />
 										<field name = "learner_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>
@@ -404,7 +404,7 @@
 					<field name = "class_code"/>
 					<field name = "sess_no"/>
 			    </tree>
-            </field>	
+            </field>
         </record>
 		<record id="view_class_filter" model="ir.ui.view">
             <field name="name">class.search</field>
@@ -420,14 +420,14 @@
 				</search>
             </field>
         </record>
-	
+
 	          	<!-- Event calendar view -->
         <record model="ir.ui.view" id="event_calendar_view1">
             <field name="name">class.calendar</field>
             <field name="model">class.info</field>
 			<field name="priority" eval="1"/>
 			<field name="auto_refresh">1</field>
-            <field name="arch" type="xml">			
+            <field name="arch" type="xml">
 				<calendar string="Calendar" date_start="start_date" date_stop="end_date" color="class_code">
 					<field name = "name" string="Class"/>
 					<field name = "class_code" string="Code"/>
@@ -438,7 +438,7 @@
 					<field name = "end_date" readonly="context.get('ctx', False)"/>
 				</calendar>
             </field>
-        </record> 
+        </record>
 
 		<record model="ir.actions.act_window" id="action_class">
             <field name="name">Class</field>
@@ -455,7 +455,7 @@
               </p>
             </field>
         </record>
-		
+
 		<record id="move_form" model="ir.ui.view">
 			<field name="name">Move Learner</field>
 			<field name="model">learner.move</field>
@@ -477,13 +477,13 @@
 						 <button  name="move_learner_save"  string="Confirm" type="object"/>
 						 <button  name="move_learner_cancel"  string="Cancel" type="object"/>
 						</group>
-						 
+
 				   </sheet>
 				</form>
 		   </field>
 		</record>
-		
+
 <menuitem name = "Class Calendar" id = "class" parent = "menu_sub3" action = "action_class" />
 
-</data> 
+</data>
 </openerp>
