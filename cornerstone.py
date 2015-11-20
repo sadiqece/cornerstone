@@ -361,6 +361,16 @@ class program(osv.osv):
        
        value_ids = self.pool.get('req.module').search(cr, uid, [('mod_id', 'in', module_ids)])
        return dict([(id, value_ids) for id in ids])
+	   
+    def _load_prog_mode_instruction(self, cr, uid, ids, field_names, args,  context=None):
+       prog_mod_obj = self.pool.get('program.module.line')
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       module_ids =[]
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+           module_ids.append(prog_module_line['module_id'].id)
+       
+       value_ids = self.pool.get('mode.of.instruction').search(cr, uid, [('mod_id', 'in', module_ids)])
+       return dict([(id, value_ids) for id in ids])
 
     def _load_prog_mod_show_do_line(self, cr, uid, ids, field_names, args, context=None):
        prog_mod_obj = self.pool.get('program.module.line')
@@ -423,28 +433,119 @@ class program(osv.osv):
        prog_mod_obj = self.pool.get('program.module.line')
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
-       prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])]) 
        module_ids =[]
+       module_ids_in_loop =[]
        res = {}
+       fee_list = []
+       new_fee_list = []
        max_fee = 0.00
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
-               module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
+              if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+              elif lis_program['set_module_as_1'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_1']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val]
            #2
-           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
-               module_ids.append(prog_module_line['module_id_2'].id)
-           #3
-           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and lis_program['set_group_as_sel_2'] == False:
+              if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+              elif lis_program['set_module_as_2'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_2'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_2']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val] 
+          #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
+              if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+              elif lis_program['set_module_as_3'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_3'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_3']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val] 
            #4
-           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
+              if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+              elif lis_program['set_module_as_4'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_4'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_4']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val] 
            #5
-           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
+              if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+              elif lis_program['set_module_as_5'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_5'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_5']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val] 
            #6
-           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
-               module_ids.append(prog_module_line['module_id_6'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
+              if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+              elif lis_program['set_module_as_6'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_6'].id)
+                module_fee_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  fee_list.append(value_ids['module_fee'])
+                  module_fee_pair[value_ids.id] = value_ids['module_fee']
+                for num in range(0,lis_program['max_no_modules_6']):
+                  max_fee_val = max(module_fee_pair.iterkeys(), key=lambda k: module_fee_pair[k]) 
+                  module_ids.append(max_fee_val)
+                  del module_fee_pair[max_fee_val]
        mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
            max_fee += value_ids['module_fee']
@@ -763,27 +864,122 @@ class program(osv.osv):
        prog_mod_obj2 = self.pool.get('lis.program')
        lis_program = prog_mod_obj2.browse(cr, uid, ids[0],context=context)
        prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+       prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+       prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+       prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+       prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+       prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+       prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])]) 
        module_ids =[]
+       module_ids_in_loop =[]
        res = {}
+       dur_list = []
+       new_dur_list = []
        max_dur = 0.00
+	   #1
        for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False:
-               module_ids.append(prog_module_line['module_id'].id)
+           if 'module_id' in prog_module_line and prog_module_line['module_id'] != False and lis_program['set_group_as_sel_1'] == False:
+              if lis_program['set_module_as_1'] == 'Block':
+                module_ids.append(prog_module_line['module_id'].id)
+              elif lis_program['set_module_as_1'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_1']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val]
+				  
            #2
-           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False:
-               module_ids.append(prog_module_line['module_id_2'].id)
-           #3
-           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False:
-               module_ids.append(prog_module_line['module_id_3'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+           if 'module_id_2' in prog_module_line and prog_module_line['module_id_2'] != False and lis_program['set_group_as_sel_2'] == False:
+              if lis_program['set_module_as_2'] == 'Block':
+                module_ids.append(prog_module_line['module_id_2'].id)
+              elif lis_program['set_module_as_2'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_2'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_2']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val]
+          #3
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
+           if 'module_id_3' in prog_module_line and prog_module_line['module_id_3'] != False and lis_program['set_group_as_sel_3'] == False:
+              if lis_program['set_module_as_3'] == 'Block':
+                module_ids.append(prog_module_line['module_id_3'].id)
+              elif lis_program['set_module_as_3'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_3'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_3']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val] 
            #4
-           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False:
-               module_ids.append(prog_module_line['module_id_4'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
+           if 'module_id_4' in prog_module_line and prog_module_line['module_id_4'] != False and lis_program['set_group_as_sel_4'] == False:
+              if lis_program['set_module_as_4'] == 'Block':
+                module_ids.append(prog_module_line['module_id_4'].id)
+              elif lis_program['set_module_as_4'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_4'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_4']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val] 
            #5
-           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False:
-               module_ids.append(prog_module_line['module_id_5'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
+           if 'module_id_5' in prog_module_line and prog_module_line['module_id_5'] != False and lis_program['set_group_as_sel_5'] == False:
+              if lis_program['set_module_as_5'] == 'Block':
+                module_ids.append(prog_module_line['module_id_5'].id)
+              elif lis_program['set_module_as_5'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_5'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_5']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val] 
            #6
-           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False:
-               module_ids.append(prog_module_line['module_id_6'].id)
+       for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
+           if 'module_id_6' in prog_module_line and prog_module_line['module_id_6'] != False and lis_program['set_group_as_sel_6'] == False:
+              if lis_program['set_module_as_6'] == 'Block':
+                module_ids.append(prog_module_line['module_id_6'].id)
+              elif lis_program['set_module_as_6'] == 'Selectable':
+                prog_mod_ids_in_loop = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+                for prog_module_line_in_loop in prog_mod_obj.browse(cr, uid, prog_mod_ids_in_loop,context=context):
+                  module_ids_in_loop.append(prog_module_line_in_loop['module_id_6'].id)
+                module_dur_pair = {}
+                for value_ids in self.pool.get('cs.module').browse(cr, uid, module_ids_in_loop):
+                  dur_list.append(value_ids['module_duration'])
+                  module_dur_pair[value_ids.id] = value_ids['module_duration']
+                for num in range(0,lis_program['max_no_modules_6']):
+                  max_dur_val = max(module_dur_pair.iterkeys(), key=lambda k: module_dur_pair[k]) 
+                  module_ids.append(max_dur_val)
+                  del module_dur_pair[max_dur_val] 
+				  
        mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', 'in', module_ids)])
        for value_ids in self.pool.get('cs.module').browse(cr, uid, mod_obj):
            max_dur += value_ids['module_duration']
@@ -939,6 +1135,92 @@ class program(osv.osv):
                   total_credit += module_obj['module_credit_value']
           res[line.id] = total_credit
        return res
+	   
+    def _calculate_total_program_duration(self, cr, uid, ids, field_names, args,  context=None):
+       res = {}
+       for line in self.browse(cr, uid, ids, context=context):
+          total_duration =0
+          prog_mod_obj = self.pool.get('program.module.line')
+          prog_mod_ids = prog_mod_obj.search(cr, uid, ['|','|','|','|','|',('prog_mod_id', '=', ids[0]),('prog_mod_id_2', '=', ids[0]),('prog_mod_id_3', '=', ids[0]),('prog_mod_id_4', '=', ids[0]),('prog_mod_id_5', '=', ids[0]),('prog_mod_id_6', '=', ids[0])])
+          prog_mod_ids = prog_mod_obj.search(cr, uid, [('prog_mod_id', '=', ids[0])])
+          prog_mod_ids_2 = prog_mod_obj.search(cr, uid, [('prog_mod_id_2', '=', ids[0])])       
+          prog_mod_ids_3 = prog_mod_obj.search(cr, uid, [('prog_mod_id_3', '=', ids[0])])       
+          prog_mod_ids_4 = prog_mod_obj.search(cr, uid, [('prog_mod_id_4', '=', ids[0])])       
+          prog_mod_ids_5 = prog_mod_obj.search(cr, uid, [('prog_mod_id_5', '=', ids[0])])       
+          prog_mod_ids_6 = prog_mod_obj.search(cr, uid, [('prog_mod_id_6', '=', ids[0])])
+		  
+		  #1
+          if len(prog_mod_ids) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
+              if type(prog_module_line['module_id'].id) == int:
+                 module_ids.append(prog_module_line['module_id'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+		  
+		  #2
+          if len(prog_mod_ids_2) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_2,context=context):
+              if type(prog_module_line['module_id_2'].id) == int:
+                 module_ids.append(prog_module_line['module_id_2'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+		  
+		  #3
+          if len(prog_mod_ids_3) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_3,context=context):
+              if type(prog_module_line['module_id_3'].id) == int:
+                 module_ids.append(prog_module_line['module_id_3'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+
+		  #4
+          if len(prog_mod_ids_4) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_4,context=context):
+              if type(prog_module_line['module_id_4'].id) == int:
+                 module_ids.append(prog_module_line['module_id_4'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+		  
+		  #5
+          if len(prog_mod_ids_5) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_5,context=context):
+              if type(prog_module_line['module_id_5'].id) == int:
+                 module_ids.append(prog_module_line['module_id_5'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+		  
+		  #6
+          if len(prog_mod_ids_6) > 0:
+            module_ids =[]
+            for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids_6,context=context):
+              if type(prog_module_line['module_id_6'].id) == int:
+                 module_ids.append(prog_module_line['module_id_6'].id)
+                 
+            if len(module_ids) > 0:
+              for module_obj in self.pool.get('cs.module').browse(cr, uid, module_ids):
+                  total_duration += module_obj['module_duration']
+          res[line.id] = total_duration
+       return res
 
 #Program Status
 
@@ -1084,7 +1366,7 @@ class program(osv.osv):
           values['date4'] = fields.date.today()
 
        changes = values.keys()
-       program_list ={'name': 'Program Name','program_code': 'Program Code','program_level':'Level','program_category':'Category',
+       program_list ={'name': 'Program Name','program_code': 'Program Code','program_duration':'Program Duration', 'program_level':'Level','program_category':'Category',
              'program_pathway': 'Pathway','program_status': 'Status','program_center': 'Center','program_audience': 'Target Audience',
              'program_description': 'Description','program_synopsis':'Synopsis','program_outline':'Outline',
              'program_cert_achevied':'Certifications Acheived','program_mod_line': 'Module Lines','program_show_do_line': 'Program Show Do',
@@ -1093,8 +1375,8 @@ class program(osv.osv):
        for i in range(len(changes)):
           if changes[i] in program_list:
              arr[i] = program_list[changes[i]]
-       today = datetime.date.today()  
-       sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
+       today = datetime.date.today()
+       sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'time_created':history_line_id[0]['time_created'],'created_by':history_line_id[0]['created_by'],
             'last_update':today.strftime('%d-%m-%Y'),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
        values.update({'program_history_line': sub_lines})
        module_id = super(program, self).write(cr, uid, ids,values, context=context)
@@ -1467,6 +1749,7 @@ class program(osv.osv):
 		'program_synopsis':fields.text('Synopsis'),
 		'program_outline':fields.text('Outline'),
 		'program_cert_achevied': fields.char('Certifications Acheived', size=100),
+		'program_duration': fields.function(_calculate_total_program_duration, relation="lis.program",readonly=1,string='Program Duration',type='float'),
 		#Table in Module Group
 		'program_mod_line': fields.one2many('program.module.line', 'prog_mod_id', 'Order Lines', select=True, required=True),
 		'program_mod_line_2': fields.one2many('program.module.line', 'prog_mod_id_2', 'Order Lines', select=True, required=True),
@@ -1476,7 +1759,7 @@ class program(osv.osv):
 		'program_mod_line_6': fields.one2many('program.module.line', 'prog_mod_id_6', 'Order Lines', select=True, required=True),
 		'program_module_desc_line': fields.function(_load_module_info, relation="cs.module",readonly=1,string='Module',type='one2many'),
 		'program_mod_req_line': fields.function(_load_prog_mod_line, relation="req.module",readonly=1,type='one2many', string='Module'),
-		'program_modality_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many', string='Module'),
+		'program_modality_line': fields.function(_load_prog_mode_instruction, relation="mode.of.instruction",readonly=1,type='one2many', string='Module'),
 		'program_pf_line': fields.function(_load_module_info, relation="cs.module",readonly=1,type='one2many',string='Module'),
 		'program_show_do_line': fields.one2many('program.show.do.module','program_id','Show Do'),
 		'program_module_show_do_line':  fields.function(_load_prog_mod_show_do_line, relation="req.module",readonly=1,type='one2many', string='Module'),
@@ -1648,7 +1931,7 @@ class program_mod_line(osv.osv):
 		'prog_mod_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
 		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-		'no_of_hrs': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True),  
+		'no_of_hrs': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
 		#2
 		'prog_mod_id_2': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
 		'module_id_2':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
@@ -1674,7 +1957,7 @@ class program_mod_line(osv.osv):
 		'module_id_6':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
 		'module_code_6': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
 		'no_of_hrs_6': fields.related('module_id','module_duration',type="float",relation="cs.module",string="Module Duration", readonly=1, required=True), 
-    }
+	}
 
 	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['Module'])]
 
@@ -1783,6 +2066,7 @@ class program_show_do(osv.osv):
 	def on_change_master_show_do(self, cr, uid, ids, master_show_do):
 		master_show_do_obj = self.pool.get('master.show.do').browse(cr, uid, master_show_do)
 		return {'value': {'supp_doc_req': master_show_do_obj.supp_doc_req}}
+
 	def _check_unique_prog_show_do(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -2147,17 +2431,17 @@ class cs_module(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
 					if dd.mod_id.id == True:
-						table_ids.append(dd.test_list.id)	
+						table_ids.append(dd.modality.id)	
 				for x in values['pre_test_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
-						deleted_ids.append(obj.test_list.id)
-					elif x[0] == 0 and 'test_list' in x[2]:
-						added_ids.append(x[2]['test_list'])
-						if x[2]['test_list'] in table_ids :
-							new_table_ids.append(dd.test_list.id)
-					elif x[0] == 1  and 'test_list' in x[2]:
-						updated_ids.append(x[2]['test_list'])
+						deleted_ids.append(obj.modality.id)
+					elif x[0] == 0 and 'modality' in x[2]:
+						added_ids.append(x[2]['modality'])
+						if x[2]['modality'] in table_ids :
+							new_table_ids.append(dd.modality.id)
+					elif x[0] == 1  and 'modality' in x[2]:
+						updated_ids.append(x[2]['modality'])
 
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_pretest_found_create
@@ -2235,17 +2519,17 @@ class cs_module(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
 					if dd.mod_id.id == True:
-						table_ids.append(dd.test_list.id)	
+						table_ids.append(dd.modality.id)	
 				for x in values['in_class_test_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
-						deleted_ids.append(obj.test_list.id)
-					elif x[0] == 0 and 'test_list' in x[2]:
-						added_ids.append(x[2]['test_list'])
-						if x[2]['test_list'] in table_ids :
-							new_table_ids.append(dd.test_list.id)
-					elif x[0] == 1  and 'test_list' in x[2]:
-						updated_ids.append(x[2]['test_list'])
+						deleted_ids.append(obj.modality.id)
+					elif x[0] == 0 and 'modality' in x[2]:
+						added_ids.append(x[2]['modality'])
+						if x[2]['modality'] in table_ids :
+							new_table_ids.append(dd.modality.id)
+					elif x[0] == 1  and 'modality' in x[2]:
+						updated_ids.append(x[2]['modality'])
 
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_inclasstest_found_create
@@ -2323,17 +2607,17 @@ class cs_module(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
 					if dd.mod_id.id == True:
-						table_ids.append(dd.test_list.id)	
+						table_ids.append(dd.modality.id)	
 				for x in values['post_test_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
-						deleted_ids.append(obj.test_list.id)
-					elif x[0] == 0 and 'test_list' in x[2]:
-						added_ids.append(x[2]['test_list'])
-						if x[2]['test_list'] in table_ids :
-							new_table_ids.append(dd.test_list.id)
-					elif x[0] == 1  and 'test_list' in x[2]:
-						updated_ids.append(x[2]['test_list'])
+						deleted_ids.append(obj.modality.id)
+					elif x[0] == 0 and 'modality' in x[2]:
+						added_ids.append(x[2]['modality'])
+						if x[2]['modality'] in table_ids :
+							new_table_ids.append(dd.modality.id)
+					elif x[0] == 1  and 'modality' in x[2]:
+						updated_ids.append(x[2]['modality'])
 
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_posttest_found_create
@@ -2530,15 +2814,15 @@ class cs_module(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('pre.test.module').browse(cr,1,ids_test_lear):
 					if dd.mod_id.id == ids[0]:
-						table_ids.append(dd.test_list.id)
+						table_ids.append(dd.modality.id)
 				for x in values['pre_test_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('pre.test.module').browse(cr,uid,x[1])
-						deleted_ids.append(obj.test_list.id)
-					elif x[0] == 0 and 'test_list' in x[2]:
-						added_ids.append(x[2]['test_list'])
-					elif x[0] == 1  and 'test_list' in x[2]:
-						updated_ids.append(x[2]['test_list'])
+						deleted_ids.append(obj.modality.id)
+					elif x[0] == 0 and 'modality' in x[2]:
+						added_ids.append(x[2]['modality'])
+					elif x[0] == 1  and 'modality' in x[2]:
+						updated_ids.append(x[2]['modality'])
 				'''create check'''		
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_pretest_found
@@ -2610,15 +2894,15 @@ class cs_module(osv.osv):
 					updated_ids = []
 					for dd in self.pool.get('in.class.test.module').browse(cr,1,ids_test_lear):
 						if dd.mod_id.id == ids[0]:
-							table_ids.append(dd.test_list.id)
+							table_ids.append(dd.modality.id)
 					for x in values['in_class_test_line'] :
 						if x[0] == 2 and x[2] ==  False :
 							obj = self.pool.get('in.class.test.module').browse(cr,uid,x[1])
-							deleted_ids.append(obj.test_list.id)
-						elif x[0] == 0 and 'test_list' in x[2]:
-							added_ids.append(x[2]['test_list'])
-						elif x[0] == 1  and 'test_list' in x[2]:
-							updated_ids.append(x[2]['test_list'])
+							deleted_ids.append(obj.modality.id)
+						elif x[0] == 0 and 'modality' in x[2]:
+							added_ids.append(x[2]['modality'])
+						elif x[0] == 1  and 'modality' in x[2]:
+							updated_ids.append(x[2]['modality'])
 					'''create check'''		
 					if len(added_ids) - len(set(added_ids)) >  0 :
 						global dupliacte_inclasstest_found
@@ -2690,15 +2974,15 @@ class cs_module(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('post.test.module').browse(cr,1,ids_test_lear):
 					if dd.mod_id.id == ids[0]:
-						table_ids.append(dd.test_list.id)
+						table_ids.append(dd.modality.id)
 				for x in values['post_test_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('post.test.module').browse(cr,uid,x[1])
-						deleted_ids.append(obj.test_list.id)
-					elif x[0] == 0 and 'test_list' in x[2]:
-						added_ids.append(x[2]['test_list'])
-					elif x[0] == 1  and 'test_list' in x[2]:
-						updated_ids.append(x[2]['test_list'])
+						deleted_ids.append(obj.modality.id)
+					elif x[0] == 0 and 'modality' in x[2]:
+						added_ids.append(x[2]['modality'])
+					elif x[0] == 1  and 'modality' in x[2]:
+						updated_ids.append(x[2]['modality'])
 				'''create check'''		
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_posttest_found
@@ -2777,8 +3061,7 @@ class cs_module(osv.osv):
 			staus_changed_by  = current_user['name']
 			values['date1'] = fields.date.today()
 			values['date2'] = fields.date.today()
-
-        
+			
 		if 'pre_test' in values and values['pre_test']:
 			if 'pre_test_line' in values: 
 				if len(values['pre_test_line']) == 0:
@@ -2835,21 +3118,31 @@ class cs_module(osv.osv):
 					test_line_id =  self.browse(cr, uid, ids[0], context=context).post_test_line or []
 					if len(test_line_id) == 0:
 						raise osv.except_osv(_('Error!'),_("Please add Post Test"))
-		changes = values.keys()
-		module_list ={'name':'Module Name','module_code':'Module Code','module_crscode':'CRS Code','module_certification':'Certification Achieved','module_level':'Level',
-			'module_category':'Category','module_pathway':'Pathway','module_credit_value':'Credit Hours','synopsis':'Synopsis','outline':'Outline','module_duration':'Duration',
+		
+		module_obj_list ={'name':'Module Name','module_code':'Module Code','module_crscode':'CRS Code','module_certification':'Certification Achieved','module_level':'Level',
+			'module_category':'Category','module_pathway':'Pathway','module_credit_value':'Credits','synopsis':'Synopsis','outline':'Outline','module_duration':'Duration',
 			'module_fee':'Fee','module_status':'Status','module_center':'Center','description':'Description','delivery_mode':'Delivery Mode','binder_in_use':'Binder',
 			'tablet_in_use':'Tablet','primary':'Primary','modalities_in_use':'Modalities In Use','max_num_ppl_class':'Max Number of People in a Class','room_arr':'Room Arrangment',
 			'pre_test':'Pre Test Required','in_class_test':'In Class Test Required','post_test':'Post Test Required','module_fee_gst':'Module Fee w/o GST',
 			'total_duration':'Total Duration in Hours','min_hr_session':'Minimum Hours Per Session','max_hr_session':'Maximum Hours Per Session',
 			'max_session_week':'Maximum Sessions Per Week','req_line':'Requirments','pf_line':'Equipment List','pre_test_line':'Pre Test','in_class_test_line':'In Class',
-			'post_test_line':'Post Test','show_do_line':'Show Do','alert_line':'Alerts','show_do_verification':'Verification Required'}
+			'post_test_line':'Post Test','show_do_line':'Show Do','eductor_requirment_line': 'Educator Requirement', 'alert_line':'Alerts','show_do_verification':'Verification Required'}
+		
+		changes = values.keys()
+		module_list ={'name':'Module Name','module_code':'Module Code','module_crscode':'CRS Code','module_certification':'Certification Achieved','module_level':'Level',
+			'module_category':'Category','module_pathway':'Pathway','module_credit_value':'Credits','synopsis':'Synopsis','outline':'Outline','module_duration':'Duration',
+			'module_fee':'Fee','module_status':'Status','module_center':'Center','description':'Description','delivery_mode':'Delivery Mode','binder_in_use':'Binder',
+			'tablet_in_use':'Tablet','primary':'Primary','modalities_in_use':'Modalities In Use','max_num_ppl_class':'Max Number of People in a Class','room_arr':'Room Arrangment',
+			'pre_test':'Pre Test Required','in_class_test':'In Class Test Required','post_test':'Post Test Required','module_fee_gst':'Module Fee w/o GST',
+			'total_duration':'Total Duration in Hours','min_hr_session':'Minimum Hours Per Session','max_hr_session':'Maximum Hours Per Session',
+			'max_session_week':'Maximum Sessions Per Week','req_line':'Requirments','pf_line':'Equipment List','pre_test_line':'Pre Test','in_class_test_line':'In Class',
+			'post_test_line':'Post Test','show_do_line':'Show Do','eductor_requirment_line': 'Educator Requirement', 'alert_line':'Alerts','show_do_verification':'Verification Required'}
 		arr={}
 		for i in range(len(changes)):
 			if changes[i] in module_list:
 				arr[i] = module_list[changes[i]]
 		today = datetime.date.today()
-		sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
+		sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'time_created':history_line_id[0]['time_created'],'created_by':history_line_id[0]['created_by'],
 				'last_update':today.strftime('%d-%m-%Y'),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
 		values.update({'history_line': sub_lines})
 		module_id = super(cs_module, self).write(cr, uid, ids,values, context=context)
@@ -2894,7 +3187,14 @@ class cs_module(osv.osv):
        for line in self.browse(cr, uid, ids, context=context):
           res[line.id] = line['module_status']
        return res
-	   
+	 
+    def on_change_module_status(self, cr, uid, ids, module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,context=None):
+		if module_code and module_crscode and module_certification and module_level and module_credit_value and module_duration and module_fee and description and module_category and module_pathway:
+			return {'value': {'module_status': 'Completed'}}
+		else:
+			return {'value': {'module_status': 'Incomplete'}}
+			
+	 
 #Module Fee
     def on_change_module_fee_gst(self, cr, uid, ids, module_fee_gst):
        return {'value': {'module_fee': module_fee_gst}}
@@ -2993,7 +3293,18 @@ class cs_module(osv.osv):
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.module_credit_value < 0:
                 return False
-        return True	
+        return True
+
+    def default_get(self, cr, uid, fields, context=None):
+		_logger.info("Calleing Default %s",fields)
+		data = super(cs_module, self).default_get(cr, uid, fields, context=context)
+		invoice_lines = []
+		_logger.info("Calleing Default %s",fields)
+		modality_ids = self.pool.get('master.mode.instruction').search(cr, uid, [],limit=3)
+		for p in self.pool.get('master.mode.instruction').browse(cr, uid, modality_ids):
+			invoice_lines.append((0,0,{'mode':p.id,}))
+		data['mode_of_instr'] = invoice_lines
+		return data
 
 #Table For cs Modules		
     _name = "cs.module"
@@ -3005,29 +3316,33 @@ class cs_module(osv.osv):
        'module_code': fields.char('Module Code', size=20),
 	   'module_crscode': fields.char('CRS Code', size=80),
 	   'module_certification': fields.char('Certification Achieved (if any)', size=100),
-	   'module_level': fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level'),
-	   'module_category': fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
-	   'module_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
+	   'module_level': fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level', type='one2many'),
+	   'module_category': fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category', type='one2many'),
+	   'module_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway', type='one2many'),
+	   #'module_level': fields.many2one('module.level', 'Level', size=25, help='Module Level'),
+	   #'module_category': fields.many2one('module.category', 'Category', size=25, help='Module Category'),
+	   #'module_pathway': fields.many2one('module.pathway', 'Pathway', size=25, help='Module Pathway'),
 	   'module_credit_value': fields.integer('Credits', size=4),
 	   'orientation': fields.selection((('Yes','Yes'),('No','No')),'Orientation'),
 	   'synopsis':fields.text('Synopsis', size=500),
 	   'outline':fields.text('Outline'),
-	   'module_duration': fields.float('Duration in hours', size=4),
+	   'module_duration': fields.float('Duration in hours', size=6),
 	   'module_fee': fields.float('Fee $',size=9),
 	   'module_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status', required=True, select=True),
 	   'module_center': fields.selection((('Hougang','Hougang'),('Jurong','Jurong'),('Tampines','Tampines'),('Woodlands','Woodlands')),'Select Center'),
 	   'select_program': fields.selection((('Program 1','Program 1'),('Program 2','Program 2'),('Program 3','Program 3'),('Program 4','Program 4')),'Select Program'),
 	   'description': fields.text('Description', size=500),
-	   'delivery_mode': fields.selection((('English','English'),('Mandarin','Mandarin'),('Bilingual','Bilingual'),('Malay','Malay'),('Others','Others')),'Delivery Mode'),
+	   'delivery_mode': fields.selection((('English','English'),('Mandarin','Mandarin'),('Bilingual','Bilingual'),('Malay','Malay'),('Others','Others')),'Delivery Mode',type='one2many'),
 	   'binder_in_use':fields.boolean('Binder'),
 	   'tablet_in_use':fields.boolean('Tablet'),
 	   'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet'),('Blended','Blended')),'Primary'),
-	   'modalities_in_use' : fields.function(_calculate_modalities_in_use, relation="cs.module",string='Modalities In Use',readonly=1,type='char',store=True),
+	   'mode_of_instr': fields.one2many('mode.of.instruction', 'mod_id', 'Mode of Instructions'),
+	   #'modalities_in_use' : fields.function(_calculate_modalities_in_use, relation="cs.module",string='Modalities In Use',readonly=1,type='char',store=True),
 	   'max_num_ppl_class': fields.integer('Max Number of People in a Class', size=3),
 	   'room_arr': fields.selection((('Default','Default'),('Active','Active'),('Cluster','Cluster'),('U-Shape','U-Shape'),('Lecture','Lecture'),('Theater','Theater'),('Classroom','Classroom')),'Room Arrangment'),
-	   'pre_test': fields.boolean('Pre Test Required'),
-	   'in_class_test': fields.boolean('In Class Test Required'),
-	   'post_test': fields.boolean('Post Test Required'),
+	   'pre_test': fields.boolean('Pre-Training Assesment Required'),
+	   'in_class_test': fields.boolean('In Class Assesment Required'),
+	   'post_test': fields.boolean('Post-Training Assesment Required'),
 	   'module_fee_gst': fields.float('Module Fee w/o GST'),
 	   'total_duration': fields.integer('Total Duration in Hours'),
 	   'min_hr_session': fields.integer('Minimum Hours Per Session'),
@@ -3039,6 +3354,7 @@ class cs_module(osv.osv):
 	   'in_class_test_line': fields.one2many('in.class.test.module','mod_id','In Class'),
 	   'post_test_line': fields.one2many('post.test.module','mod_id','Post Test'),
 	   'show_do_line': fields.one2many('show.do.module','mod_id','Show Do'),
+	   'eductor_requirment_line': fields.one2many('educator.requirment','mod_id','Alerts', type='integer'),
 	   'alert_line': fields.one2many('alert.module','mod_id','Alerts', type='integer'),
 	   'history_line': fields.one2many('history.module','mod_id','History', limit=None),
 	   'status_display': fields.function(_status_display, readonly=1, type='char'),
@@ -3079,6 +3395,37 @@ class cs_module(osv.osv):
     _constraints = [(_check_unique_name, 'Error: Module Name Already Exists', ['Module Name']),(_check_unique_code, 'Error: Module Code Already Exists', ['Module Code']),(_check_neg_duration, 'Error: Duration Cannot be negative value', ['Duration']),(_check_neg_fee, 'Error: Fee Cannot be negative value', ['Fee']),(_check_neg_credit_value, 'Error: Credit Value Cannot be negative', ['Credit']),(_check_neg_no_ppl, 'Error: No. of People Cannot be negative value', ['People'])]
 
 cs_module()
+
+class module_level(osv.osv):
+
+	_name ='module.level'
+	_description ="Module Level"
+	_columns = {
+	'mod_level': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
+	'name':fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level'),
+	}
+module_level()
+
+class module_category(osv.osv):
+
+	_name ='module.category'
+	_description ="Module Category"
+	_columns = {
+	'mod_category': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
+	'name':fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
+	}
+module_category()
+
+class module_pathway(osv.osv):
+
+	_name ='module.pathway'
+	_description ="Module Pathway"
+	_columns = {
+	'mod_pathway': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
+	'name':fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
+	}
+module_pathway()
+
 
 #Class Module Requirements
 ###############
@@ -3171,9 +3518,50 @@ class master_req(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: Requirement Label Already Exists', ['name'])]
 master_req()
 
+#Class Mode of Instruction
+###############
+class mode_of_instruction(osv.osv):
+
+	_name ='mode.of.instruction'
+	_description ="Mode Of Instruction Tab"
+	_rec_name='mod_id'
+	_columns = {
+		'mode':fields.many2one('master.mode.instruction', 'Mode', ondelete='cascade', help='Mode', select=True, required=True),	
+		'in_use':fields.boolean('In Use'),
+		'primary':fields.boolean('Primary'),
+		'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
+		'module_name': fields.related('mod_id','name',type="char",relation="cs.module",string="Module Name"),
+		'module_code': fields.related('mod_id','module_code',type="char",relation="cs.module",string="Module Code"),
+		'delivery_mode': fields.related('mod_id','delivery_mode',type="char",relation="cs.module",string="Delivery Mode"),
+	}
+mode_of_instruction()
+
+class master_mode_instruction(osv.osv):
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+		
+	_name ='master.mode.instruction'
+	_description ="Master Mode Instruction Tab"
+	_columns = {
+		'name':fields.char('Mode'),
+		'in_use':fields.boolean('In Use'),
+		'primary':fields.boolean('Primary'),
+	}
+	_constraints = [(_check_unique_name, 'Error: Mode of Instruction Already Exists', ['Mode'])]
+master_mode_instruction()
+
 #Class Module Master Equipment
 ###############
 class master_equip(osv.osv):
+
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		lst = [
@@ -3194,7 +3582,7 @@ master_equip()
 
 #Class Module Master Test
 ###############
-class master_tests(osv.osv):
+class master_modality(osv.osv):
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		lst = [
@@ -3205,13 +3593,13 @@ class master_tests(osv.osv):
 			if self_obj.name and self_obj.name.lower() in  lst:
 				return False
 		return True
-	_name ='master.tests'
-	_description ="People and Facilites Tab"
+	_name ='master.modality'
+	_description ="Modality"
 	_columns = {
-	'name':fields.char('Test Descripton',size=20),
+	'name':fields.char('Modality',size=20),
 	}
-	_constraints = [(_check_unique_name, 'Error: This Description Already Exists', ['name'])]
-master_tests()
+	_constraints = [(_check_unique_name, 'Error: This Modality Already Exists', ['name'])]
+master_modality()
 
 #Class Module MOI
 ###############
@@ -3223,9 +3611,21 @@ class peoplefac(osv.osv):
 			return False
 		else :
 			return True
+			
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(peoplefac, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+			
 	_name ='pf.module'
 	_description ="People and Facilites Tab"
 	_columns = {
+    's_no' : fields.integer('S.No',size=20,readonly=1),
 	'pf_id':fields.integer('S.No',size=20),
 	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
@@ -3236,13 +3636,22 @@ peoplefac()
 #Class Module Pre Test
 ###############
 class pre_test(osv.osv):
-	def _check_unique_pre_test(self, cr, uid, ids, context=None):
+	'''def _check_unique_pre_test(self, cr, uid, ids, context=None):
 		if dupliacte_pretest_found == True:
 			return False
 		elif dupliacte_pretest_found_create == True:
 			return False
 		else :
-			return True
+			return True'''
+			
+	'''def _check_unique_order(self, cr, uid, ids, context=None):
+		if dupliacte_pretest_found == True:
+			return False
+		elif dupliacte_pretest_found_create == True:
+			return False
+		else :
+			return True'''
+			
 	def unlink(self, cr, uid, ids, context=None):
 		mod_id = self.browse(cr, uid, ids[0], context=context).mod_id
 		test_checked =  self.pool.get('cs.module').browse(cr, uid, mod_id.id, context=context).pre_test
@@ -3252,20 +3661,47 @@ class pre_test(osv.osv):
 			if final_val == 0: 
 				raise osv.except_osv(_('Error!'),_("Atleast One Pre Test Required"))
 		return super(pre_test, self).unlink(cr, uid, ids, context=context)
+			
+	def _check_unique_pre_test(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality == self_obj.modality:
+						raise osv.except_osv(_('Error:'),_("Pre Test 'Modality' Should Be Unique")%(self_obj))
+		return True
+			
 	def _check_unique_order(self, cr, uid, ids, context=None):
-		if dupliacte_pretest_found == True:
-			return False
-		elif dupliacte_pretest_found_create == True:
-			return False
-		else :
-			return True
-		
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
+						raise osv.except_osv(_('Error:'),_("Pre Test 'Order Priority' Should Be Unique")%(self_obj))
+		return True
+			
+	def _check_unique_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality_link == self_obj.modality_link:
+						raise osv.except_osv(_('Error:'),_("Pre Test 'Module Link' Should Be Unique")%(self_obj))
+		return True
+			
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.order_priority < 0:
-				return False
+				raise osv.except_osv(_('Error:'),_("Pre Test 'Order of Priority' Cannot be negative value")%(self_obj))
+		return True
+		
+	def _check_neg_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.modality_link < 0:
+				raise osv.except_osv(_('Error:'),_("Pre Test 'Module Link' Cannot be negative value")%(self_obj))
 		return True
 
 #Table for Test in Modules
@@ -3274,12 +3710,14 @@ class pre_test(osv.osv):
 	_columns = {
 	#'pre_test_id':fields.integer('Order Of Priority',size=20),
 	'order_priority':fields.integer('Order Of Priority',size=2,required=True),
-	'test_list':fields.many2one('master.tests', 'Test Description', ondelete='cascade', help='Description', required=True),
+	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description', required=True),
+	'modality_link':fields.integer('Modality Link', size=3, required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
 	_constraints = [(_check_unique_pre_test, 'Error: Test Already Exists', ['Test']),
      (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
-     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
+	 (_check_unique_modality_link, 'Error: Modality Link Should Be Unique', ['Modality Link']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order']), (_check_neg_modality_link, 'Error: Module Link Cannot be negative value', ['Module Link'])]
 pre_test()
 
 #Class Module In Class
@@ -3294,7 +3732,7 @@ class in_class_test(osv.osv):
 			if final_val == 0: 
 				raise osv.except_osv(_('Error!'),_("Atleast One In Class Test Required"))
 		return super(in_class_test, self).unlink(cr, uid, ids, context=context)
-	def _check_unique_in_class_test(self, cr, uid, ids, context=None):
+	'''def _check_unique_in_class_test(self, cr, uid, ids, context=None):
 		if dupliacte_inclasstest_found == True:
 			return False
 		elif dupliacte_inclasstest_found_create == True:
@@ -3308,26 +3746,64 @@ class in_class_test(osv.osv):
 		elif dupliacte_inclasstest_found_create == True:
 			return False
 		else :
-			return True
+			return True'''
+			
+	def _check_unique_in_class_test(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality == self_obj.modality:
+						raise osv.except_osv(_('Error:'),_("In Class 'Modality' Should Be Unique")%(self_obj))
+		return True
+			
+	def _check_unique_order(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
+						raise osv.except_osv(_('Error:'),_("In Class 'Order Priority' Should Be Unique")%(self_obj))
+		return True
+			
+	def _check_unique_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality_link == self_obj.modality_link:
+						raise osv.except_osv(_('Error:'),_("In Class 'Module Link' Should Be Unique")%(self_obj))
+		return True
 		
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.order_priority < 0:
-				return False
+				raise osv.except_osv(_('Error:'),_("In Class 'Order of Priority' Cannot be negative value")%(self_obj))
 		return True
+		
+	def _check_neg_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.modality_link < 0:
+				raise osv.except_osv(_('Error:'),_("In Class 'Module Link' Cannot be negative value")%(self_obj))
+		return True
+	
 	_name ='in.class.test.module'
 	_description ="In Calss Table"
 	_columns = {
 	#'in_class_id':fields.integer('Order Of Priority',size=20),
 	'order_priority':fields.integer('Order Of Priority',size=2,required=True),
-	'test_list':fields.many2one('master.tests', 'Test Description', ondelete='cascade', help='Description', select=True, required=True),
+	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description', select=True, required=True),
+	'modality_link':fields.integer('Modality Link', size=3, required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_in_class_test, 'Error: In Class Test Already Exists', ['test_list']),
+	_constraints = [(_check_unique_in_class_test, 'Error: In Class Test Already Exists', ['modality']),
      (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
-     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
+	 (_check_unique_modality_link, 'Error: Modality Link Should Be Unique', ['Modality Link']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order']),
+	 (_check_neg_modality_link, 'Error: Module Link Cannot be negative value', ['Module Link'])]
 in_class_test()
 
 #Class Module Post Test
@@ -3342,7 +3818,7 @@ class post_test(osv.osv):
 			if final_val == 0: 
 				raise osv.except_osv(_('Error!'),_("Atleast One Post Test Required"))
 		return super(post_test, self).unlink(cr, uid, ids, context=context)
-	def _check_unique_post_test(self, cr, uid, ids, context=None):
+	'''def _check_unique_post_test(self, cr, uid, ids, context=None):
 		if dupliacte_posttest_found == True:
 			return False
 		elif dupliacte_posttest_found_create == True:
@@ -3356,25 +3832,64 @@ class post_test(osv.osv):
 		elif dupliacte_posttest_found_create == True:
 			return False
 		else :
-			return True
+			return True'''
+			
+	def _check_unique_post_test(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality == self_obj.modality:
+						raise osv.except_osv(_('Error:'),_("Post Test 'Modality' Should Be Unique")%(self_obj))
+		return True
+			
+	def _check_unique_order(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.order_priority == self_obj.order_priority:
+						raise osv.except_osv(_('Error:'),_("Post Test 'Order Priority' Should Be Unique")%(self_obj))
+		return True
+			
+	def _check_unique_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.mod_id == self_obj.mod_id and x.modality_link == self_obj.modality_link:
+						raise osv.except_osv(_('Error:'),_("Post Test 'Module Link' Should Be Unique")%(self_obj))
+		return True
+		
 #Validate Order of Preority
 	def _check_neg_order_priority(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.order_priority < 0:
-				return False
+				raise osv.except_osv(_('Error:'),_("Post Test 'Order of Priority' Cannot be negative value")%(self_obj))
 		return True
+	
+	def _check_neg_modality_link(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.modality_link < 0:
+				raise osv.except_osv(_('Error:'),_("Post Test 'Module Link' Cannot be negative value")%(self_obj))
+		return True
+	
 	_name ='post.test.module'
 	_description ="Post Test Table"
 	_columns = {
 	#'post_test_id':fields.integer('Order Of Priority',size=20),
 	'order_priority':fields.integer('Order Of Priority',size=2,required=True),
-	'test_list':fields.many2one('master.tests', 'Test Description', ondelete='cascade', help='Description', select=True, required=True),
+	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description', select=True, required=True),
+	'modality_link':fields.integer('Modality Link', size=3, required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_post_test, 'Error: Post Test Already Exists', ['test_list']),
+	_constraints = [(_check_unique_post_test, 'Error: Post Test Already Exists', ['modality']),
      (_check_unique_order, 'Error: Order Id Should Be Unique', ['Order']),
-     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order'])]
+	 (_check_unique_modality_link, 'Error: Modality Link Should Be Unique', ['Modality Link']),
+     (_check_neg_order_priority, 'Error: Order of Priority Cannot be negative value', ['Order']),
+	 (_check_neg_modality_link, 'Error: Module Link Cannot be negative value', ['Module Link'])]
 post_test()
 
 #Class Module Master Alerts
@@ -3402,6 +3917,41 @@ class master_alerts(osv.osv):
 	}
 	_constraints = [(_check_unique_name, 'Error: This Alert Description Already Exists', ['name'])]
 master_alerts()
+
+#Educator Requirments
+###############
+class educator_reqirment(osv.osv):
+	_name = 'educator.requirment'
+	_description = 'Module Educator Requirement'
+	_columns = {
+	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module'),
+	'educator_lable': fields.many2one('master.educator.label', 'Label', ondelete='cascade', help='Module'),
+	'eductor_description': fields.text('Description', size=500),
+	'educator_must_have': fields.boolean('Must Have'),
+	'educator_verification': fields.boolean('Verification'),
+	}
+	
+educator_reqirment()
+
+class master_educator_label(osv.osv):
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+	_name ='master.educator.label'
+	_description ="Master Educator Label"
+	_columns = {
+	'name':fields.char('Label',size=20,required=True),
+	}
+	_constraints = [(_check_unique_name, 'Error: Educator Label Already Exists', ['name'])]
+master_educator_label()
+
 
 #Class Module Alert
 ###############
