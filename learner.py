@@ -685,7 +685,9 @@ class learner_info(osv.osv):
 		#raise osv.except_osv(_('Warning!'),_('wwwwwww %s')%(id))
 		self.populate_payments_create( cr, uid, ids, id)
 		return id
-		
+
+	
+
 	def write(self, cr, uid, ids, vals, context=None):
 				
 		id = super(learner_info, self).write(cr, uid, ids, vals, context)
@@ -833,15 +835,15 @@ class learner_info(osv.osv):
 		globvar = 1
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'learner_form')
 		view_id = view_ref and view_ref[1] or False
-		#self.onchange_class_hist(self,cr,uid,ids,'Learner 1')
 		return {
 		'type': 'ir.actions.act_window',
 		'name': _('Learner'),
 		'res_model': 'learner.info',
 		'view_type': 'form',
-		'res_id': ids[0], # this will open particular product,
+		'res_id': ids[0], # this will open particular Learner Details,
 		'view_id': view_id,
 		'view_mode': 'form',
+		'nodestroy': True,
 		}
 
 #Schedule Tab Info
@@ -869,6 +871,18 @@ class learner_info(osv.osv):
 		s_date2 = ''
 		#raise osv.except_osv(_('Warning!'),_('Nationality %s ')%(i_mod))
 		
+		'''if i_mod:
+			sql="select module_id from temp_module where id = %s" % (i_mod)
+			cr.execute(sql)
+			r = cr.fetchall()
+			for i in r:
+				if i[0]:
+					val2.update({'select_module2': i[0]})
+					i_mod2=i[0]
+		if not i_centre and i_mod: 
+			res['value']['i_mod'] = ''
+			res.update({'warning': {'title': _('Warning !'), 'message': _('Please Select Center first.')}})	'''
+					
 		if s_date:
 			sql="select name from test_date where id = %s" % (s_date)
 			cr.execute(sql)
@@ -888,7 +902,7 @@ class learner_info(osv.osv):
 			val2.update({'class_code': ''})
 			val2.update({'start_date': ''})
 			val2.update({'end_date': ''})
-			val2.update({'schedule_line': sub_lines})
+			val2.update({'class_schedule_line': sub_lines})
 			for s in itm:
 			
 				val2.update({'class_name':s[0]})
@@ -904,7 +918,7 @@ class learner_info(osv.osv):
 				for prog_line in p_obj.browse(cr, uid, value_ids,context=context):
 					sub_lines.append({'session_no':prog_line['sess_no'], 'week_no':prog_line['week_no'], 'date_schd':prog_line['start_date']})
 					
-				val2.update({'schedule_line': sub_lines})
+				val2.update({'class_schedule_line': sub_lines})
 			
 			return {'value': val2}
 		else:
@@ -925,46 +939,13 @@ class learner_info(osv.osv):
 		val.update({'end_date': ''})
 		#val.update({'select_module2': ''})
 		val.update({'select_module': ''})
-		val.update({'schedule_line': sub_lines})
+		val.update({'class_schedule_line': sub_lines})
 		
-		if i_centre:
+		'''if i_centre:
 			cr.execute("delete from temp_module")
 			sql="insert into temp_module (module_id, name) select distinct c.id, c.name from cs_module c, class_info ci where c.id=ci.module_id and location_id = %s" % (i_centre)
-			cr.execute(sql)
+			cr.execute(sql)'''
 					
-		return  {'value': val}
-		
-	def onchange_populate_schedule4(self, cr, uid, ids, i_centre, i_mod, context=None):
-		#raise osv.except_osv(_('Warning!'),_('Nationality %s %s %s ')%(s_date.id[name]))
-		val ={}
-		sub_lines = []
-		val.update({'session_no':''})
-		val.update({'week_no': ''})
-		val.update({'date_schd': ''})
-		val.update({'sch_date': ''})
-		val.update({'sch_date2': ''})
-		#val.update({'select_module': ''})
-		val.update({'select_module2': ''})
-		val.update({'class_name':''})
-		val.update({'class_code':''})
-		val.update({'start_date': ''})
-		val.update({'end_date': ''})
-		val.update({'schedule_line': sub_lines})
-		
-		if i_mod:
-			sql="select module_id from temp_module where id = %s" % (i_mod)
-			#sql="select module_id from select_module where id = %s" % (i_mod)
-			cr.execute(sql)
-			r = cr.fetchall()
-			for i in r:
-				if i[0]:
-					val.update({'select_module2': i[0]})
-					
-					if i_centre and i_mod:
-						cr.execute("delete from test_date")
-						sql="insert into test_date (name) select start_date from class_info where parent_id = 0 and module_id = %s and location_id = %s" % ( i[0], i_centre)
-						cr.execute(sql)
-			
 		return  {'value': val}
 		
 		
@@ -1111,7 +1092,7 @@ class learner_info(osv.osv):
 		learner_move_array = []
 		self_obj  = self.browse(cr, uid, ids[0], context=context)
 		learners = []
-		for le_obj in self_obj.schedule_line:
+		for le_obj in self_obj.class_schedule_line:
 			if le_obj.class_info_id == True :
 				learner_move_array.append(le_obj.class_info_id.id)
 				learners.append(le_obj.id)
@@ -1122,17 +1103,59 @@ class learner_info(osv.osv):
 			sub_lines.append( (0,0, {'learner_id':self_obj['session_no'],'learner_nric':self_obj['week_no']}) )
 			values.update({'learner_line': sub_lines})
 			learner_obj = self.pool.get("class.info")
-	
+			
+	'''def on_change_name_search(self, cr, uid, name2, args=None, operator='ilike', context=None, limit=100):
+		if not args:
+			args = []
+		if context is None:
+			context = {}
+		ids = []
+		name2 = name2 + '%'
+		cr.execute("select name from learner_info where name2 like %s", (name2,))
+		ids = cr.dictfetchall()
+		return self.name_get(cr, uid, ids, context)
+		
+	def _auto_complete_form(self, cr, uid, ids, field_names, args,  context=None):
+		learner_nric_obj = self.pool.get('learner.info')
+		nric_learner = learner_nric_obj.browse(cr, uid, ids[0],context=context)
+		learner_mod_ids = prog_mod_obj.search(cr, uid, [('learner_nric', '=', ids[0])])
+		return'''
+		
+	def on_change_scheduling(self, cr, uid, ids, toggling):
+		val = {}
+		val['class_type_schedule'] = False
+		val['test_type_schedule'] = False
+		if toggling == 'Class Schedule':
+			val['class_type_schedule'] = True
+		if toggling == 'Test Schedule':
+			val['test_type_schedule'] = True
+		
+		return {'value': val}
+		
+	def on_change_nationality(self, cr, uid, ids, nationality):
+		val = {}
+		val['learner_nric'] = False
+		val['learner_non_nric'] = False
+		if nationality == 'Class Schedule':
+			val['learner_nric'] = True
+		if nationality == 'Test Schedule':
+			val['learner_non_nric'] = True
+		
+		return {'value': val}
+		
 #Table Learner Info
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
 	_columns = {
 		'learner_id': fields.char('Id',size=20),
-		'name': fields.char('Name', size=100,required=True, select=True),
-		#'learnerfull_name': fields.many2one('learner.name.nric', 'Name as in NRIC/FIN', required=True, size=20),
+		#'name': fields.many2one('learner.name', 'Name', required=True, size=100, type='char'),
+		#'learnerfull_name': fields.many2one('learner.name.nric', 'Name as in NRIC/FIN', required=True, size=100),
 		#'learner_nric': fields.many2one('learner.nric', 'NRIC', size=7,required=True, help='Add one Prefix and one Suffix'),
-		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=120,required=True),
-		'learner_nric': fields.char('NRIC', size=10,required=True, help='Add one Prefix and one Suffix'),
+		'name': fields.char('Name', size=100,required=True, select=True),
+		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=100,required=True),
+		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality',required=True),
+		'learner_nric': fields.char('NRIC', size=9, help='Add one Prefix and one Suffix'),
+		'learner_non_nric': fields.char('Non-NRIC', size=44,  help='Add one Prefix and one Suffix'),
 		'learner_status': fields.selection((('Active','Active'),('InActive','InActive'),('Complete','Complete'),('InComplete','InComplete'),('Blocked','Blocked')),'Status', required=True),
 		'learner_status_display_1': fields.function(_learner_status_display_1, readonly=1, type='char'),
 		'learner_status_display_2': fields.function(_learner_status_display_2, readonly=1, type='char'),
@@ -1140,6 +1163,7 @@ class learner_info(osv.osv):
 		'date1': fields.date('Date Created', readonly='True'),
 		'date2': fields.date('Date Created', readonly='True'),
 		'program_learner': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True,required=True),
+		'selected_program': fields.many2one('learner.info', 'Selected Programs by Learner', ondelete='cascade', help='Learner', Select=True),
 		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, store=True),
 		'image': fields.binary("Photo",
             help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
@@ -1162,8 +1186,12 @@ class learner_info(osv.osv):
 		#checklist Tab
 		'checklist_tab': fields.one2many('checklist.module','checklist_id','checklist'),
 		#Schedule Tab
+		'toggling': fields.selection((('Class Schedule','Class Schedule'),('Test Schedule','Test Schedule')),'Select Schedule'),
+		'class_type_schedule': fields.boolean('Class Schedule'),
+		'test_type_schedule': fields.boolean('Test Schedule'),
 		'select_center':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
-		'schedule_line': fields.one2many('schedule.module','session_no','schedule'),
+		'class_schedule_line': fields.one2many('class.schedule.module','session_no','Class Schedule'),
+		'test_schedule_line': fields.one2many('test.schedule.module','class_info_id','Test Schedule'),
 		#'select_module':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 		'select_module':fields.many2one('temp.module', 'Module'),
 		'select_module2':fields.integer('Module2'),
@@ -1173,13 +1201,12 @@ class learner_info(osv.osv):
 		'start_date':fields.date('Start Date', readonly=1),
 		'end_date':fields.date('End Date', readonly=1),
 		#'sch_date':fields.selection((_onchange_populate_schedule), 'Select Date', type='char'),
-		'sch_date':fields.many2one('test.date', 'Select Date', type='char'),
+		'sch_date':fields.many2one('class.start.date', 'Select Date'),
 		'sch_date2':fields.char('Select Date2'),
 		#payment
 		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		#Personal Tab Fields
-		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
 		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
@@ -1257,6 +1284,7 @@ class learner_info(osv.osv):
 		'max_no_modules_6': fields.integer('Maximum Modules', readonly=1),
 		'outstanding_line': fields.one2many('outstanding.module','outstanding_id','outstanding'),
 		'action_learn_line': fields.one2many('action.learn.module','action_id','Action'),
+		'current_class_line': fields.one2many('current.class','class_id','Current Class', readonly=1),
 		'class_history_line': fields.one2many('class.history.module','class_id','Class History', readonly=1),
 		'test_history_line': fields.one2many('test.history.module', 'test_id', 'Test'),
 		'test_score_line': fields.one2many('test.score.module','test_score_id','Test Scores',readonly=1),
@@ -1288,6 +1316,24 @@ class learner_info(osv.osv):
 	_constraints = [(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_check_email, 'Error! Email is invalid.', ['work_email']),(_check_unique_id, 'Error: Email Already Exist', ['Email'])]		
 learner_info ()
 
+class learner_name(osv.osv):
+	def _check_learner_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+	_name ='learner.name'
+	_description ="Learner Name"
+	_columns = {
+	'name':fields.char('Learner Name'),
+	}
+	_constraints = [(_check_learner_name, 'Error: Learner Already Exists', ['Learner'])]
+learner_name()
 
 class learner_name_nric(osv.osv):
 	def _check_learner_name(self, cr, uid, ids, context=None):
@@ -1301,7 +1347,7 @@ class learner_name_nric(osv.osv):
 				return False
 		return True
 	_name ='learner.name.nric'
-	_description ="Learner Name"
+	_description ="Learner Nric"
 	_columns = {
 	'name':fields.char('Learner Name'),
 	}
@@ -1342,15 +1388,111 @@ class temp_module(osv.osv):
 	_description = "Test date"
 	_columns = {
 	'name' : fields.char('Module', readonly='True'),
-	'module_id' : fields.integer('Module', readonly='True')
+	'module_id' : fields.integer('Module', readonly='True'),
+	'date' : fields.datetime('Module', readonly='True'),
 	}	
 temp_module()
+
+class class_start_date(osv.osv):
+	
+	_name = "class.start.date"
+	_description = "Test date"
+	_columns = {
+	'name' : fields.datetime('Start Date', readonly='True')
+	}	
+class_start_date()
 
 #Class Program Module Line
 ###############
 globvar = 0
 class program_mod_line(osv.osv):
 
+	def check_box_value(self, cr, uid, ids, iId, abc, context=None):
+		val = {}
+		#idate=''
+		sql="select name from cs_module where id = ('%s') " % (iId)
+		cr.execute(sql)
+		modName = cr.fetchall()
+		for i in modName:
+			idd = i[0]
+		
+		if abc == False:
+			cr.execute("delete from temp_module where module_id = %s " % (iId))
+		if abc == True:
+			cr.execute("delete from temp_module where module_id = %s " % (iId))
+			sql="insert into temp_module (module_id,name) values (%s,'%s') " % (iId,idd)
+			r = cr.execute(sql)
+
+		'''sql="select start_date from class_info where id = (%s) " % (iId)
+		cr.execute(sql)
+		modDate = cr.fetchall()
+		for i in modDate:
+			idate = i[0]
+			
+		if abc == True:
+			#cr.execute("delete from class_start_date where name = %s " % (iId))
+			sql="insert into class_start_date (name) values (%s) " % (idate)
+			#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(sql))
+			d = cr.execute(sql)
+			
+		sql="select start_date from class_info where id = ('%s') " % (iId)
+		cr.execute(sql)
+		r = cr.fetchall()
+		raise osv.except_osv(_('Warning!'),_('Nationality %s')%(r))
+		for i in r:
+			s_date2=i[0]
+			
+		sql="insert into class_start_date (name) values ('%s') " % (iId)
+		r = cr.execute(sql)'''
+
+		return True
+
+		return True
+		
+	def onchange_populate_schedule2(self, cr, uid, ids, i_centre, i_mod, s_date, context=None):
+		val2 ={}
+		sub_lines = []			
+		if s_date:
+			sql="select name from class_start_date where module_id = %s" % (s_date)
+			cr.execute(sql)
+			r = cr.fetchall()
+			for i in r:
+				if i[0]:
+					val2.update({'sch_date2': i[0]})
+					s_date2=i[0]
+
+					
+		if i_centre and i_mod and s_date2:
+			sql = "select name, class_code, start_date, end_date from class_info where location_id = %s and module_id = %s and start_date = '%s'" % (i_centre,i_mod,s_date2) 
+			cr.execute(sql)
+			itm = cr.fetchall()
+			sub_lines = []
+			val2.update({'class_name': ''})
+			val2.update({'class_code': ''})
+			val2.update({'start_date': ''})
+			val2.update({'end_date': ''})
+			val2.update({'class_schedule_line': sub_lines})
+			for s in itm:
+			
+				val2.update({'class_name': s[0]})
+				val2.update({'class_code': s[1]})
+				val2.update({'start_date': s[2]})
+				val2.update({'end_date': s[3]})
+			
+				p_obj = self.pool.get('class.info')
+				value_ids = p_obj.search(cr, uid, [('module_id', '=', i_mod)])
+				
+				#sub_lines.append({'session_no':'', 'week_no':'', 'date_schd':''})
+				
+				for prog_line in p_obj.browse(cr, uid, value_ids,context=context):
+					sub_lines.append({'session_no':prog_line['sess_no'], 'week_no':prog_line['week_no'], 'date_schd':prog_line['start_date']})
+					
+				val2.update({'class_schedule_line': sub_lines})
+			
+			return {'value': val2}
+		else:
+			return {'value': val2}
+			
 	def on_change_payment_moule(self, cr, uid, ids, module_id) :
 		i= {}
 		mod_obj = self.pool.get('cs.module').search(cr, uid, [('id', '=', module_id)])
@@ -1541,7 +1683,8 @@ class program_mod_line(osv.osv):
 		'name': fields.related('qualification_module_id', 'name', relation='learner.info', readonly=1),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', readonly=1),
 		'check_module_select_1': fields.boolean('Selectable'),
-		'select_mod_1': fields.boolean('Select', select=True, store=True),		
+		'select_mod_1': fields.boolean('Select', select=True, store=True),
+		'class_start_date_1':fields.many2one('class.info', 'Class Start Date', ondelete='cascade', help='Class Calendar', readonly=1),
 	#2
 		'prog_mod_id_2': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', readonly=1),
 		'qualification_module_id_2': fields.many2one('learner.info'),
@@ -1576,112 +1719,6 @@ class program_mod_line(osv.osv):
     }
 program_mod_line()
 
-#Class Enrollment Info
-###############
-
-class enroll_info(osv.osv):
-
-#Image
-	def _get_image(self, cr, uid, ids, name, args, context=None):
-		result = dict.fromkeys(ids, False)
-		for obj in self.browse(cr, uid, ids, context=context):
-			result[obj.id] = tools.image_get_resized_images(obj.image)
-		return result
-
-	def _set_image(self, cr, uid, id, name, value, args, context=None):
-		return self.write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
-		
-	def true_false_control(self, cr, uid, ids, context=None):
-		if val:
-			raise osv.except_osv(_('Warning', _('Test')))
-				
-	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-			]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-			
-	_name = "enroll.info"
-	_description = "This table is for keeping location data"
-	_columns = {
-	    'location_id': fields.char('Id',size=20),
-		'name': fields.char('Name', size=100,required=True, select=True),
-		'full_name': fields.char('Name as in NRIC/FIN', size=100),
-		'nric': fields.char('NRIC', size=30),
-		'program_info': fields.selection((('prog A','Prog A'),('prog B','prog B')),'Program'),
-		'program_learner': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True),
-		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, store=True),
-		'module_line': fields.one2many('enroll.module.line','module_id','Module'),
-		'check_line': fields.one2many('checklist.module','en_checklist_id','checklist'),
-		'schedule_line': fields.one2many('schedule.module','session_no','schedule'),
-		'select_center':fields.selection((('Center A','Center A'),('Center B','Center B'),('Center C','Center C'),),'Select Center'),
-		'select_module':fields.selection((('Module 1','Module 1'),('Module 2','Module 2'),('Module 3','Module 3'),),'Select Module'),
-		'date_1':fields.date('Date', readonly='True'),
-		'class_code':fields.char('Class Code', readonly=1),
-		'start_date':fields.date('Start Date', readonly='True'),
-		'end_date':fields.date('End Date', readonly='True'),
-		'personal_line': fields.one2many('personal.module','personal_id','Personal Details'),
-		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
-		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
-		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
-		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
-		'birth_date':fields.date('Birth Date'),
-		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
-		('O Level or equivalent','O Level or equivalent'),('A Level or equivalent','A Level or equivalent'),('ITE Skills Certification (ISC)','ITE Skills Certification (ISC)'),('Higher NITEC','Higher NITEC'),('NITEC/Post Nitec','NITEC/Post Nitec'),
-		('Polytechnic Diploma','Polytechnic Diploma'),('WSQ Diploma','WSQ Diploma'),('Professional Qualification & Other Diploma','Professional Qualification & Other Diploma'),('University First Degree','University First Degree'),
-		('University Post-graduate Diploma & Degree/Master/Doctorate','University Post-graduate Diploma & Degree/Master/Doctorate'),('WSQ Certificate','WSQ Certificate'),('WSQ Higher Certificate','WSQ Higher Certificate'),('WSQ Advance Certificate','WSQ Advance Certificate'),
-		('WSQ Diploma','WSQ Diploma'),('WSQ Specialist Diploma','WSQ Specialist Diploma'),('WSQ Graduate Diploma','WSQ Graduate Diploma'),('Others','Others'),('Not Reported','Not Reported')),'Highest Qualification'),
-		'language_proficiency':fields.boolean('Language Proficiency'),
-		'desig_detail':fields.selection('designation', 'Designation'),
-		'sponsor_ship':fields.selection((('LG','LG'),('DELL','DELL'),('THUMPS UP','THUMPS UP')),'Sponsorship'),
-		'email_id': fields.char('Email', size=30),
-		'addr_1': fields.char('Address'),
-		'postal_code': fields.integer('Postal Code', size=6),		
-		'mobile_no': fields.integer('Mobile Number'),
-		'landline_no': fields.integer('Home Number'),
-		'office_no': fields.integer('Office'),
-		'history_line': fields.one2many('history.learner.module','history_id','history'),
-		'image': fields.binary("Photo",
-			help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
-		'image_medium': fields.function(_get_image, fnct_inv=_set_image,
-			string="Medium-sized photo", type="binary", multi="_get_image",
-			store = {
-				'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-			},
-			help="Medium-sized photo of the employee. It is automatically "\
-				"resized as a 128x128px image, with aspect ratio preserved. "\
-					"Use this field in form views or some kanban views."),
-		'image_small': fields.function(_get_image, fnct_inv=_set_image,
-			string="Smal-sized photo", type="binary", multi="_get_image",
-			store = {
-				'enroll.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-			},
-			help="Small-sized photo of the employee. It is automatically "\
-				"resized as a 64x64px image, with aspect ratio preserved. "\
-				"Use this field anywhere a small image is required."),
-	}
-	_constraints = [(_check_unique_name, 'Error: Learner Already Exists', ['name'])]
-enroll_info ()
-
-#Class Enroll Module Line
-###############
-
-class enroll_module_line(osv.osv):
-	_name = "enroll.module.line"
-	_description = "Module Tab"
-	_columns = {
-	'enroll_id' : fields.many2one('enroll.info', 'Id'), 
-	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
-	'enroll_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),	
-	}
-	
-enroll_module_line()
-
 #Class Checklist
 ###############
 
@@ -1707,7 +1744,6 @@ class checklist(osv.osv):
 	_description ="checklist Tab"
 	_columns = {
 		'checklist_id' : fields.many2one('learner.info'),
-		'en_checklist_id' : fields.many2one('enroll.info'),
 		's_no' : fields.integer('S.No',size=50, readonly=1),
 		'item':fields.many2one('master.show.do', 'Item', ondelete='cascade', readonly=1),
 		'subsidy_fee': fields.integer('% Of Module Fee', ondelete='cascade', readonly=1),
@@ -1738,13 +1774,13 @@ class checklist(osv.osv):
 		return super(checklist, self).write(cr, uid, ids, vals, context)
 checklist()
 
-#Class Schedule
+#Class Schedules
 ###############
-class schedule(osv.osv):
+class class_schedule(osv.osv):
 
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		
-		res = super(schedule, self).read(cr, uid,ids, fields, context, load)
+		res = super(class_schedule, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+1
@@ -1753,10 +1789,10 @@ class schedule(osv.osv):
 		return res
 		
 	def update_status(self,cr, uid, ids, values, context=None):
-		super(schedule, self).write(cr, uid, ids,values, context=context)
+		super(class_schedule, self).write(cr, uid, ids,values, context=context)
 
-	_name ='schedule.module'
-	_description ="schedule Tab"
+	_name ='class.schedule.module'
+	_description ="Class Schedule Tab"
 	_columns = {
 		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
 		'class_info_id':fields.many2one('class.info', 'Learner', ondelete='cascade', help='Learner', select=True),
@@ -1765,7 +1801,33 @@ class schedule(osv.osv):
 		'date_schd': fields.date('Date', readonly='True'),
 		't_status':fields.char('Status'),
 	}
-schedule ()
+class_schedule ()
+
+#Test Schedules
+###############
+class test_schedule(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(test_schedule, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['test_name'] = seq_number
+		
+		return res
+
+	_name ='test.schedule.module'
+	_description ="Test schedule Tab"
+	_columns = {
+		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
+		'class_info_id':fields.many2one('class.info', 'Learner', ondelete='cascade', help='Learner', select=True),
+		'test_name' : fields.char('Test Name', size=10, readonly=1),
+		'test_code' : fields.char('Test Code', size=20, readonly=1),
+		'start_date': fields.datetime('Start Date', readonly='True'),
+		'end_date': fields.datetime('End Date', readonly='True'),
+	}
+test_schedule ()
 
 #Personal Details Race Field
 
@@ -2031,7 +2093,42 @@ action_learn()
 
 #Learner Payment History Tab
 
+#Current Class
+class current_class(osv.osv):
 
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(current_class, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+
+	_name = "current.class"
+	_description = "Currents Class Details"
+	_columns = {
+		'class_id' : fields.many2one('learner.info', ondelete='cascade'),
+		'class_iid': fields.many2one('class.info', ondelete='cascade'),
+		's_no' : fields.integer('S.No',size=20,readonly=1),
+		'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
+		'class_code':fields.char('Class Code'),
+		'start_date': fields.date('Start Date'),
+		'end_date': fields.date('End Date'),
+		'session_timings': fields.char('Session Timings', size=20),
+		'class_status': fields.char('Class Status'),
+		'attendance': fields.integer('Attendance'),
+		'no_of_sessions': fields.integer('No of Sessions', size=3),
+		'class_schedule_paltform': fields.char('Class Schedule Pattern'),
+	}
+	
+	def on_change_prog_name(self, cr, uid, ids, program_name):
+		module_obj = self.pool.get('lis.program').browse(cr, uid, program_name)
+		return {'value': {'program_name': module_obj.program_name}}	
+		
+current_class()
+	
 #Learner Class History Tab
 class class_history(osv.osv):
 
@@ -2050,14 +2147,14 @@ class class_history(osv.osv):
 	_columns = {
 	'class_id' : fields.many2one('learner.info', ondelete='cascade'), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
+	'action': fields.char('Action'),
 	'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
 	'module_name':fields.many2one('cs.module', 'Module', ondelete='cascade'),
-	#'class_code':fields.many2one('class.info', 'Class Code', ondelete='cascade'),
 	'class_code':fields.char('Class Code'),
 	'start_date': fields.datetime('Date Commenced'),
-	'end_date': fields.datetime('Date Completed'),
+	'action_by': fields.char('Action By'),
+	'additional_info': fields.char('Additional Info'),
 	'emp_staus': fields.many2one('employee.status', 'Employee Status'),
-	'desig_detail':fields.many2one('designation', 'Designation'),
 	'sponsor_ship':fields.many2one('sponsership', 'Sponsership'),
 	}
 	
@@ -2073,10 +2170,10 @@ class test_history(osv.osv):
 	_description = "Test History Tab"
 	_columns = {
 	'test_id' : fields.many2one('learner.info', 'Learner', ondelete='cascade'), 
-	'test_type' : fields.many2one('test','Test', ondelete='cascade'),
+	#'test_type' : fields.many2one('test','Test', ondelete='cascade'),
 	'test_code' : fields.char('Test Code',),
 	'test_date' : fields.date('Test Date'),
-	'test_status' : fields.char('Test Status',),
+	'test_status' : fields.char('Test Status'),
 	
 	}	
 test_history()
@@ -2258,6 +2355,8 @@ class remarks(osv.osv):
 	   }
 	_order = "date_of_remarks desc"
 remarks()
+
+
 
 
 	
