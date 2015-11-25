@@ -742,9 +742,9 @@
                 <field name="name" class="oe_inline" readonly="context.get('ctx', False)" />
               </h1>
               <label for="module_code" class="oe_edit_only" invisible="context.get('ctx', False)" />
-              <field name="module_code"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" />
+              <field name="module_code"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" />
               <label for="module_crscode" class="oe_edit_only" invisible="context.get('ctx', False)" />
-              <field name="module_crscode"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_crscode"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-2">
               <group col="4">
@@ -783,15 +783,15 @@
             <div class="clear" />
             <div class="col-3">
               <label for="module_certification" />
-              <field name="module_certification"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_certification"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="module_duration" />
-              <field name="module_duration"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_duration"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="module_fee" />
-              <field name="module_fee" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_fee" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="clear" />
             <div class="col-3">
@@ -800,20 +800,20 @@
             </div>
             <div class="col-3">
               <label for="module_credit_value" />
-              <field name="module_credit_value" readonly="context.get('ctx', False)" string="Credit Value" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_credit_value" readonly="context.get('ctx', False)" string="Credit Value" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="module_level" />
-              <field name="module_level" widget="selection/" group="cornerstone_user" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_level" widget="selection/" group="cornerstone_user" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="clear" />
             <div class="col-3">
               <label for="module_category" />
-              <field name="module_category" widget="selection/" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_category" widget="selection/" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="module_pathway" />
-              <field name="module_pathway" widget="selection/" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_pathway" widget="selection/" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="orientation" />
@@ -823,7 +823,7 @@
             <group col="8">
               <div colspan="4">
                 <label for="description" />
-                <field name="description" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" readonly="context.get('ctx', False)" />
+                <field name="description" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" readonly="context.get('ctx', False)" />
               </div>
             </group>
             <!-- ========================= Start Of Module Tabs ========================= -->
@@ -833,7 +833,7 @@
                 <h3>
                   <label string="Requirments" />
                 </h3>
-                <field name="req_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+                <field name="req_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                   <tree string="Req Order Lines" editable="bottom" class="grey_border">
                     <field name="master_req" on_change="on_change_master_req(master_req)" />
                     <field name="description" />
@@ -848,18 +848,18 @@
                   <label string="Description" />
                 </h3>
                 <group>
-                  <field name="max_num_ppl_class" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+                  <field name="max_num_ppl_class" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
                 </group>
                 <group>
                   <div>
                     <label for="synopsis" />
-                    <field name="synopsis" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"  readonly="context.get('ctx', False)" /> <!-- on_change="on_change_module_synopsis(synopsis)" -->
+                    <field name="synopsis" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"  readonly="context.get('ctx', False)" /> <!-- on_change="on_change_module_synopsis(synopsis)" -->
                   </div>
                 </group>
                 <group>
                   <div>
                     <label for="outline" />
-                    <field name="outline" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" />
+                    <field name="outline" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)" />
                   </div>
                 </group>
               </page>
@@ -871,10 +871,10 @@
                 <group>
                   <div>
                     <group>
-                      <field name="delivery_mode" string="Medium Of Instruction" style="width:180px;" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
-					  <field name="binder_in_use" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
-                      <field name="tablet_in_use" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
-                      <field name="primary" readonly="context.get('ctx', False)" style="width:180px;" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+                      <field name="delivery_mode" string="Medium Of Instruction" style="width:180px;" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+					  <field name="binder_in_use" readonly="context.get('ctx', False)"/>
+                      <field name="tablet_in_use" readonly="context.get('ctx', False)" />
+                      <field name="primary" readonly="context.get('ctx', False)" style="width:180px;" />
 					</group>
 					<!--field name="mode_of_instr" readonly="context.get('ctx', False)">
                         <tree editable="bottom" delete="false" >
@@ -888,7 +888,7 @@
                     <group>
                       <field name="room_arr"  style="width:180px;" />
                     </group>
-					<field name="pf_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+					<field name="pf_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                         <tree editable="bottom" >
 						  <field name="s_no" />
                           <field name="equip_list" required="True" />
@@ -909,7 +909,7 @@
                       <field name="pre_test" readonly="context.get('ctx', False)" />
                     </group>
                     <div attrs="{'invisible': [('pre_test', '=' , False)]}">
-                      <field name="pre_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+                      <field name="pre_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                         <tree string="Pre Order Lines" editable="bottom">
                           <field name="order_priority" />
                           <field name="modality" options="{'create': False, 'create_edit': False}" />
@@ -923,7 +923,7 @@
                       <field name="in_class_test" readonly="context.get('ctx', False)" />
                     </group>
                     <div attrs="{'invisible': [('in_class_test', '=' , False)]}">
-                      <field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+                      <field name="in_class_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                         <tree string="In Class Order Lines" editable="bottom">
                           <field name="order_priority" />
                           <field name="modality" options="{'create': False, 'create_edit': False}" />
@@ -937,7 +937,7 @@
                       <field name="post_test" readonly="context.get('ctx', False)" />
                     </group>
                     <div attrs="{'invisible': [('post_test', '=' , False)]}">
-                      <field name="post_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+                      <field name="post_test_line" nolabel="1" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                         <tree string="Post Order Lines" editable="bottom">
                           <field name="order_priority" />
                           <field name="modality" options="{'create': False, 'create_edit': False}"/>
@@ -967,7 +967,7 @@
                 <h3>
                   <label string="Alerts" />
                 </h3>
-                <field name="alert_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
+                <field name="alert_line" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)">
                   <tree string="Alert Order Lines" editable="bottom" class="grey_border">
                     <field name="s_no" />
                     <field name="alert_list" on_change="on_change_master_module_alerts(alert_list,mod_id)" />

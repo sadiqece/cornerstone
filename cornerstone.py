@@ -3189,8 +3189,8 @@ class cs_module(osv.osv):
        return res
 	   
 #Status Completed
-    def on_change_module_status(self, cr, uid, ids, module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,binder_in_use,tablet_in_use,primary,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line,context=None):
-		if module_code and module_crscode and module_certification and module_level and module_credit_value and module_duration and module_fee and description and module_category and module_pathway and req_line and max_num_ppl_class and synopsis and outline and delivery_mode and binder_in_use and tablet_in_use and primary and room_arr and pf_line and pre_test_line and in_class_test_line and post_test_line and alert_line:
+    def on_change_module_status(self, cr, uid, ids, module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line,context=None):
+		if module_code and module_crscode and module_certification and module_level and module_credit_value and module_duration and module_fee and description and module_category and module_pathway and req_line and max_num_ppl_class and synopsis and outline and delivery_mode and room_arr and pf_line and pre_test_line and in_class_test_line and post_test_line and alert_line:
 			return {'value': {'module_status': 'Completed'}}
 		else:
 			return {'value': {'module_status': 'Incomplete'}}
