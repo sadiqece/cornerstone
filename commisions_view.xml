@@ -20,7 +20,7 @@
 				        </div>
 		       </group>
 				<group style="width:280px;">
-					<field name='pay_value' attrs="{'readonly':[('pay_value','!=',False)]}" on_change="on_change_pay_value(pay_value)"/> 
+					<field name='pay_value' on_change="on_change_pay_value(pay_value)"/> 
 				</group>
 				<group style="width:250px;">
 					<field name="commision_status"/>
@@ -152,7 +152,6 @@
         </record>
 
 
-		
 <menuitem name = "Commissions" id = "commision" parent = "menu_sub2" action = "action_commision"/>
 
 </data> 

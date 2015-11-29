@@ -11,7 +11,7 @@
       <field name="name">Enrollment</field>
       <field name="model">learner.info</field>
       <field name="arch" type="xml">
-        <tree string="Learner" create="false">
+        <tree string="Learner">
           <field name="name" />
           <field name="learnerfull_name" />
           <field name="learner_nric" />
@@ -29,6 +29,8 @@
       </field>
     </record>
 	
+	
+	
    <!-- ========================= Leaner & Enrolment Profile Action Layout ============================= -->
     
 	<record model="ir.actions.act_window" id="action_profile">
@@ -37,7 +39,7 @@
       <field name="res_model">learner.info</field>
       <field name="view_type">form</field>
 	  <field name="view_id" ref="enroll_tree"/>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">form,tree</field>
       <field name="search_view_id" ref="view_enrollment_filter" />
     </record>
 	
@@ -46,8 +48,7 @@
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">learner.info</field>
       <field name="view_type">form</field>
-	  <field name="view_id" ref="enroll_form"/>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">form,tree</field>
       <field name="search_view_id" ref="view_enrollment_filter" />
     </record>
 	
@@ -57,7 +58,10 @@
       <field name="name">Enrollment</field>
       <field name="model">learner.info</field>
       <field name="arch" type="xml">
-        <form string="enroll_info" version="7.0">
+        <form string="Learner 5 tab" version="7.0">
+		  <header>
+			<!--button name="views_enroll" string="Learner Profile" type="object" class="oe_highlight"/-->
+		  </header>
           <sheet>
 		  <group class="col-10">
 			<label string="Learner Enrollment" class="oe_edit_only" style="font-size:20px;"/>
@@ -76,15 +80,15 @@
             <!-- Color Boxes -->
             <div class="col-35">
               <group>
-			  <div class="col-2" style="margin:0px;">
-                <div class="openerp oe_form_readonly schedule_status_box_9 ">
-                  <div class="no_learners_9">Checklist Items</div>
-                  <div class="learner_box_9">
-					<field name = "actual_number" />
+				  <div class="col-2" style="margin:0px;">
+					<div class="openerp oe_form_readonly schedule_status_box_9 ">
+					  <div class="no_learners_9">Checklist Items</div>
+					  <div class="learner_box_9">
+						<field name = "actual_number" />
+					  </div>
+					</div>
 				  </div>
-                </div>
-			  </div>
-			  	 <group col="4">
+			  	<group col="4">
 					<div attrs="{'invisible': [('learner_status_display_3', 'in' ,('Active','Complete', 'InComplete', 'InActive', 'False'))]}">
 						<div id="div_status1" class="openerp oe_form_readonly learner_status_box_2">
 							<div class="learner_status_box_label_2 ">Status</div>
@@ -125,14 +129,24 @@
             </div>
 			
             <div class="clear" />
-            <div class="col-2">
+            <div class="col-3">
               <label for="learnerfull_name" />
               <field name="learnerfull_name" />
             </div>
 			
-            <div class="col-2">
+			<div class="col-3">
+              <label for="nationality" />
+              <field name="nationality" on_change="on_change_nationality(nationality)"/>
+            </div>
+			
+			<div class="col-3" attrs="{'invisible': ['|','|','|','|','|','|','|',('nationality', '=' , ''),('nationality', '=' , 'Malaysia'),('nationality', '=' , 'South Korea'),('nationality', '=' , 'North Korea'),('nationality', '=' , 'India'),('nationality', '=' , 'Indonesia'),('nationality', '=' , 'Vietnam')]}">
               <label for="learner_nric" />
               <field name="learner_nric" />
+            </div>
+			
+            <div class="col-3" attrs="{'invisible': ['|','|',('nationality', '=' , 'Singapore'),('nationality', '=' , '')]}">
+              <label for="learner_non_nric" />
+              <field name="learner_non_nric" />
             </div>
 			
             <div class="col-2">
@@ -145,6 +159,11 @@
                 <field name="select_center" on_change="onchange_populate_schedule3(select_center,select_module)" options="{'create': False, 'create_edit': False}" />
 			</div>
 			
+			<div class="col-2">
+				<label string="Selected Programs by Learner" invisible="1"/>
+                <field name="selected_program" options="{'create': False, 'create_edit': False}" invisible="1"/>
+			</div>
+			
             <!-- Learner Enrollment Profile Tabs -->
 			
             <notebook colspan="5" col="10">
@@ -155,7 +174,7 @@
                     <label string="Personal Details" readonly="context.get('ctx', False)" />
                   </h3>
                   <group>
-                    <field name="nationality" style="width:280px;" />
+                    <!--field name="nationality" style="width:280px;" /-->
                     <field name="marital_status" style="width:280px;" />
                     <field name="race" style="width:280px;" />
                     <field name="gender" style="width:280px;" />
@@ -251,7 +270,9 @@
                         <field name="prog_mod_id" invisible="1" />
                         <field name="module_id" widget="selection" />
                         <field name="check_module_select_1" invisible="1" />
-                        <field name="select_mod_1" attrs="{'invisible': [('check_module_select_1', '=' , False)]}" />
+						<field name="class_start_date_1" invisible="1" />
+                        <!--field name="select_mod_1" attrs="{'invisible': [('check_module_select_1', '=' , False)]}" /-->
+						<field name="select_mod_1" on_change="check_box_value(module_id,select_mod_1)" />
 						<button name="views" string="View Module" icon="view_info2" type="object"/>
                       </tree>
                     </field>
@@ -461,70 +482,120 @@
                 <h3>
                   <label string="Schedule" readonly="context.get('ctx', False)" />
                 </h3>
-                <div class="col-3">
-                  <!--label string="Select Center" invisible="1" />
-                  <field name="select_center" on_change="onchange_populate_schedule3(select_center,select_module)" options="{'create': False, 'create_edit': False}" /-->
-                  <label string="Select Module" />
-                  <field name="select_module" on_change="onchange_populate_schedule4(select_center,select_module)" options="{'create': False, 'create_edit': False}" />
-				  <field name="select_module2" invisible="1"/>
-				  <label string="Select Date" />
-                    <field name="sch_date" on_change="onchange_populate_schedule2(select_center, select_module2, sch_date)" options="{'create': False, 'create_edit': False}"/>
-					<field name="sch_date2" invisible="1"/>
-					<field name="t_status" invisible="1"/>
+				
+				<!-- Class Schedule Info -->
+				<group style="width:350px;">
+					<field name='toggling' on_change="on_change_scheduling(toggling)"/> 
+				</group>
+				<group>
+			 		<div>	
+						<group attrs="{'invisible': [('test_type_schedule', '=' , True)]}">
+							<field name='class_type_schedule' invisible="1"/>
+						</group>
 					
-				  <group>
-				  </group>
-				  
-				  <group>
-					<!--button name="learner_move" string="Learner Move" type="object" class="oe_edit_only"/-->
-				  </group>
-                </div>
-                <div class="col-75">
-                  <div class="col-2" style="float:right;">
-                    <group>
-                      <div class="openerp oe_form_readonly schedule_status_box_shed_9 ">
-                        <div class="no_learners_shed_9">No. of Learner</div>
-                        <div class="learner_box_shed_9">5</div>
-                      </div>
-                      <div class="openerp oe_form_readonly schedule_status_box_shed_10">
-                        <div class="no_learners_shed_10">Status</div>
-                        <div class="learner_box_shed_10">In Progress</div>
-                      </div>
-                    </group>
-                  </div>
-                  <div class="clear" />
-				  <div class="col-4">
-                    <label string="Class Name" />
-                    <field name="class_name" />
-                  </div>
-                  <div class="col-4">
-                    <label string="Class Code" />
-                    <field name="class_code" />
-                  </div>
-                  <div class="col-4">
-                    <label string="Start Date" />
-                    <div class="clear" />
-                    <field name="start_date" />
-                  </div>
-                  <div class="col-4">
-                    <label string="End Date" />
-                    <div class="clear" />
-                    <field name="end_date" />
-                  </div>
-                  <div>
-                    <h2>
-                      <label string="Sessions Info" readonly="context.get('ctx', False)" />
-                    </h2>
-                    <field name="schedule_line" nolabel="1">
+						<group attrs="{'invisible': [('class_type_schedule', '=' , True)]}">
+							<field name='test_type_schedule' invisible="1"/>
+						</group>
+					</div>
+				</group>
+                
+                
+				<!-- Class Schedule Info -->  
+                <div attrs="{'invisible': [('class_type_schedule', '=' , False)]}">
+                    <h3>
+                      <label string=" Class Sessions Info:" readonly="context.get('ctx', False)" />
+                    </h3>
+					
+					<div class="col-3">
+						<label string="Select Module" />
+						<field name="select_module" options="{'create': False, 'create_edit': False}" />
+						<field name="select_module2" invisible="1"/>
+						<label string="Select Date" />
+							<field name="sch_date" on_change="onchange_populate_schedule2(select_center, select_module2, sch_date)" options="{'create': False, 'create_edit': False}"/>
+							<field name="sch_date2" invisible="1"/>
+					</div>
+					
+					<div class="col-75">
+					  <div class="col-2" style="float:right;">
+						<group>
+						  <div class="openerp oe_form_readonly schedule_status_box_shed_9 ">
+							<div class="no_learners_shed_9">No. of Learner</div>
+							<div class="learner_box_shed_9">5</div>
+						  </div>
+						  <div class="openerp oe_form_readonly schedule_status_box_shed_10">
+							<div class="no_learners_shed_10">Status</div>
+							<div class="learner_box_shed_10">In Progress</div>
+						  </div>
+						</group>
+					  </div>
+					</div>
+					
+					<div class="col-4">
+						<label string="Class Name" />
+						<field name="class_name" />
+					</div>
+					<div class="col-4">
+						<label string="Class Code" />
+						<field name="class_code" />
+					</div>
+					<div class="col-4">
+						<label string="Start Date" />
+						<field name="start_date" />
+					</div>
+					<div class="col-4">
+						<label string="End Date" />
+						<field name="end_date" />
+					</div>
+					
+                    <field name="class_schedule_line" nolabel="1">
                       <tree string="List" create="false" delete="false">
                         <field name="session_no" />
                         <field name="week_no" />
                         <field name="date_schd" />
                       </tree>
                     </field>
-                  </div>
                 </div>
-                <div class="clear" />
+				
+				<!-- Test Schedule Info -->  
+                <div attrs="{'invisible': [('test_type_schedule', '=' , False)]}">
+                    <h3>
+                      <label string=" Test Sessions Info:" readonly="context.get('ctx', False)" />
+                    </h3>
+					
+					<div class="col-3">
+						<label string="Select Module" />
+						<field name="select_module" options="{'create': False, 'create_edit': False}" />
+						<field name="select_module2" invisible="1"/>
+						<label string="Select Date" />
+							<field name="sch_date" on_change="onchange_populate_schedule2(select_center, select_module2, sch_date)" options="{'create': False, 'create_edit': False}"/>
+							<field name="sch_date2" invisible="1"/>
+					</div>
+					
+					<!--div class="col-75">
+					  <div class="col-2" style="float:right;">
+						<group>
+						  <div class="openerp oe_form_readonly schedule_status_box_shed_9 ">
+							<div class="no_learners_shed_9">No. of Learner</div>
+							<div class="learner_box_shed_9">5</div>
+						  </div>
+						  <div class="openerp oe_form_readonly schedule_status_box_shed_10">
+							<div class="no_learners_shed_10">Status</div>
+							<div class="learner_box_shed_10">In Progress</div>
+						  </div>
+						</group>
+					  </div>
+					</div-->
+					
+                    <field name="test_schedule_line" nolabel="1">
+                      <tree string="List" create="false" delete="false">
+                        <field name="test_name" />
+                        <field name="test_code" />
+                        <field name="start_date" />
+						<field name="end_date" />
+                      </tree>
+                    </field>
+                </div>
+				
               </page>
 			  
               <!-- Payment Tab -->
@@ -565,7 +636,7 @@
       <field name="name">Enrollment</field>
       <field name="model">learner.info</field>
       <field name="arch" type="xml">
-        <form string="enroll_info" version="7.0">
+        <form string="Learner 11 tab" version="7.0">
           <sheet>
             <field name="image_medium" widget="image" class="oe_left oe_avatar" />
             <div class="col-3">
@@ -574,49 +645,27 @@
                 <field name="name"/>
               </h1>
             </div>
-            <div class="clear" />
-			
-            <div class="col-3">
-              <label for="learnerfull_name" />
-              <field name="learnerfull_name" />
-            </div>
-			
-            <div class="col-3">
-              <label for="learner_nric" />
-              <field name="learner_nric" />
-            </div>
-			
-            <div class="col-3">
-              <label for="learner_status" />
-              <field name="learner_status" />
-            </div>
-            <div class="clear" />
-			
+		
             <!-- Color Boxes -->
-            <div class="col-2">
-              <group>
-                <div class="openerp oe_form_readonly schedule_status_box_5 ">
-                  <div class="no_learners_5">Outstanding Items</div>
-                  <div class="learner_box_5">
-					<field name = "actual_number" />
-				  </div>
-                </div>
-                <div class="openerp oe_form_readonly schedule_status_box_6">
-                  <div class="no_learners_6">Attendance</div>
-                  <div class="learner_box_6">76</div>
-                </div>
-              </group>
-            </div>
-			<div class="col-2">
-                <group>
-				<div class="col-2" style="margin-top: 0;">
+			<div class="col-2 pull_right">
+				<div class="col-3" style="margin-top: 0;">
+					<div class="openerp oe_form_readonly schedule_status_box_5 ">
+					  <div class="no_learners_5">Outstanding Items</div>
+					  <div class="learner_box_5">
+						<field name = "actual_number" />
+					  </div>
+					</div>
+				</div>
+			
+				<div class="col-3" style="margin-top: 0;">
 					<div class="openerp oe_form_readonly schedule_status_box_7">
 					  <div class="no_learners_7">Call Status</div>
 					  <div class="learner_box_7">DON'T
 										CALL</div>
 					</div>
 				</div>
-				<div class="col-2" style="margin-top: 0;">
+				
+				<div class="col-3" style="margin-top: 0;">
 					<div attrs="{'invisible': [('learner_status_display_3', 'in' ,('Active','Complete', 'InComplete', 'InActive', 'False'))]}">
 						<div id="div_status1" class="openerp oe_form_readonly learner_status_box_2">
 							<div class="learner_status_box_label_2 ">Status</div>
@@ -653,99 +702,102 @@
 						</div>
 					</div>
 				</div>
-                </group>
 			</div>
             <div class="clear" />
-			
-            <div class="col-2">
-              <h3>
-                <label string="Current Information:" />
-              </h3>
-              <label string="Program Name" />
-              <field name="program_learner" string="Program" readonly="True" options="{'create': False, 'create_edit': False}"/>
-              <label string="Module Name" />
-              <!--field name="module_id" string="Module" options="{'create': False, 'create_edit': False}" readonly="True"/-->
-			  <field name="select_module" />
+		<div class="col-3">
+              <label for="learnerfull_name" />
+              <field name="learnerfull_name" />
             </div>
 			
-            <div class="col-2">
-              <h3>
-                <label string="Class Detail:" />
-              </h3>
-              <div class="col-3">
-                <label string="Class Code" />
-                <field name="class_code" />
-              </div>
-              <div class="col-3">
-                <label string="Start Date" />
-                <div class="clear" />
-                <field name="start_date" />
-              </div>
-              <div class="col-3">
-                <label string="End Date" />
-                <div class="clear" />
-                <field name="end_date" />
-              </div>
+            <div class="col-3">
+              <label for="learner_nric" />
+              <field name="learner_nric" />
+            </div>
+			
+            <div class="col-3">
+              <label for="learner_status" />
+              <field name="learner_status" />
             </div>
             <div class="clear" />
 			
-    <!-- Learner Profile 11 Tabs Starts -->
+    <!-- Learner Profile 12 Tabs Starts -->
 			
-            <notebook colspan="5" col="10">
+        <notebook colspan="5" col="10">
+		
+		<!-- Current Class Tab -->
+			<page string="Current Class">
+				<h3>
+				  <label string="Current Class" readonly="context.get('ctx', False)" />
+				</h3>
+				<field name="current_class_line" nolabel="1">
+				  <tree string="List" editable="bottom" edit="false">
+					<field name="s_no" />
+					<field name="program_name" />
+					<field name="class_code" />
+					<field name="start_date" />
+					<field name="end_date" />
+					<field name="session_timings" />
+					<field name="class_status" />
+					<field name="attendance" />
+					<field name="no_of_sessions" />
+					<field name="class_schedule_paltform" />
+				  </tree>
+				</field>
+			</page>
 			
 		<!-- Personal Details Tab -->
-		  <page string="Personal Details">
-			<div class="col-2">
-			  <h3>
-				<label string="Personal Details" readonly="context.get('ctx', False)" />
-			  </h3>
-			  <group>
-				<field name="nationality" style="width:280px;" />
-				<field name="marital_status" style="width:280px;" />
-				<field name="race" style="width:280px;" />
-				<field name="gender" style="width:280px;" />
-				<field name="birth_date" />
-			  </group>
-			</div>
-			
-			<div class="col-2">
-			  <h3>
-				<label string="Educational Details" readonly="context.get('ctx', False)" />
-			  </h3>
-			  <group>
-				<field name="high_qualification" style="width:280px;" />
-				<field name="language_proficiency" />
-			  </group>
-			</div>
-			<div class="clear" />
-			
-			<div class="col-2">
-			  <h3>
-				<label string="Work Details" readonly="context.get('ctx', False)" />
-			  </h3>
-			  <group>
-				<field name="emp_staus" style="width:280px;" />
-				<field name="company_name" string="Company" style="width:280px;" />
-				<field name="desig_detail" style="width:280px;" editable="bottom" />
-				<field name="salary" style="width:280px;" />
-				<field name="sponsor_ship" style="width:280px;" />
-			  </group>
-			</div>
-			
-			<div class="col-2">
-			  <h2>
-				<label string="Contact Details" readonly="context.get('ctx', False)" />
-			  </h2>
-			  <group>
-				<field name="email_id"/>
-				<field name="addr_1" style="width:280px;" />
-				<field name="mobile_no" style="width:280px;" />
-				<field name="landline_no" style="width:280px;" />
-				<field name="office_no" style="width:280px;" />
-			  </group>
-			</div>
-			<div class="clear" />
-		  </page>
+			  <page string="Personal Details">
+				<div class="col-2">
+				  <h3>
+					<label string="Personal Details" readonly="context.get('ctx', False)" />
+				  </h3>
+				  <group>
+					<field name="nationality" style="width:280px;" />
+					<field name="marital_status" style="width:280px;" />
+					<field name="race" style="width:280px;" />
+					<field name="gender" style="width:280px;" />
+					<field name="birth_date" />
+				  </group>
+				</div>
+				
+				<div class="col-2">
+				  <h3>
+					<label string="Educational Details" readonly="context.get('ctx', False)" />
+				  </h3>
+				  <group>
+					<field name="high_qualification" style="width:280px;" />
+					<field name="language_proficiency" />
+				  </group>
+				</div>
+				<div class="clear" />
+				
+				<div class="col-2">
+				  <h3>
+					<label string="Work Details" readonly="context.get('ctx', False)" />
+				  </h3>
+				  <group>
+					<field name="emp_staus" style="width:280px;" />
+					<field name="company_name" string="Company" style="width:280px;" />
+					<field name="desig_detail" style="width:280px;" editable="bottom" />
+					<field name="salary" style="width:280px;" />
+					<field name="sponsor_ship" style="width:280px;" />
+				  </group>
+				</div>
+				
+				<div class="col-2">
+				  <h2>
+					<label string="Contact Details" readonly="context.get('ctx', False)" />
+				  </h2>
+				  <group>
+					<field name="email_id"/>
+					<field name="addr_1" style="width:280px;" />
+					<field name="mobile_no" style="width:280px;" />
+					<field name="landline_no" style="width:280px;" />
+					<field name="office_no" style="width:280px;" />
+				  </group>
+				</div>
+				<div class="clear" />
+			  </page>
 		  
         <!-- Outstanding Tab -->
 		  <page string="Outstanding">
@@ -802,20 +854,21 @@
 		  </page>
 		  
         <!-- Class History Tab -->
-		  <page string="Class History">
+		  <page string="Class Txns">
 			<h3>
-			  <label string="Class History" readonly="context.get('ctx', False)" />
+			  <label string="Class Txns" readonly="context.get('ctx', False)" />
 			</h3>
 			<field name="class_history_line" nolabel="1">
 			  <tree string="List" editable="bottom" edit="false">
 				<field name="s_no" />
+				<field name="action" />
 				<field name="program_name" />
 				<field name="module_name" />
 				<field name="class_code" />
 				<field name="start_date" />
-				<field name="end_date" />
+				<field name="action_by" />
+				<field name="additional_info" />
 				<field name="emp_staus" />
-				<field name="desig_detail" />
 				<field name="sponsor_ship" />
 			  </tree>
 			</field>
@@ -829,7 +882,7 @@
 			</h3>
 			<field name="test_history_line" nolabel="1">
 			  <tree string="List" editable="bottom" edit="false">
-				<field name="test_type" />
+				<!--field name="test_type" /-->
 				<field name="test_code" />
 				<field name="test_date" />
 				<field name="test_status" />
