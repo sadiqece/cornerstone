@@ -57,7 +57,6 @@ class class_info(osv.osv):
 
 	def _property_expense_preset_expenses1(self, cr, uid, ids, expenses, arg, context):
 		spus = self.browse(cr, uid, ids)
-		_logger.info("write _property_expense_preset_expenses1 %s",ids)
 		module_ids =[]
 		parent_id = spus[0]['parent_id']
 		if parent_id > 0:
@@ -931,7 +930,6 @@ class class_info(osv.osv):
 
 
 	def write(self,cr, uid, ids, values, context=None,holidays=False):
-		_logger.info("write class %s",values)
 		if holidays ==  False :
 			if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
@@ -952,7 +950,6 @@ class class_info(osv.osv):
 			else :
 				apply_to_future = values['apply_to_future']
 
-			_logger.info("In Write Class 1 %s %s",apply,apply_to_future)
 			if apply == True :
 				self.apply_to_all(cr, uid, ids, values, context)
 			elif apply_to_future == True :
@@ -999,19 +996,16 @@ class class_info(osv.osv):
 						if len(added_ids) - len(set(added_ids)) >  0 :
 							global dupliacte_found
 							dupliacte_found = True
-							_logger.info("Duplicate 1")
 						else:
 							'''check create in table'''
 							for c in added_ids :
 								if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
 									global dupliacte_found
 									dupliacte_found = True
-									_logger.info("Duplicate 2")
 							'''check for update ids '''
 							if len(updated_ids) - len(set(updated_ids)) >  0 :
 								global dupliacte_found
 								dupliacte_found = True
-								_logger.info("Duplicate 3")
 							else :
 								found = 0
 								for u in updated_ids :
@@ -1020,7 +1014,6 @@ class class_info(osv.osv):
 								if found == 1 :
 									global dupliacte_found
 									dupliacte_found = True
-									_logger.info("Duplicate 4")
 					for ddd in deleted_line_ids :
 						values_obj = self.pool.get("learner.line").browse(cr,uid,ddd,context)
 						class_id = values_obj['learner_mod_id']
@@ -1035,7 +1028,6 @@ class class_info(osv.osv):
 							prog_mod_ids.append(class_id.id)
 						line_ids = self.pool.get("learner.line").search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
 						for prog_module_line in self.browse(cr,uid,line_ids,context):
-							_logger.info("Unlinek  prog_module_line.id %s", prog_module_line.id)
 							self.pool.get("learner.line").unlink(cr, uid, prog_module_line.id, context=context)
 				elif 'trainers_line' in values :
 					deleted_line_ids = []
@@ -1347,7 +1339,6 @@ class class_info(osv.osv):
 				value[inr_1] = end.strftime("%Y-%m-%d %H:%M:%S")
 				value['day_'+str(i)] = pytz.utc.localize(start_date).astimezone(tz).strftime("%A")[:3]
 				value['include_'+str(i)] = True
-			_logger.info("start data value %s ",value)
 			return {'value': value}
 		else:
 			if not start_date:
@@ -1536,7 +1527,6 @@ class swap_class(osv.osv):
 
 	def default_get(self, cr, uid, fields, context=None):
 		if from_create :
-			_logger.info("dws data ")
 			data = super(swap_class, self).default_get(cr, uid, fields, context=context)
 			return data
 		data = super(swap_class, self).default_get(cr, uid, fields, context=context)
@@ -1547,11 +1537,9 @@ class swap_class(osv.osv):
 		data['class_id'] = parent_class.id
  		start_date = parent_class['start_date']
 		start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
-		_logger.info("start_date start %s",start)
 		swpa_class_ids = self.search(cr,uid,[('location_id', '=', data['location_id']) and
 		('class_code', '=',data['class_code'])])
 		dwz = self.pool.get('swap.class.table')
-		_logger.info("Unlink Default %s",swpa_class_ids)
 		dwz.unlink(cr, uid,dwz.search(cr, uid, [('class_id', '=',data['class_id']) and
 		('swap_class_id', 'in', swpa_class_ids) ]), context=context)
 		self.unlink(cr,uid,swpa_class_ids,context=context)
@@ -1563,9 +1551,7 @@ class swap_class(osv.osv):
 		for self_obj in class_info.browse(cr,uid,class_id_loc):
 			self_obj_start_date = self_obj['start_date']
 			self_obj_start = datetime.strptime(self_obj_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
-			_logger.info("self_obj self_obj_start %s",self_obj_start)
 			if ((self_obj.id != context.get('class_id')) and (start == self_obj_start)):
-				_logger.info("self_obj self_obj_start %s",start)
 				room_capacity = self.pool.get('room').browse(cr,uid,self_obj.room_id.id).room_max_cap
  				dw = dwz.create(cr, uid,{
 					'swap_class_id':swap_class_id,
@@ -1593,6 +1579,8 @@ class swap_class(osv.osv):
 		swap_obj = self.browse(cr,uid,ids,context)
 		if swap_obj[0].apply_all == True :
 			class_ooo = self.pool.get('class.info')
+			sub_lines = []
+			current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
 			for m in  class_ooo.browse(cr,uid,class_ooo.search(cr,uid,[('class_code','=',context.get('class_code'))]),context=context):
 				m_start_date = m['start_date']
 				m_start = datetime.strptime(m_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
@@ -1600,8 +1588,18 @@ class swap_class(osv.osv):
 					n_start_date = n['start_date']
 					n_start = datetime.strptime(n_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
 					if(m_start == n_start):
-						class_ooo.write(cr,uid,m.id,{'room_id':n.room_id.id},context=context,holidays=True)
-						class_ooo.write(cr,uid,n.id,{'room_id':m.room_id.id},context=context,holidays=True)
+						sub_lines = []
+						sub_lines_1 = []
+						sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+						'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),
+						'status_change_by':current_user['name'],'changes':m.room_id.name}) )
+						sub_lines_1.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+						'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),
+						'status_change_by':current_user['name'],'changes':n.room_id.name}) )
+						class_ooo.write(cr,uid,m.id,{'room_id':n.room_id.id,'history_line': sub_lines},context=context,holidays=True)
+						class_ooo.write(cr,uid,n.id,{'room_id':m.room_id.id,'history_line': sub_lines_1},context=context,holidays=True)
+
+
 		else :
 			class_ooo = self.pool.get('class.info')
 			class_object_1 = class_ooo.browse(cr,uid,int(context.get('class_id')),context=context)
@@ -1695,7 +1693,6 @@ class learner_mod_line(osv.osv):
 			return True
 
 	def create(self,cr, uid, values, context=None):
-		_logger.info("Create Called")
 		global class_create
 		#if class_create == True :
 			#id = super(learner_mod_line, self).create(cr, uid, values, context=context)
@@ -1734,7 +1731,6 @@ class learner_mod_line(osv.osv):
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
-		_logger.info("Wriet Called %s",ids)
 		id = super(learner_mod_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['learner_mod_id']
@@ -1748,8 +1744,6 @@ class learner_mod_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
-		_logger.info("Write prog_mod_ids %s",prog_mod_ids)
-		_logger.info("Write line_ids %s",line_ids)
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				if 'attendance' in values :
@@ -1843,7 +1837,6 @@ class trainers_line(osv.osv):
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
-		_logger.info("write %s",values)
 		global trianer_created
 		trianer_created = True
 		id = super(trainers_line, self).write(cr, uid, ids,values, context=context)
@@ -1894,7 +1887,6 @@ class trainers_line(osv.osv):
 		user = self.pool.get('res.users').browse(cr, uid, uid)
 		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 		new_date_time_utc = pytz.utc.localize(datetime.strptime(class_info_obj_id.start_date,"%Y-%m-%d %H:%M:%S")).astimezone(tz)
-		_logger.info ('ccccc %s', new_date_time_utc)
 		sub_lines.append( (0,0, {'trainer':trainer_obj.name,'session_assigned':class_info_obj_id.sess_no,
 			'date_of_assignment':new_date_time_utc.strftime ("%Y-%m-%d %H:%M:%S"),'single_session':True}) )
 		values.update({'trainer_history': sub_lines})
