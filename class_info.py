@@ -16,6 +16,9 @@ from openerp import tools
 
 _logger = logging.getLogger(__name__)
 
+global isSaved
+isSaved=False
+
 global class_create
 class_create = False
 
@@ -224,6 +227,14 @@ class class_info(osv.osv):
 			return new_rs;
 	    #['module_id', 'location_id', 'room_id', 'start_date', 'end_date', 'name', 'class_code']
 		return res
+		
+	def _combine(self, cr, uid, ids, field_name, args, context=None):
+		values = {}
+		for id in ids:
+			rec = self.browse(cr, uid, [id], context=context)[0]
+			values[id] = {}
+			values[id] = '%s - %s' % (rec.start_time, rec.end_time)
+		return values
 
 	_name = "class.info"
 	_description = "This table is for keeping Class data"
@@ -237,8 +248,16 @@ class class_info(osv.osv):
 		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True, required=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 		'start_date': fields.datetime('Start Date', required=True),
+		'start_time': fields.char('Start Time'),
+		'start_yy_mm': fields.char('Start YYMM'),
+		'class_count': fields.integer('Employee Id', required=True, size=3),
+		'end_time': fields.char('End Time'),
+		'start_end_time': fields.function(_combine, string='Start End Time!', type='char',
+                    arg=('start_time','end_time'), method=True),
 		'end_date': fields.datetime('End Date'),
 		'duration': fields.float('Duration(Hrs)'),
+		'class_end_date': fields.datetime('End Date'),
+		'class_days': fields.char('Class Conducting Days 1'),
 		#'client_type_id':fields.integer('Client Type Id'),
 		'client': fields.selection((('Public','Public'),('Corporate','Corporate')),'Client', required=True),
 		'client_type_public': fields.boolean('Public'),
@@ -1301,24 +1320,45 @@ class class_info(osv.osv):
 		else :
 			return {'value': {'total_weeks': 0}}
 
-	def on_change_sess_week(self, cr, uid, ids, include_1,include_2,include_3,include_4,include_5,include_6,include_7):
+	def on_change_sess_week(self, cr, uid, ids, include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7):
 		sessions_per_week = 0
+		dEndDate = 0
+		dClassDays_1 = ''
+		dClassDays_2 = ''
+		dClassDays_3 = ''
+		dClassDays_4 = ''
+		dClassDays_5 = ''
+		dClassDays_6 = ''
+		dClassDays_7 = ''
 		if include_1 :
 			sessions_per_week+=1
+			dEndDate=end_date1
+			dClassDays_1 = day_1
 		if include_2 :
 			sessions_per_week+=1
+			dEndDate=end_date2
+			dClassDays_2 = day_2
 		if include_3 :
 			sessions_per_week+=1
+			dEndDate=end_date3
+			dClassDays_3 = day_3
 		if include_4 :
 			sessions_per_week+=1
+			dEndDate=end_date4
+			dClassDays_4 = day_4
 		if include_5 :
 			sessions_per_week+=1
+			dEndDate=end_date5
+			dClassDays_5 = day_5
 		if include_6 :
 			sessions_per_week+=1
+			dEndDate=end_date6
+			dClassDays_6 = day_6
 		if include_7 :
 			sessions_per_week+=1
-
-		return {'value': {'sessions_per_week': sessions_per_week}}
+			dEndDate=end_date7
+			dClassDays_7 = day_7
+		return {'value': {'sessions_per_week': sessions_per_week,'class_end_date':dEndDate, 'class_days':dClassDays_1+' '+dClassDays_2+' '+dClassDays_3+' '+dClassDays_4+' '+dClassDays_5+' '+dClassDays_6+' '+dClassDays_7}}
 
 	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
@@ -1334,11 +1374,20 @@ class class_info(osv.osv):
 
 
 			start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			user = self.pool.get('res.users').browse(cr, uid, uid)
+			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+			ran = pytz.utc.localize(start).astimezone(tz)
+			value['start_time'] = ran.strftime("%H:%M")
+			value['start_yy_mm'] = ran.strftime("%y%m")
 
 
 			if not end_date:
 				end = start + timedelta(hours=duration)
 				value['end_date'] = end.strftime("%Y-%m-%d %H:%M:%S")
+				user = self.pool.get('res.users').browse(cr, uid, uid)
+				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+				ran = pytz.utc.localize(end).astimezone(tz)
+				value['end_time'] = ran.strftime("%H:%M")
 
 			if duration and total_hrs:
 				sessions_duration_in_hrs = duration
@@ -1696,53 +1745,107 @@ class learner_mod_line(osv.osv):
 			return False
 		else :
 			return True
+			
+	def _current_class(self, cr, uid, ed, sd, cc, st, cs, ns, csp, values, context=None):
+			obj_current_class = self.pool.get('current.class')
+			
+			global isSaved
+			for sh in values:
+				if isSaved==False:
+					sql = "select program_learner from learner_info where id = %s " % (sh['learner_id'])
+					cr.execute(sql)
+					itms = cr.fetchall()
+					for r in itms:
+						prn = r[0]
+					
+						vals = {
+							'program_name': prn,
+							'class_id':sh['learner_id'],
+							'class_code':cc,
+							'start_date': sd,
+							'end_date': ed,
+							'session_timings': st,
+							'class_status': cs,
+							'no_of_sessions': ns,
+							'class_schedule_paltform': csp
+						}
+						obj_current_class.create(cr, uid, vals, context=context)
+						#raise osv.except_osv(_('Error:'),_("Iddddd"))
+						isSaved=True
+				return True
 
-	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
+	def _create_hist(self, cr, uid, sdt,  mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
 
 			for ch in values:
 				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(ch['learner_id']))
-				sql="select program_learner, emp_staus, desig_detail, sponsor_ship from learner_info where id = %s " % (ch['learner_id'])
+				sql="select program_learner, emp_staus, sponsor_ship from learner_info where id = %s " % (ch['learner_id'])
 				cr.execute(sql)
 				itm = cr.fetchall()
 				for s in itm:
 					pn = s[0]
 					es = s[1]
-					dd = s[2]
-					ss = s[3]
-				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed,
-				#obj_li=self.pool.get('learner.info').browse(cr, uid, ch['learner_id'])
+					ss = s[2]
 
 				vals = {
 					'program_name': pn,
 					'emp_staus': es,
-					'desig_detail': dd,
 					'sponsor_ship': ss,
-					'end_date':ed,
 					'class_id':ch['learner_id'],
 					'class_code':cc,
-					'start_date': sd,
-					'module_name':mn
+					'start_date': sdt,
+					'module_name':mn,
+					#'end_date': edt,
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
 
 	def create(self,cr, uid, values, context=None):
+		_logger.info("Create Called")
 		global class_create
-		#if class_create == True :
-			#id = super(learner_mod_line, self).create(cr, uid, values, context=context)
-			#return id
+		if class_create == True :
+			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
+			class_id = values['learner_mod_id']
+			class_info_obj = self.pool.get('class.info')
+			class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
+			_logger.info("Learner Class Details")
+			sd = class_info_obj_id.start_date
+			ed = class_info_obj_id.class_end_date
+			cc = class_info_obj_id.class_code
+			st = class_info_obj_id.start_end_time
+			cs = 'In Progress'
+			ns = class_info_obj_id.total_sessions
+			csp = class_info_obj_id.class_days
+			self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)
+			#Masih Class History
+			sdt = class_info_obj_id.start_date
+			mn = class_info_obj_id.module_id.id
+			cc = class_info_obj_id.class_code
+			self._create_hist(cr, uid, sdt, mn, cc,[values], context=context)
+			return id
+		
 		id = super(learner_mod_line, self).create(cr, uid, values, context=context)
 		class_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('class.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
 		#Masih
-		ed = class_info_obj_id.end_date
-		sd = class_info_obj_id.start_date
+		'''edt = class_info_obj_id.end_date
+		sdt = class_info_obj_id.start_date
 		mn = class_info_obj_id.module_id.id
 		cc = class_info_obj_id.class_code
-		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		self._create_hist(cr, uid, edt, sdt, mn, cc, [values], context=context)
+		#Supreeth Current Class
+		_logger.info("Learner Class Details")
+		sd = class_info_obj_id.start_date
+		ed = class_info_obj_id.end_date
+		cc = class_info_obj_id.class_code
+		st = class_info_obj_id.start_end_time
+		cs = 'In Progress'
+		ns = class_info_obj_id.total_sessions
+		csp = class_info_obj_id.day_1
+		self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)'''
 		parent_id = class_info_obj_id['parent_id']
+		#raise osv.except_osv(_('Error:'),_("Iddddd %s")%(parent_id))
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
 			ids = class_info_obj.search(cr, uid, [('id', '=', parent_id)])
@@ -1750,7 +1853,7 @@ class learner_mod_line(osv.osv):
 		else:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', class_info_obj_id.id)])
 			prog_mod_ids.append(class_info_obj_id.id)
-
+		
 		for prog_module_line in prog_mod_ids:
 			if prog_module_line != class_id:
 				new_array = values
@@ -1758,18 +1861,32 @@ class learner_mod_line(osv.osv):
 				new_array['attendance'] = False
 				local_id = super(learner_mod_line, self).create(cr, uid, new_array, context=context)
 				#created_line_ids.append(local_id)
-		#created_line_ids.append(local_id)
-		if class_create == True :
-			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
-			#return id
+		#created_line_ids.append(local_id)	
 
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
+		_logger.info("Wriet Called %s",ids)
 		id = super(learner_mod_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['learner_mod_id']
-
+		class_info_obj = self.pool.get('class.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
+		#Supreeth Current Class
+		'''sd = class_info_obj_id.start_date
+		ed = class_info_obj_id.end_date
+		cc = class_info_obj_id.class_code
+		st = class_info_obj_id.start_end_time
+		cs = 'In Progress'
+		ns = class_info_obj_id.total_sessions
+		csp = class_info_obj_id.day_1'''
+		#self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)
+		#Masih
+		ed = class_info_obj_id.end_date
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.module_id
+		cc = class_info_obj_id.class_code
+		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1779,6 +1896,8 @@ class learner_mod_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
+		_logger.info("Write prog_mod_ids %s",prog_mod_ids)
+		_logger.info("Write line_ids %s",line_ids)
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				if 'attendance' in values :
@@ -1789,15 +1908,18 @@ class learner_mod_line(osv.osv):
 
 	def on_change_learner_id(self, cr, uid, ids, learner_id):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
-		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
+		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric, 'learner_non_nric': module_obj.learner_non_nric}}
 
 
 	_name = "learner.line"
 	_description = "Learner Line"
 	_columns = {
 		'learner_mod_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
-		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, ),
-		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1, required=True),
+		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True,),
+		'curr_class': fields.many2one('current.class', ondelete='cascade'),
+		'users_id': fields.many2one('res.users', 'Users', ondelete='cascade', help='Learner', select=True ),
+		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1),
+		'learner_non_nric': fields.related('learner_id','learner_non_nric',type="char",relation="learner.info",string="Learner Non-NRIC", readonly=1),
 		'binder':fields.boolean('Binder'),
 		'tablet':fields.boolean('Tablet'),
 		'blended':fields.boolean('Blended'),
