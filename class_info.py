@@ -19,9 +19,6 @@ _logger = logging.getLogger(__name__)
 global class_create
 class_create = False
 
-global isSaved
-isSaved=False
-
 global dupliacte_found
 dupliacte_found = False
 
@@ -34,20 +31,23 @@ dupliacte_equip_create = False
 global dupliacte_trainer_found
 dupliacte_trainer_found = False
 
+global called_swap
+called_swap = False
+
 class class_info(osv.osv):
 
 	def _property_expense_preset_expenses(self, cr, uid, ids, expenses, arg, context):
-		spus = self.browse(cr, uid, ids)
+		spus = self.pool.get("class.info").browse(cr, uid, ids)
 		module_ids =[]
 		parent_id = spus[0]['parent_id']
 		if parent_id > 0:
-			prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
+			prog_mod_ids = self.pool.get("class.info").search(cr, uid, [('parent_id', '=', parent_id)])
 			prog_mod_ids.append(parent_id)
 		else:
-			prog_mod_ids = self.search(cr, uid, [('parent_id', '=', spus[0].id)])
+			prog_mod_ids = self.pool.get("class.info").search(cr, uid, [('parent_id', '=', spus[0].id)])
 			prog_mod_ids.append(spus[0].id)
 
-		for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+		for prog_module_line in self.pool.get("class.info").browse(cr, uid, prog_mod_ids,context=context):
 			if prog_module_line['sess_issues'] != 'None' :
 					module_ids.append(prog_module_line.id)
 
@@ -56,21 +56,21 @@ class class_info(osv.osv):
 
 
 	def _property_expense_preset_expenses1(self, cr, uid, ids, expenses, arg, context):
-		spus = self.browse(cr, uid, ids)
+		spus = self.pool.get("class.info").browse(cr, uid, ids)
 		module_ids =[]
 		parent_id = spus[0]['parent_id']
 		if parent_id > 0:
-			prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
+			prog_mod_ids =  self.pool.get("class.info").search(cr, uid, [('parent_id', '=', parent_id)])
 			prog_mod_ids.append(parent_id)
 		else:
-			prog_mod_ids = self.search(cr, uid, [('parent_id', '=', spus[0].id)])
+			prog_mod_ids =  self.pool.get("class.info").search(cr, uid, [('parent_id', '=', spus[0].id)])
 			prog_mod_ids.append(spus[0].id)
 
-		for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
+		for prog_module_line in  self.pool.get("class.info").browse(cr, uid, prog_mod_ids,context=context):
 			if 'sess_issues' in prog_module_line and prog_module_line['sess_issues'] == 'None' :
 					module_ids.append(prog_module_line.id)
 
-		value_ids = self.search(cr, uid, [('id', 'in', module_ids)])
+		value_ids =  self.pool.get("class.info").search(cr, uid, [('id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])
 
 	def _property_expense_preset_expenses2(self, cr, uid, ids, expenses, arg, context):
@@ -79,6 +79,9 @@ class class_info(osv.osv):
 			if trainer_obj.t_status == "Confirmed" :
 				trainer_ids.append(trainer_obj.id)
 		return dict([(id, trainer_ids) for id in ids])
+
+
+
 
 	def _calculate_total_learners(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
@@ -133,19 +136,47 @@ class class_info(osv.osv):
 		if len(learner_move_array) > 0 :
 			raise osv.except_osv(_('Error!'),_("Please move the learners before closing the class"))
 
-	'''def _check_unique_name(self, cr, uid, ids, context=None):
-		new_class = self.browse(cr, uid, ids, context=context)
-		sr_ids = self.search(cr, 1, [('parent_id', '=', 0)])
+	def swap_class(self, cr, uid, ids, context=None):
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'swap_form')
+		view_id = view_ref and view_ref[1] or False,
+		ctx = dict(context)
+		self_obj  = self.browse(cr, uid, ids[0], context=context)
+		parent_id = self_obj['parent_id']
+		if parent_id == 0:
+			parent_id = self_obj.id
 
-		if new_class[0].parent_id == 0 :
-			for x in self.browse(cr, uid, sr_ids, context=context) :
-				if new_class[0].parent_id == 0 and new_class[0].id != x.id and new_class[0].name.lower() == x.name.lower() :
-					return False
-		else :
-			for x in self.browse(cr, uid, sr_ids, context=context) :
-				if new_class[0].parent_id  != x.id and new_class[0].name.lower() == x.name.lower() :
-					return False
-		return True'''
+		class_start_date = datetime.strptime(self_obj['start_date'], "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+		class_id_loc = self.search(cr, uid, [('location_id', '=', self_obj.location_id.id)])
+		dws = []
+		user = self.pool.get('res.users').browse(cr, uid, uid)
+		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+		for search_class_obj in self.browse(cr,uid,class_id_loc):
+			search_class_start = datetime.strptime(search_class_obj['start_date'], "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			_logger.info("called from start_date %s %s",search_class_start,class_start_date)
+			_logger.info("called from start_date %s %s",search_class_start,class_start_date)
+			if ((search_class_obj.id != self_obj.id) and (search_class_start == class_start_date)):
+				dws.append(self_obj.id);
+
+		if(len(dws) == 0):
+			raise osv.except_osv(_('Error!'),_("There are no matching classes to swap."))
+
+		ctx.update({'class_id': self_obj.id,'class_code': self_obj.class_code,'active_location':self_obj.location_id.id,'active_parent_id':parent_id})
+		global called_swap
+		called_swap = True
+		global from_create
+		from_create = False
+		return {
+			'type': 'ir.actions.act_window',
+			'name': 'Class Room Swap',
+			'view_mode': 'form',
+			'view_type': 'form',
+			'view_id': view_id,
+			'res_model': 'swap.class',
+			'res_id':0,
+			'nodestroy': True,
+			'target':'new',
+			'context': ctx,
+		}
 
 	def trainer_broadcast(self, cr, uid, ids, context=None):
 		learner_move_array = []
@@ -171,19 +202,6 @@ class class_info(osv.osv):
 				trainer_obj.write(cr, uid, x.id,values, context=context)
 
 
-	'''def _check_unique_code(self, cr, uid, ids, context=None):
-		new_class = self.browse(cr, uid, ids, context=context)
-		sr_ids = self.search(cr, 1, [('parent_id', '=', 0)])
-		if new_class[0].parent_id == 0 :
-			for x in self.browse(cr, uid, sr_ids, context=context) :
-				if new_class[0].parent_id == 0 and new_class[0].id != x.id and new_class[0].class_code.lower() == x.class_code.lower() :
-					return False
-		else :
-			for x in self.browse(cr, uid, sr_ids, context=context) :
-				if new_class[0].parent_id  != x.id and new_class[0].class_code.lower() == x.class_code.lower() :
-					return False
-		return True'''
-
 	def on_change_client_type(self, cr, uid, ids, location_type):
 		val = {}
 		val['location_type_corp'] = False
@@ -194,37 +212,33 @@ class class_info(osv.osv):
 			val['client_type_public'] = True
 
 		return {'value': val}
-		
-	def _combine(self, cr, uid, ids, field_name, args, context=None):
-		values = {}
-		for id in ids:
-			rec = self.browse(cr, uid, [id], context=context)[0]
-			values[id] = {}
-			values[id] = '%s - %s' % (rec.start_time, rec.end_time)
-		return values
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		res = super(class_info, self).read(cr, uid,ids, fields, context, load)
+		if len(fields) == 3:
+			new_rs = []
+			new_rs = res
+			for r in res:
+				if('class_code' in r and  r['class_code'] == 'Holiday'):
+					new_rs.remove(r)
+			return new_rs;
+	    #['module_id', 'location_id', 'room_id', 'start_date', 'end_date', 'name', 'class_code']
+		return res
 
 	_name = "class.info"
-	_description = "This table is for keeping Class Calendar Data"
+	_description = "This table is for keeping Class data"
 	_columns = {
 		'class_id': fields.integer('Id',size=20),
 		'parent_id': fields.integer('Parent Id',size=20),
 		'name': fields.char('Class Name', size=100, select=True),
-		'class_code': fields.char('Class Code', size=100, select=True),
-		'segment_code': fields.selection((('CP (Corporate Public)','CP (Corporate Public)'),('CI (Corporate In-House)','CI (Corporate In-House)'),('RP (Retail Public)','RP (Retail Public)'),('HP (HE Public)','HP (HE Public)'),('HI  (HE In-House)','HI  (HE In-House)')),'Segment Code'),
+		'class_code': fields.char('Class Code',size=40, select=True),
 		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
+        'segment_code': fields.selection((('CP (Corporate Public)','CP (Corporate Public)'),('CI (Corporate In-House)','CI (Corporate In-House)'),('RP (Retail Public)','RP (Retail Public)'),('HP (HE Public)','HP (HE Public)'),('HI  (HE In-House)','HI  (HE In-House)')),'Segment Code'),
 		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True, required=True),
-		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True, type='char'),
-		'start_date': fields.datetime('Start Date', required=True, select=True),
-		'start_time': fields.char('Start Time'),
-		'start_yy_mm': fields.char('Start YYMM'),
-		'class_count': fields.integer('Employee Id', required=True, size=3),
-		'end_time': fields.char('End Time'),
-		'start_end_time': fields.function(_combine, string='Start End Time!', type='char',
-                    arg=('start_time','end_time'), method=True),
+		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'start_date': fields.datetime('Start Date', required=True),
 		'end_date': fields.datetime('End Date'),
 		'duration': fields.float('Duration(Hrs)'),
-		'class_end_date': fields.datetime('End Date'),
-		'class_days': fields.char('Class Conducting Days 1'),
 		#'client_type_id':fields.integer('Client Type Id'),
 		'client': fields.selection((('Public','Public'),('Corporate','Corporate')),'Client', required=True),
 		'client_type_public': fields.boolean('Public'),
@@ -280,7 +294,7 @@ class class_info(osv.osv):
 		'tablet_in_use':fields.boolean('Tablet'),
 		'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet')),'Primary'),
 		'moi_eq_line': fields.one2many('class.moi','class_moi_id','Equipment List'),
-		'room_arr': fields.selection((('Default','Default'),('Active','Active'),('Cluster','Cluster'),('U-Shape','U-Shape'),('Lecture','Lecture'),('Theater','Theater'),('Classroom','Classroom')),'Room Arrangment'),
+		'room_arr': fields.selection((('Default','Default'),('Active','Active')),'Room Arrangment'),
 		'learner_asset': fields.one2many('learner.asset','learner_asset_id','Asset'),
 		'non_std_items': fields.selection((('Food','Food'),('Materials','Materials'),('Learning Assets','Learning Assets'),('Rooms','Rooms')),'Items'),
 		'trainer_po_listing': fields.one2many('trainers.po.listing', 's_no', 'PO Listing'),
@@ -291,149 +305,92 @@ class class_info(osv.osv):
 		'apply_all':fields.boolean('Apply to All'),
 		'apply_to_future':fields.boolean('Apply to Future'),
 		'no_of_learners':fields.function(_calculate_total_learners, relation="class.info",readonly=1,string='No. Learners',type='integer'),
-		'status':fields.char('Status'),
+		'status':fields.char('Status')
 	}
-
-	_sql_constraints = [
-		('name_uniq_e_i', 'unique (class_count)', 'The employee Id must be unique !')
-    ]
-
-	def _get_maxclasscount_no(self, cr, ids, uid, context=None):
-		cr.execute('SELECT Max(class_count) + 001 from class_info')
-		result = cr.fetchall()
-		for recs in result:
-			return recs[0] or 0
-		return recs[0] or 0
-
 	_defaults = {
 		'status': 'Draft',
 		'room_arr': 'Default',
 		'primary': 'Binder',
 		'client': 'Public',
-		'class_count': _get_maxclasscount_no,
 	}
 	_order = "start_date"
-	
-	def create(self,cr, uid, values, context=None):
-		global class_create
-		class_create = True
 
-		if 'duration' in values and values['duration'] < 0:
-			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
+	def update_postpone_details(self,cr, uid, ids, values, context=None):
+		postpone_obj = self.pool.get("class.postpone.details")
+		postpone_ids = postpone_obj.search(cr,uid,[('class_postpone_id','=',ids)])
+		if len(postpone_ids) == 0:
+			postpone_obj.create(cr, uid,{'class_postpone_id':ids,'no_of_times':0}, context=context)
+		else :
+			for j in postpone_obj.browse(cr,uid,postpone_ids):
+				postpone_obj.write(cr, uid,j.id,{'no_of_times':(j.no_of_times)+1}, context=context)
 
-		'''if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
-			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))'''
 
-		'''validate sessions now'''
-		include_arr_list = 0
-		for i in range(1,8):
-			if values['include_'+str(i)] == True:
-				include_arr_list = include_arr_list + 1
+	def create(self,cr, uid, values, context=None,holidays=False):
+		if holidays == False :
+			global class_create
+			class_create = True
 
-		if include_arr_list > values['total_sessions'] :
-			raise osv.except_osv(_('Error!'),_("Selected Days are greater than Number of sessions"))
-			return
+			if 'duration' in values and values['duration'] < 0:
+				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
 
-		no_of_sess = 0
-		parent_id =0
-		include_array = []
-		value_array =[]
-		values['status'] = 'Edit'
-		sub_lines = []
-		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
-		sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
-		'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
-		values.update({'history_line': sub_lines})
+			'''if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
+				raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))'''
 
-		''' check for conflict now'''
-		holiday = self.pool.get('holiday')
-		holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
-		holiday_list = []
-		if len(holiday_obj_id) > 0 :
-			holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
-			holiday_line = self.pool.get('holiday.line')
-			if len(holiday_obj) > 0 :
-				holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
-				for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
-					holiday_list.append(holiday_line_obj['date_start']+";"+holiday_line_obj['date_end']+";"+holiday_line_obj['description'])
+			'''validate sessions now'''
+			include_arr_list = 0
+			for i in range(1,8):
+				if values['include_'+str(i)] == True:
+					include_arr_list = include_arr_list + 1
 
-		''' room conflicts'''
-		room_conflict_ids = self.search(cr,uid,[('room_id',"=",values['room_id']),('start_date',">=",values['start_date'])])
-		for room_line_obj in self.browse(cr,uid,room_conflict_ids,context) :
-			holiday_list.append(room_line_obj['start_date']+";"+room_line_obj['end_date']+";RoomConflict")
+			if include_arr_list > values['total_sessions'] :
+				raise osv.except_osv(_('Error!'),_("Selected Days are greater than Number of sessions"))
+				return
 
-		for i in range(1,8):
-			if values['include_'+str(i)] :
-				new_array = values
-				new_array['start_date'] = values['start_date'+str(i)]
-				new_array['end_date']= values['end_date'+str(i)]
-				no_of_sess = no_of_sess + 1
-				new_array['sess_no'] = no_of_sess
-				new_array['week_no'] = 1
-				new_array['parent_id'] = parent_id
-				t1start  = new_array['start_date']
-				t1end = new_array['end_date']
-				overlap = False
-				new_array['sess_issues'] = 'None'
-				for u in holiday_list :
-					t2start = u.split(";")[0]
-					t2end = u.split(";")[1]
-					if (t1start <= t2start <= t2end <= t1end):
-						new_array['sess_issues'] = u.split(";")[2]
-						continue
-					elif (t1start <= t2start <= t1end):
-						new_array['sess_issues'] = u.split(";")[2]
-						continue
-					elif (t1start <= t2end <= t1end):
-						new_array['sess_issues'] = u.split(";")[2]
-						continue
-					elif (t2start <= t1start <= t1end <= t2end):
-						new_array['sess_issues'] = u.split(";")[2]
-						continue
-					else:
-						overlap = False
+			no_of_sess = 0
+			parent_id =0
+			include_array = []
+			value_array =[]
+			values['status'] = 'Edit'
+			sub_lines = []
+			current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+			sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+			'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),'status_change_by':current_user['name']}) )
+			values.update({'history_line': sub_lines})
 
-				module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
-				location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
-				segment_cd =  new_array["segment_code"]
-				d = parser.parse(new_array["start_date"])
-				date_cd =  dt = str(d.year)[2:] + str(d.month)[:2]
-				count = self.search(cr, uid, [('module_id', '=', new_array["module_id"]) and ('location_id', '=', new_array["location_id"])])
-				counter = 1
-				for c in self.browse(cr,uid,count,context):
-				  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
-				     counter = counter+1;
-				new_array['class_code'] = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
-				new_array['name'] = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
-				id = super(class_info, self).create(cr, uid, new_array, context=context)
-				if(no_of_sess == 1):
-					parent_id = id
-				include_array.append(str(new_array['start_date']) + ";" + str(new_array['end_date']))
+			''' check for conflict now'''
+			holiday = self.pool.get('holiday')
+			holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
+			holiday_list = []
+			if len(holiday_obj_id) > 0 :
+				holiday_obj = holiday.browse(cr,uid,holiday_obj_id,context)
+				holiday_line = self.pool.get('holiday.line')
+				if len(holiday_obj) > 0 :
+					holiday_line_obj_id = holiday_line.search(cr, uid, [('holiday_line_id', '=',holiday_obj[0]['id'])])
+					for holiday_line_obj in holiday_line.browse(cr,uid,holiday_line_obj_id,context) :
+						holiday_list.append(holiday_line_obj['date_start']+";"+holiday_line_obj['date_end']+";"+holiday_line_obj['description'])
 
-				value_array.append(new_array)
+			''' room conflicts'''
+			room_conflict_ids = self.search(cr,uid,[('room_id',"=",values['room_id']),('start_date',">=",values['start_date'])])
+			for room_line_obj in self.browse(cr,uid,room_conflict_ids,context) :
+				holiday_list.append(room_line_obj['start_date']+";"+room_line_obj['end_date']+";RoomConflict")
 
-		no_of_days =7
-		for k in range(1,(values['total_weeks'])) :
-			new_array['week_no'] = new_array['week_no'] + 1
-			for j in range(0,len(include_array)):
-			   if no_of_sess < values['total_sessions']:
-					new_array = value_array[j]
-					newStartDate,newEndDate =  include_array[j].split(';')
-					newStartDate = datetime.strptime(str(newStartDate),"%Y-%m-%d %H:%M:%S") + relativedelta(days=no_of_days)
-					newEndDate = datetime.strptime(str(newEndDate),"%Y-%m-%d %H:%M:%S") + relativedelta(days=no_of_days)
-					new_array['start_date'] = newStartDate
-					new_array['end_date']= newEndDate
-					no_of_sess = no_of_sess+1
+			class_code_gen = ""
+			for i in range(1,8):
+				if values['include_'+str(i)] :
+					new_array = values
+					new_array['start_date'] = values['start_date'+str(i)]
+					new_array['end_date']= values['end_date'+str(i)]
+					no_of_sess = no_of_sess + 1
 					new_array['sess_no'] = no_of_sess
+					new_array['week_no'] = 1
 					new_array['parent_id'] = parent_id
 					t1start  = new_array['start_date']
 					t1end = new_array['end_date']
 					overlap = False
 					new_array['sess_issues'] = 'None'
 					for u in holiday_list :
-
-						t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
-						t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
+						t2start = u.split(";")[0]
+						t2end = u.split(";")[1]
 						if (t1start <= t2start <= t2end <= t1end):
 							new_array['sess_issues'] = u.split(";")[2]
 							continue
@@ -448,25 +405,85 @@ class class_info(osv.osv):
 							continue
 						else:
 							overlap = False
-					module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
-					location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
-					segment_cd =   new_array["segment_code"]
-					date_cd =  dt = str(new_array["start_date"].year)[2:] + str(new_array["start_date"].month)[:2]
-					count = self.search(cr, uid, [('module_id', '=', new_array["module_id"]) and ('location_id', '=', new_array["location_id"])])
-					counter = 1
-					for c in self.browse(cr,uid,count,context):
-					  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
-					     counter = counter+1;
-					new_array['class_code'] = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
+					if i == 1 :
+						module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
+						location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
+						segment_cd =  new_array["segment_code"]
+						d = parser.parse(new_array["start_date"])
+						date_cd =  dt = str(d.year)[2:] + str(d.month)[:2]
+						count = self.search(cr, uid, [('module_id', '=', new_array["module_id"])
+						and ('location_id', '=', new_array["location_id"]) and ('parent_id', '=', 0) ])
+						counter = 1
+						for c in self.browse(cr,uid,count,context):
+						  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
+						     counter = counter+1;
+						class_code_gen = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
+					new_array['class_code'] = class_code_gen
 					id = super(class_info, self).create(cr, uid, new_array, context=context)
+					if(no_of_sess == 1):
+						parent_id = id
+					include_array.append(str(new_array['start_date']) + ";" + str(new_array['end_date']))
 
-			no_of_days = no_of_days + 7
+					value_array.append(new_array)
 
-		global class_create
-		class_create = False
+			no_of_days =7
+			for k in range(1,(values['total_weeks'])) :
+				new_array['week_no'] = new_array['week_no'] + 1
+				for j in range(0,len(include_array)):
+				   if no_of_sess < values['total_sessions']:
+						new_array = value_array[j]
+						newStartDate,newEndDate =  include_array[j].split(';')
+						newStartDate = datetime.strptime(str(newStartDate),"%Y-%m-%d %H:%M:%S") + relativedelta(days=no_of_days)
+						newEndDate = datetime.strptime(str(newEndDate),"%Y-%m-%d %H:%M:%S") + relativedelta(days=no_of_days)
+						new_array['start_date'] = newStartDate
+						new_array['end_date']= newEndDate
+						no_of_sess = no_of_sess+1
+						new_array['sess_no'] = no_of_sess
+						new_array['parent_id'] = parent_id
+						t1start  = new_array['start_date']
+						t1end = new_array['end_date']
+						overlap = False
+						new_array['sess_issues'] = 'None'
+						for u in holiday_list :
+
+							t2start =datetime.strptime(str(u.split(";")[0]),"%Y-%m-%d %H:%M:%S")
+							t2end =datetime.strptime(str(u.split(";")[1]),"%Y-%m-%d %H:%M:%S")
+							if (t1start <= t2start <= t2end <= t1end):
+								new_array['sess_issues'] = u.split(";")[2]
+								continue
+							elif (t1start <= t2start <= t1end):
+								new_array['sess_issues'] = u.split(";")[2]
+								continue
+							elif (t1start <= t2end <= t1end):
+								new_array['sess_issues'] = u.split(";")[2]
+								continue
+							elif (t2start <= t1start <= t1end <= t2end):
+								new_array['sess_issues'] = u.split(";")[2]
+								continue
+							else:
+								overlap = False
+						if k == 1 :
+							module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
+							location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
+							segment_cd =   new_array["segment_code"]
+							date_cd =  dt = str(new_array["start_date"].year)[2:] + str(new_array["start_date"].month)[:2]
+							count = self.search(cr, uid, [('module_id', '=', new_array["module_id"]) and ('location_id', '=', new_array["location_id"])  and ('parent_id', '=', 0) ])
+							counter = 1
+							for c in self.browse(cr,uid,count,context):
+							  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
+							     counter = counter+1;
+							class_code_gen = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
+						new_array['class_code'] = class_code_gen
+						id = super(class_info, self).create(cr, uid, new_array, context=context)
+
+				no_of_days = no_of_days + 7
+
+			global class_create
+			class_create = False
+		else:
+			id = super(class_info, self).create(cr, uid, values, context=context)
 
 		return id
-		return {'value': {'class_code': module_obj.name}}
 
 	def apply_to_all(self,cr, uid, ids, values, context=None):
 			class_info_obj = self.browse(cr, uid, ids[0])
@@ -543,12 +560,14 @@ class class_info(osv.osv):
 
 				date_array['history_line'] = values['history_line']
 				super(class_info, self).write(cr, uid, ids,date_array, context=context)
+				self.update_postpone_details(cr, uid, ids[0],date_array,context)
 
 				if parent_id == 0 :
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
 				else:
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', parent_id)])
 					prog_mod_ids.append(parent_id)
+
 
 				for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
 					if prog_module_line.id != class_info_obj.id :
@@ -581,6 +600,7 @@ class class_info(osv.osv):
 								continue
 						date_array['history_line'] = values['history_line']
 						super(class_info, self).write(cr, uid, prog_module_line.id,date_array, context=context)
+						#self.update_postpone_details(cr, uid, prog_module_line.id,date_array, context)
 
 			if 'room_id' in values :
 				room_obj = self.pool.get('room').browse(cr, uid, values['room_id'])
@@ -770,6 +790,7 @@ class class_info(osv.osv):
 
 				date_array['history_line'] = values['history_line']
 				super(class_info, self).write(cr, uid, ids,date_array, context=context)
+				self.update_postpone_details(cr, uid, ids[0],date_array,context)
 
 				if parent_id == 0 :
 					prog_mod_ids = self.search(cr, uid, [('parent_id', '=', ids[0])])
@@ -809,6 +830,7 @@ class class_info(osv.osv):
 									continue
 							date_array['history_line'] = values['history_line']
 							super(class_info, self).write(cr, uid, prog_module_line.id,date_array, context=context)
+							#self.update_postpone_details(cr, uid,  prog_module_line.id,date_array, context)
 
 			if 'room_id' in values :
 				room_obj = self.pool.get('room').browse(cr, uid, values['room_id'])
@@ -937,8 +959,12 @@ class class_info(osv.osv):
 
 
 	def write(self,cr, uid, ids, values, context=None,holidays=False):
-		_logger.info("write class %s",values)
 		if holidays ==  False :
+			postpone_obj = self.pool.get("class.postpone.details")
+			for j in postpone_obj.browse(cr,uid,postpone_obj.search(cr,uid,[('class_postpone_id','=',ids[0])])):
+				if(j.no_of_times == 3 ):
+					raise osv.except_osv(_('Error!'),_("You cannot modify the class as it was postponed more than 3 times. Please initiate closure."))
+
 			if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
 
@@ -957,7 +983,6 @@ class class_info(osv.osv):
 				apply_to_future = location_obj['apply_to_future']
 			else :
 				apply_to_future = values['apply_to_future']
-
 
 			if apply == True :
 				self.apply_to_all(cr, uid, ids, values, context)
@@ -1005,19 +1030,16 @@ class class_info(osv.osv):
 						if len(added_ids) - len(set(added_ids)) >  0 :
 							global dupliacte_found
 							dupliacte_found = True
-							_logger.info("Duplicate 1")
 						else:
 							'''check create in table'''
 							for c in added_ids :
 								if (c in table_ids and c not in deleted_ids) or (c in updated_ids):
 									global dupliacte_found
 									dupliacte_found = True
-									_logger.info("Duplicate 2")
 							'''check for update ids '''
 							if len(updated_ids) - len(set(updated_ids)) >  0 :
 								global dupliacte_found
 								dupliacte_found = True
-								_logger.info("Duplicate 3")
 							else :
 								found = 0
 								for u in updated_ids :
@@ -1026,7 +1048,6 @@ class class_info(osv.osv):
 								if found == 1 :
 									global dupliacte_found
 									dupliacte_found = True
-									_logger.info("Duplicate 4")
 					for ddd in deleted_line_ids :
 						values_obj = self.pool.get("learner.line").browse(cr,uid,ddd,context)
 						class_id = values_obj['learner_mod_id']
@@ -1041,7 +1062,6 @@ class class_info(osv.osv):
 							prog_mod_ids.append(class_id.id)
 						line_ids = self.pool.get("learner.line").search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
 						for prog_module_line in self.browse(cr,uid,line_ids,context):
-							_logger.info("Unlinek  prog_module_line.id %s", prog_module_line.id)
 							self.pool.get("learner.line").unlink(cr, uid, prog_module_line.id, context=context)
 				elif 'trainers_line' in values :
 					deleted_line_ids = []
@@ -1156,6 +1176,7 @@ class class_info(osv.osv):
 								for prog_module_line in self.browse(cr, uid, prog_mod_ids,context=context):
 									if prog_module_line.id != ids[0] :
 										super(class_info, self).write(cr, uid, prog_module_line.id,{'start_date'+str(j):values['start_date'+str(j)],'end_date'+str(j):values['end_date'+str(j)]}, context=context)
+					self.update_postpone_details(cr, uid,ids[0],{},context)
 
 				elif 'duration' in values :
 					t1start = datetime.strptime(location_obj['start_date'],"%Y-%m-%d %H:%M:%S")
@@ -1251,14 +1272,13 @@ class class_info(osv.osv):
 			return {'value': {'apply_all': False}}
 		else :
 			return {'value': {}}
-			
+
 
 	def on_change_module_id(self, cr, uid, ids, module_id):
 		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
 		return {'value': {'total_hrs': module_obj.module_duration,'location_id':False,'room_id':False}}
 
 	def on_change_location_id(self, cr, uid, ids, location_id):
-		location_obj = self.pool.get('location').browse(cr, uid, location_id)
 		return {'value': {'room_id': False}}
 
 	def on_change_tot_sess(self, cr, uid, ids, sessions_duration_in_hrs,total_hrs):
@@ -1281,49 +1301,28 @@ class class_info(osv.osv):
 		else :
 			return {'value': {'total_weeks': 0}}
 
-	def on_change_sess_week(self, cr, uid, ids, include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7):
+	def on_change_sess_week(self, cr, uid, ids, include_1,include_2,include_3,include_4,include_5,include_6,include_7):
 		sessions_per_week = 0
-		dEndDate = 0
-		dClassDays_1 = ''
-		dClassDays_2 = ''
-		dClassDays_3 = ''
-		dClassDays_4 = ''
-		dClassDays_5 = ''
-		dClassDays_6 = ''
-		dClassDays_7 = ''
 		if include_1 :
 			sessions_per_week+=1
-			dEndDate=end_date1
-			dClassDays_1 = day_1
 		if include_2 :
 			sessions_per_week+=1
-			dEndDate=end_date2
-			dClassDays_2 = day_2
 		if include_3 :
 			sessions_per_week+=1
-			dEndDate=end_date3
-			dClassDays_3 = day_3
 		if include_4 :
 			sessions_per_week+=1
-			dEndDate=end_date4
-			dClassDays_4 = day_4
 		if include_5 :
 			sessions_per_week+=1
-			dEndDate=end_date5
-			dClassDays_5 = day_5
 		if include_6 :
 			sessions_per_week+=1
-			dEndDate=end_date6
-			dClassDays_6 = day_6
 		if include_7 :
 			sessions_per_week+=1
-			dEndDate=end_date7
-			dClassDays_7 = day_7
-		return {'value': {'sessions_per_week': sessions_per_week,'class_end_date':dEndDate, 'class_days':dClassDays_1+' '+dClassDays_2+' '+dClassDays_3+' '+dClassDays_4+' '+dClassDays_5+' '+dClassDays_6+' '+dClassDays_7}}
+
+		return {'value': {'sessions_per_week': sessions_per_week}}
 
 	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
-		
+
 		if len(ids) == 0:
 			apply_include = False
 			if not start_date:
@@ -1334,21 +1333,13 @@ class class_info(osv.osv):
 				apply_include = True
 
 
-			start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-			user = self.pool.get('res.users').browse(cr, uid, uid)
-			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
-			ran = pytz.utc.localize(start).astimezone(tz)
-			value['start_time'] = ran.strftime("%H:%M")
-			value['start_yy_mm'] = ran.strftime("%y%m")
+			start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+
 
 			if not end_date:
 				end = start + timedelta(hours=duration)
 				value['end_date'] = end.strftime("%Y-%m-%d %H:%M:%S")
-				user = self.pool.get('res.users').browse(cr, uid, uid)
-				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
-				ran = pytz.utc.localize(end).astimezone(tz)
-				value['end_time'] = ran.strftime("%H:%M")
-				
+
 			if duration and total_hrs:
 				sessions_duration_in_hrs = duration
 				if sessions_duration_in_hrs > 0 :
@@ -1369,7 +1360,6 @@ class class_info(osv.osv):
 				value[inr_1] = ''
 				value[inr] = ''
 				value['day_'+str(i)] = ''
-				value['class_schedule_pattern_'+str(i)] = ''
 				value['include_'+str(i)] = False
 			value['start_date1'] = start_date
 			value['end_date1'] = end.strftime("%Y-%m-%d %H:%M:%S")
@@ -1552,113 +1542,207 @@ class move_learner(osv.osv):
 
 move_learner
 
+class swap_class(osv.osv):
+	global from_create
+	from_create =False
+	def create(self,cr, uid, values, context=None):
+		global from_create
+		from_create = True
+		if 'room_line' in values:
+			for i in values['room_line']:
+				swp_id = self.pool.get('swap.class.table').browse(cr,uid,i[1])['swap_class_id']
+				self.unlink(cr, uid,swp_id, context=context)
+			swap_class_id = super(swap_class, self).create(cr, uid, values, context=context)
+			for j in values['room_line']:
+				self.pool.get('swap.class.table').write(cr, uid, j[1],{'swap_class_id':swap_class_id}, context=context)
+			return swap_class_id
+
+		swap_class_id = super(swap_class, self).create(cr, uid, values, context=context)
+		return swap_class_id
+
+	def default_get(self, cr, uid, fields, context=None):
+		if from_create :
+			data = super(swap_class, self).default_get(cr, uid, fields, context=context)
+			return data
+		data = super(swap_class, self).default_get(cr, uid, fields, context=context)
+		data['location_id']=context.get('active_location')
+		class_info = self.pool.get('class.info')
+		parent_class = class_info.browse(cr,uid,context.get('class_id'))
+		data['class_code'] = parent_class.class_code
+		data['class_id'] = parent_class.id
+ 		start_date = parent_class['start_date']
+		start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+		swpa_class_ids = self.search(cr,uid,[('location_id', '=', data['location_id']) and
+		('class_code', '=',data['class_code'])])
+		dwz = self.pool.get('swap.class.table')
+		dwz.unlink(cr, uid,dwz.search(cr, uid, [('class_id', '=',data['class_id']) and
+		('swap_class_id', 'in', swpa_class_ids) ]), context=context)
+		self.unlink(cr,uid,swpa_class_ids,context=context)
+		swap_class_id = self.create(cr,uid,{'location_id':data['location_id'],'class_code':data['class_code'],'class_id':data['class_id']},context =context)
+		class_id_loc = class_info.search(cr, uid, [('location_id', '=', data['location_id'])])
+		dws = []
+		user = self.pool.get('res.users').browse(cr, uid, uid)
+		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+		for self_obj in class_info.browse(cr,uid,class_id_loc):
+			self_obj_start_date = self_obj['start_date']
+			self_obj_start = datetime.strptime(self_obj_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			if ((self_obj.id != context.get('class_id')) and (start == self_obj_start)):
+				room_capacity = self.pool.get('room').browse(cr,uid,self_obj.room_id.id).room_max_cap
+ 				dw = dwz.create(cr, uid,{
+					'swap_class_id':swap_class_id,
+					'room_id': self_obj.room_id.id,
+					'class_code': self_obj.class_code,
+					'class_id': self_obj.id,
+					'start_date':self_obj_start,
+					'capacity':room_capacity
+				}, context=context)
+				dws.append(dw)
+		data['room_line'] = dws
+		return data
+
+	def swap_class_save(self, cr, uid, ids, context=None):
+		dwz = self.pool.get('swap.class.table')
+		swap_ids = []
+		for j in dwz.browse(cr,uid,dwz.search(cr, uid,[])):
+			if(j.swap and ids[0] == j.swap_class_id):
+				swap_ids.append(j)
+
+		if(len(swap_ids) > 1 or len(swap_ids) == 0):
+			raise osv.except_osv(_('Error!'),_("Please select one room to swap"))
+
+		swap_obj_ids = self.search(cr,uid,[])
+		swap_obj = self.browse(cr,uid,ids,context)
+		if swap_obj[0].apply_all == True :
+			class_ooo = self.pool.get('class.info')
+			sub_lines = []
+			current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
+			for m in  class_ooo.browse(cr,uid,class_ooo.search(cr,uid,[('class_code','=',context.get('class_code'))]),context=context):
+				m_start_date = m['start_date']
+				m_start = datetime.strptime(m_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+				for n in  class_ooo.browse(cr,uid,class_ooo.search(cr,uid,[('class_code','=',swap_ids[0].class_code)]),context=context):
+					n_start_date = n['start_date']
+					n_start = datetime.strptime(n_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+					if(m_start == n_start):
+						sub_lines = []
+						sub_lines_1 = []
+						sub_lines.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+						'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),
+						'status_change_by':current_user['name'],'changes':m.room_id.name}) )
+						sub_lines_1.append( (0,0, {'date_created':fields.date.today(),'created_by':current_user['name'],
+						'last_update':'-','last_update_by':'-','date_status_change':fields.date.today(),
+						'status_change_by':current_user['name'],'changes':n.room_id.name}) )
+						class_ooo.write(cr,uid,m.id,{'room_id':n.room_id.id,'history_line': sub_lines},context=context,holidays=True)
+						class_ooo.write(cr,uid,n.id,{'room_id':m.room_id.id,'history_line': sub_lines_1},context=context,holidays=True)
+
+
+		else :
+			class_ooo = self.pool.get('class.info')
+			class_object_1 = class_ooo.browse(cr,uid,int(context.get('class_id')),context=context)
+			class_object_2 = class_ooo.browse(cr,uid,int(swap_ids[0].class_id),context=context)
+			class_ooo.write(cr,uid,class_object_2.id,{'room_id':class_object_1.room_id.id},context=context,holidays=True)
+			class_ooo.write(cr,uid,class_object_1.id,{'room_id':swap_ids[0].room_id},context=context,holidays=True)
+
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'class_form')
+		view_id = view_ref and view_ref[1] or False,
+		ctx = dict(context)
+		#this will return product tree view and form view.
+		ctx.update({
+			'active_id': ids[0]
+		})
+		return {
+			'type': 'ir.actions.act_window',
+			'name': 'Class',
+			'view_mode': 'form',
+			'view_type': 'form',
+			'view_id': view_id,
+			'res_model': 'class.info',
+			'res_id':context.get('active_id'),
+			'nodestroy': True,
+			'target':'current',
+			'context': ctx,
+		}
+
+	_name = "swap.class"
+	_description = "Swap Class Room"
+	_columns = {
+		'location_id': fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True),
+		'class_code':fields.char('Class Code'),
+		'class_id':fields.integer('Class Id'),
+        'room_line': fields.one2many('swap.class.table','swap_class_id', ondelete='cascade',string='Class'),
+		'apply_all':fields.boolean('Apply To All')
+    }
+
+swap_class
+
+class swap_class_table(osv.osv):
+	_name = "swap.class.table"
+	_description = "Swap Class Table"
+	_columns = {
+		'id':fields.integer('id'),
+		'swap_class_id':fields.integer('id',readonly=1),
+		'room_id': fields.integer('Room',readonly=1),
+		'class_code': fields.char('Class Code',readonly=1),
+		'class_id':fields.char('Class Id'),
+		'start_date': fields.datetime('Start Date',readonly=1),
+		'capacity': fields.integer('Capacity',readonly=1),
+		'swap':fields.boolean('Swap'),
+	}
+
+swap_class_table
+
 class learner_mod_line(osv.osv):
 	def _check_unique_learner(self, cr, uid, ids, context=None):
 		if dupliacte_found == True:
 			return False
 		else :
 			return True
-			
-	def _current_class(self, cr, uid, ed, sd, cc, st, cs, ns, csp, values, context=None):
-			obj_current_class = self.pool.get('current.class')
-			
-			global isSaved
-			for sh in values:
-				if isSaved==False:
-					sql = "select program_learner from learner_info where id = %s " % (sh['learner_id'])
-					cr.execute(sql)
-					itms = cr.fetchall()
-					for r in itms:
-						prn = r[0]
-					
-						vals = {
-							'program_name': prn,
-							'class_id':sh['learner_id'],
-							'class_code':cc,
-							'start_date': sd,
-							'end_date': ed,
-							'session_timings': st,
-							'class_status': cs,
-							'no_of_sessions': ns,
-							'class_schedule_paltform': csp
-						}
-						obj_current_class.create(cr, uid, vals, context=context)
-						#raise osv.except_osv(_('Error:'),_("Iddddd"))
-						isSaved=True
-				return True
 
-	def _create_hist(self, cr, uid, sdt,  mn, cc, values, context=None):
+	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
 
 			for ch in values:
 				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s ")%(ch['learner_id']))
-				sql="select program_learner, emp_staus, sponsor_ship from learner_info where id = %s " % (ch['learner_id'])
+				sql="select program_learner, emp_staus, desig_detail, sponsor_ship from learner_info where id = %s " % (ch['learner_id'])
 				cr.execute(sql)
 				itm = cr.fetchall()
 				for s in itm:
 					pn = s[0]
 					es = s[1]
-					ss = s[2]
+					dd = s[2]
+					ss = s[3]
+				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed,
+				#obj_li=self.pool.get('learner.info').browse(cr, uid, ch['learner_id'])
 
 				vals = {
 					'program_name': pn,
 					'emp_staus': es,
+					'desig_detail': dd,
 					'sponsor_ship': ss,
+					'end_date':ed,
 					'class_id':ch['learner_id'],
 					'class_code':cc,
-					'start_date': sdt,
-					'module_name':mn,
-					#'end_date': edt,
+					'start_date': sd,
+					'module_name':mn
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
 
 	def create(self,cr, uid, values, context=None):
-		_logger.info("Create Called")
 		global class_create
-		if class_create == True :
-			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
-			class_id = values['learner_mod_id']
-			class_info_obj = self.pool.get('class.info')
-			class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
-			_logger.info("Learner Class Details")
-			sd = class_info_obj_id.start_date
-			ed = class_info_obj_id.class_end_date
-			cc = class_info_obj_id.class_code
-			st = class_info_obj_id.start_end_time
-			cs = 'In Progress'
-			ns = class_info_obj_id.total_sessions
-			csp = class_info_obj_id.class_days
-			self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)
-			#Masih Class History
-			sdt = class_info_obj_id.start_date
-			mn = class_info_obj_id.module_id.id
-			cc = class_info_obj_id.class_code
-			self._create_hist(cr, uid, sdt, mn, cc,[values], context=context)
-			return id
-		
+		#if class_create == True :
+			#id = super(learner_mod_line, self).create(cr, uid, values, context=context)
+			#return id
 		id = super(learner_mod_line, self).create(cr, uid, values, context=context)
 		class_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('class.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
 		#Masih
-		'''edt = class_info_obj_id.end_date
-		sdt = class_info_obj_id.start_date
+		ed = class_info_obj_id.end_date
+		sd = class_info_obj_id.start_date
 		mn = class_info_obj_id.module_id.id
 		cc = class_info_obj_id.class_code
-		self._create_hist(cr, uid, edt, sdt, mn, cc, [values], context=context)
-		#Supreeth Current Class
-		_logger.info("Learner Class Details")
-		sd = class_info_obj_id.start_date
-		ed = class_info_obj_id.end_date
-		cc = class_info_obj_id.class_code
-		st = class_info_obj_id.start_end_time
-		cs = 'In Progress'
-		ns = class_info_obj_id.total_sessions
-		csp = class_info_obj_id.day_1
-		self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)'''
+		self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		parent_id = class_info_obj_id['parent_id']
-		#raise osv.except_osv(_('Error:'),_("Iddddd %s")%(parent_id))
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
 			ids = class_info_obj.search(cr, uid, [('id', '=', parent_id)])
@@ -1666,7 +1750,7 @@ class learner_mod_line(osv.osv):
 		else:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', class_info_obj_id.id)])
 			prog_mod_ids.append(class_info_obj_id.id)
-		
+
 		for prog_module_line in prog_mod_ids:
 			if prog_module_line != class_id:
 				new_array = values
@@ -1674,32 +1758,18 @@ class learner_mod_line(osv.osv):
 				new_array['attendance'] = False
 				local_id = super(learner_mod_line, self).create(cr, uid, new_array, context=context)
 				#created_line_ids.append(local_id)
-		#created_line_ids.append(local_id)	
+		#created_line_ids.append(local_id)
+		if class_create == True :
+			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
+			#return id
 
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
-		_logger.info("Wriet Called %s",ids)
 		id = super(learner_mod_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['learner_mod_id']
-		class_info_obj = self.pool.get('class.info')
-		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
-		#Supreeth Current Class
-		'''sd = class_info_obj_id.start_date
-		ed = class_info_obj_id.end_date
-		cc = class_info_obj_id.class_code
-		st = class_info_obj_id.start_end_time
-		cs = 'In Progress'
-		ns = class_info_obj_id.total_sessions
-		csp = class_info_obj_id.day_1'''
-		#self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)
-		#Masih
-		ed = class_info_obj_id.end_date
-		sd = class_info_obj_id.start_date
-		mn = class_info_obj_id.module_id
-		cc = class_info_obj_id.class_code
-		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1709,8 +1779,6 @@ class learner_mod_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
-		_logger.info("Write prog_mod_ids %s",prog_mod_ids)
-		_logger.info("Write line_ids %s",line_ids)
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				if 'attendance' in values :
@@ -1721,18 +1789,15 @@ class learner_mod_line(osv.osv):
 
 	def on_change_learner_id(self, cr, uid, ids, learner_id):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
-		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric, 'learner_non_nric': module_obj.learner_non_nric}}
+		return {'value': {'name': module_obj.name, 'learner_nric': module_obj.learner_nric}}
 
 
 	_name = "learner.line"
 	_description = "Learner Line"
 	_columns = {
 		'learner_mod_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
-		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True,),
-		'curr_class': fields.many2one('current.class', ondelete='cascade'),
-		'users_id': fields.many2one('res.users', 'Users', ondelete='cascade', help='Learner', select=True ),
-		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1),
-		'learner_non_nric': fields.related('learner_id','learner_non_nric',type="char",relation="learner.info",string="Learner Non-NRIC", readonly=1),
+		'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, ),
+		'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1, required=True),
 		'binder':fields.boolean('Binder'),
 		'tablet':fields.boolean('Tablet'),
 		'blended':fields.boolean('Blended'),
@@ -1807,7 +1872,6 @@ class trainers_line(osv.osv):
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
-		_logger.info("write %s",values)
 		global trianer_created
 		trianer_created = True
 		id = super(trainers_line, self).write(cr, uid, ids,values, context=context)
@@ -1858,7 +1922,6 @@ class trainers_line(osv.osv):
 		user = self.pool.get('res.users').browse(cr, uid, uid)
 		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 		new_date_time_utc = pytz.utc.localize(datetime.strptime(class_info_obj_id.start_date,"%Y-%m-%d %H:%M:%S")).astimezone(tz)
-		_logger.info ('ccccc %s', new_date_time_utc)
 		sub_lines.append( (0,0, {'trainer':trainer_obj.name,'session_assigned':class_info_obj_id.sess_no,
 			'date_of_assignment':new_date_time_utc.strftime ("%Y-%m-%d %H:%M:%S"),'single_session':True}) )
 		values.update({'trainer_history': sub_lines})
@@ -2123,12 +2186,13 @@ class class_history(osv.osv):
 class_history()
 
 
-'''class client_corp(osv.osv):
+class class_postpone_details(osv.osv):
 
-	_name = "client.class.info"
-	_description = "Client Class"
+	_name = "class.postpone.details"
+	_description = "Client Class Postpone"
 	_columns = {
-	'corp_id' : fields.many2one('client.class', 'corprate'),
+	'class_postpone_id' : fields.integer('Class Id', size=20),
+	'no_of_times':fields.integer('No Of Times', size=20),
 
 	}
-client_corp()'''
+class_postpone_details()
