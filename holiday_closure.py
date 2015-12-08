@@ -27,9 +27,9 @@ dupliacte_desc_found_create = False
 #Class Holidays
 ###############
 class holidays(osv.osv):
-#Year Dropdown	
+#Year Dropdown
 	def _populate_year(self, cursor, user_id, context=None):
-		return ( 
+		return (
 		   ('2010', '2010'),
 		   ('2011', '2011'),
 		   ('2012', '2012'),
@@ -53,7 +53,7 @@ class holidays(osv.osv):
 			val[i] = ('choice'+str(i), str(year_dropdown))
 			i = i+1
 		return val
-		
+
 #Calculate Holidays
 	def _calculate_total_holiday(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
@@ -63,7 +63,7 @@ class holidays(osv.osv):
 			_logger.info('Adding rooms %s', mod_line_ids)
 			total_mod = len(mod_line_ids)
 			res[line.id] = total_mod
-				
+
 		return res
 
 #Validate Unique Year
@@ -75,7 +75,7 @@ class holidays(osv.osv):
 					if x.holiday_id == self_obj.holiday_id and x.year == self_obj.year:
 						return False
 		return True
-		
+
 # Room mandatory
 	def _make_mandatory1(self, cr, uid, ids, context=None):
 			pl = self.pool.get('holiday.line')
@@ -89,7 +89,7 @@ class holidays(osv.osv):
 					else:
 						return False
 			return True
-		
+
 #Table For Year in Holiday
 	_name = "holiday"
 	_description = "This table is for keeping location data"
@@ -100,12 +100,12 @@ class holidays(osv.osv):
 		'holiday_line': fields.one2many('holiday.line', 'holiday_line_id', 'Holiday Lines', select=True, required=True),
 		'no_of_holidays': fields.function(_calculate_total_holiday, relation="holiday",readonly=1,string='No. of Holidays',type='integer'),
 	}
-	
+
 	def create(self,cr, uid, values, context=None):
-		
+
 		global dupliacte_desc_found_create
 		dupliacte_desc_found_create = False
-		
+
 		if 'holiday_line' in values :
 			if values['holiday_line']  > 1:
 				ids_test_lear = self.pool.get('holiday.line').search(cr,1,[])
@@ -116,7 +116,7 @@ class holidays(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('holiday.line').browse(cr,1,ids_test_lear):
 					if dd.holiday_line_id.id == True:
-						table_ids.append(dd.description)	
+						table_ids.append(dd.description)
 				for x in values['holiday_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('holiday.line').browse(cr,uid,x[1])
@@ -149,19 +149,19 @@ class holidays(osv.osv):
 						if found == 1 :
 							global dupliacte_desc_found_create
 							dupliacte_desc_found_create = True
-	
+
 		module_id = super(holidays, self).create(cr, uid, values, context=context)
 		return module_id
-	
+
 	def write(self,cr, uid, ids, values, context=None):
-	
+
 		global dupliacte_desc_found
 		dupliacte_desc_found = False
-	
+
 		if 'holiday_line' in values :
 				if values['holiday_line']  > 1:
 					ids_test_lear = self.pool.get('holiday.line').search(cr,1,[])
-					table_ids = [] 
+					table_ids = []
 					added_ids = []
 					deleted_ids =[]
 					updated_ids = []
@@ -176,7 +176,7 @@ class holidays(osv.osv):
 							added_ids.append(x[2]['description'])
 						elif x[0] == 1  and 'description' in x[2]:
 							updated_ids.append(x[2]['description'])
-					'''create check'''		
+					'''create check'''
 					if len(added_ids) - len(set(added_ids)) >  0 :
 						global dupliacte_desc_found
 						dupliacte_desc_found = True
@@ -198,7 +198,7 @@ class holidays(osv.osv):
 							if found == 1 :
 								global dupliacte_desc_found
 								dupliacte_desc_found = True
-								
+
 		module_id = super(holidays, self).write(cr, uid, ids,values, context=context)
 		return module_id
 	_constraints = [(_check_unique_year, 'Error: Year Already Exists', ['year']),(_make_mandatory1, 'Error: Atleast One Holiday should be Entered', ['Holiday']),]
@@ -207,21 +207,30 @@ holidays
 #Class Holiday Line
 ###############
 class holiday_line(osv.osv):
+
+	def unlink(self, cr, uid, ids, context=None):
+		id = super(holiday_line, self).unlink(cr, uid, ids, context=context)
+		class_obj = self.pool.get("class.info")
+		for k in class_obj.browse(cr,uid,class_obj.search(cr,uid,[('class_id','=',ids[0])])):
+			class_obj.unlink(cr, uid, k.id, context=context)
+		return id
+
+
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
+
 		res = super(holiday_line, self).read(cr, uid,ids, fields, context, load)
-		seq_number =0 
+		seq_number =0
 		for r in res:
 			seq_number = seq_number+1
 			r['s_no'] = seq_number
-		
+
 		return res
 
-#Validate Date For Past		
+#Validate Date For Past
 	def months_between1(self, date1, date2):
 		r = relativedelta.relativedelta(date1, date2)
 		return r.days
-		
+
 	def months_between2(self, date1, date2):
 		date11 = datetime.strptime(date1, '%d-%m-%Y %H:%M:%S')
 		date12 = datetime.strptime(date2, '%d-%m-%Y %H:%M:%S')
@@ -232,7 +241,7 @@ class holiday_line(osv.osv):
 	def onchange_start_date_past(self, cr, uid, ids, start_date, eofdate, year2, context=None):
 		res = {'value':{}}
 		chng_year = False
-		if start_date:		
+		if start_date:
 			chng_year = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
 			user = self.pool.get('res.users').browse(cr, uid, uid)
 			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
@@ -247,7 +256,7 @@ class holiday_line(osv.osv):
 					#res['value']['date_start'] = ''
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year ' + str(year2))}})
 					return res
-				d = self.months_between1(chng_year, current_date) 
+				d = self.months_between1(chng_year, current_date)
 				if d < 0:
 					#res['value']['date_start'] = ''
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Past date not allowed. Date selected is ' + str(start_date))}})
@@ -257,7 +266,7 @@ class holiday_line(osv.osv):
 				return False
 		raise osv.except_osv(_('Warning!'),_('Please Enter Start Date')%())
 
-			
+
 #Validate End Date : Past Date and Year Match
 	def onchange_end_date_past(self, cr, uid, ids, eofdate, start_date, year2, context=None):
 		res = {'value':{}}
@@ -268,7 +277,7 @@ class holiday_line(osv.osv):
 			tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 			ran = pytz.utc.localize(chng_year).astimezone(tz)
 			today = time.strftime('%Y-%m-%d %H:%M:%S')
-			current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')				
+			current_date = datetime.strptime(today, '%Y-%m-%d %H:%M:%S')
 			if not start_date and eofdate:
 				#res['value']['date_end'] = ''
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter start date first.')}})
@@ -279,9 +288,9 @@ class holiday_line(osv.osv):
 					#res['value']['date_end'] = ''
 					res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct Year ' + str(year2))}})
 					return res
-				
+
 				#d = self.months_between1(eofdate, str(datetime.now().date()))
-				d = self.months_between1(chng_year, current_date) 
+				d = self.months_between1(chng_year, current_date)
 				#raise osv.except_osv(_('Warning!'),_('sdasdfdsdfsf %s %s')%(d, eofdate))
 				if d < 0:
 					#res['value']['date_end'] = ''
@@ -289,7 +298,7 @@ class holiday_line(osv.osv):
 					return res
 				'''elif eofdate and start_date:
 					c = self.months_between2(str(eofdate), str(start_date))
-					d = self.months_between1(start_date, str(datetime.now().date())) 
+					d = self.months_between1(start_date, str(datetime.now().date()))
 					if c < 0:
 						res['value']['date_end'] = ''
 						res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date')}})
@@ -298,9 +307,9 @@ class holiday_line(osv.osv):
 			else:
 				return False
 		raise osv.except_osv(_('Warning!'),_('Please Enter End Date')%())
-		
 
-#Validate Start/End Date	
+
+#Validate Start/End Date
 	def _date_start_end_validate(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
@@ -309,15 +318,15 @@ class holiday_line(osv.osv):
 				raise osv.except_osv(_('Error:'),_('Entered Invalid Date or Time in: %s')%(xcv))
 		return True
 
-#Validate Unique Name	
+#Validate Unique Name
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		if dupliacte_desc_found == True:
 			return False
 		elif dupliacte_desc_found_create == True:
 			return False
 		else :
-			return True	
-		
+			return True
+
 #Validate Unique Start Date
 	def _check_unique_start_date(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -328,7 +337,7 @@ class holiday_line(osv.osv):
 						return False
 		return True
 
-#Validate Unique End Date		
+#Validate Unique End Date
 	def _check_unique_end_date(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
@@ -337,14 +346,15 @@ class holiday_line(osv.osv):
 					if x.s_no == self_obj.s_no and x.date_end == self_obj.date_end:
 						return False
 		return True
-		
+
 #Sadiq - Check Class and Test Schedule for Holidays and Closures
 	def create(self,cr, uid, values, context=None):
+		_logger.info("values %s",values)
 		id = super(holiday_line, self).create(cr, uid, values, context=context)
-	
+
 		Range = namedtuple('Range', ['start', 'end'])
 		r1 = Range(start=datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S"))
-		
+
 		class_obj =self.pool.get("class.info")
 		class_obj_ids = class_obj.search(cr,uid,[])
 		sess_issue = 'None'
@@ -353,30 +363,36 @@ class holiday_line(osv.osv):
 			latest_start = max(r1.start, r2.start)
 			earliest_end = min(r1.end, r2.end)
 			overlap = (earliest_end - latest_start)
-			if overlap.days == 0:
-				class_obj.write(cr, uid, [u.id],{'sess_issues':values['description']}, context,holidays= True)
-		
+			if overlap.days == 0 :
+				if u.class_code == 'Holiday' :
+					raise osv.except_osv(_('Error:'),_('Holiday Error : Holiday exists for this day'))
+				else :
+					raise osv.except_osv(_('Error:'),_('Holiday Error : Class [ %s ]conflicts  exists for this day')%(u.class_code))
+		self.pool.get("class.info").create(cr, uid, {'name':values['description'],
+		'class_code':'Holiday','module_id':1,'start_date':values['date_start'],'end_date':values['date_end'],'client':'Public',
+		'room_id':1,'location_id':3,'parent_id':-1,'class_id':id}, context=context,holidays=True)
+
 		return id
 	def write(self,cr, uid, ids, values, context=None):
-		
+
 		if 'date_start' in values :
-			t1start = datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S") 
+			t1start = datetime.strptime(values['date_start'], "%Y-%m-%d %H:%M:%S")
 		else:
-			t1start = datetime.strptime(self.browse(cr,uid,ids[0])['date_start'], "%Y-%m-%d %H:%M:%S") 
-			
+			t1start = datetime.strptime(self.browse(cr,uid,ids[0])['date_start'], "%Y-%m-%d %H:%M:%S")
+
 		if 'date_end' in values :
-			t1end = datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S") 
+			t1end = datetime.strptime(values['date_end'], "%Y-%m-%d %H:%M:%S")
 		else:
-			t1end = datetime.strptime(self.browse(cr,uid,ids[0])['date_end'], "%Y-%m-%d %H:%M:%S") 
-		
+			t1end = datetime.strptime(self.browse(cr,uid,ids[0])['date_end'], "%Y-%m-%d %H:%M:%S")
+
 		if 'description' in values:
 			description = values['description']
 		else:
 			description = self.browse(cr,uid,ids[0])['description']
-			
+
 		Range = namedtuple('Range', ['start', 'end'])
 		r1 = Range(start = t1start, end=t1end)
-		
+
 		class_obj =self.pool.get("class.info")
 		class_obj_ids = class_obj.search(cr,uid,[])
 		for u in class_obj.browse(cr,uid,class_obj_ids) :
@@ -384,13 +400,16 @@ class holiday_line(osv.osv):
 			latest_start = max(r1.start, r2.start)
 			earliest_end = min(r1.end, r2.end)
 			overlap = (earliest_end - latest_start)
-			if overlap.days == 0:
-				class_obj.write(cr, uid, [u.id],{'sess_issues':description}, context,holidays= True)
-		
+			if overlap.days == 0 and u.class_id != ids[0]:
+				raise osv.except_osv(_('Error:'),_('Holiday Error : Class [ %s ]conflicts  exists for this day')%(u.class_code))
+
 		id = super(holiday_line, self).write(cr, uid, ids,values, context=context)
+		for k in class_obj.browse(cr,uid,class_obj.search(cr,uid,[('class_id','=',ids[0])])):
+			class_obj.write(cr, uid, k.id,{'start_date':t1start,'end_date':t1end,'name':description}, context=context,holidays=True)
+
 		return id
-			
-			
+
+
 #Table For Holiday And Closure
 	_name = "holiday.line"
 	_description = "This table is for keeping location data"
