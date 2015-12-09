@@ -33,6 +33,17 @@ class learner_info(osv.osv):
 			res[claim.id] = total
 		return res
 		
+# Payment Test Function for Grand Total
+	#_inherit = "payment.module"
+	def _amount_test(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_test_learner:
+				total += line.test_cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
+		
 # Serial number for Learner_info Profile file
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):		
 		res = super(learner_info, self).read(cr, uid,ids, fields, context, load)
@@ -324,7 +335,21 @@ class learner_info(osv.osv):
 		val.update({'checklist_tab': sub_lines})
 		#return {'value': val}	'''
 		
-	
+# Payment Program to fetch the detailed Programs
+		learner_id = 0
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			learner_id = self_obj.id
+
+		sql="select program_learner from learner_info where id = %s " % (learner_id)
+		cr.execute(sql)
+		pay_recs = cr.fetchall()
+		
+		sub_lines = []
+		for i in pay_recs:
+			sub_lines.append({'program_name':i[0]})
+			
+		val.update({'payment_learner': sub_lines})
+		return {'value': val}
 
 # Payment Module to fetch the detailed Modules
 		learner_id = 0
@@ -412,62 +437,62 @@ class learner_info(osv.osv):
 		#raise osv.except_osv(_('Warning!'),_('ssssssssssss. %s') % (pay_id))
 		#raise osv.except_osv(_('Warning!'),_('ssssssssssss. %s %s') % (learner_id, progid))
 		#raise osv.except_osv(_('Warning!'),_('aaaaaaaaa %s')%(iid))
-		sql = "select ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		sql = "select l.program_learner, ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_1 = l.id and ll.module_id = m.id \
 			and l.select_mod_gp_1 = 't' and ll.select_mod_1 = 't' \
 			and l.id = %s \
 			union \
-		select ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll, lis_program lp \
+		select l.program_learner, ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll, lis_program lp \
 			where ll.qualification_module_id_1 = l.id and ll.module_id = m.id and lp.id = l.program_learner \
 			and l.select_mod_gp_1 = 't' and lp.set_module_as_1 = 'Block' \
 			and l.id = %s \
 			union \
-		select ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_2 = l.id and ll.module_id_2 = m.id \
 			and l.select_mod_gp_2 = 't' and ll.select_mod_2 = 't' \
 			and l.id = %s \
 			union \
-		select ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_2 = l.id and ll.module_id_2 = m.id \
 			and l.select_mod_gp_2 = 't' and min_no_modules_2 = 0 \
 			and l.id = %s \
 			union \
-		select ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_3 = l.id and ll.module_id_3 = m.id \
 			and l.select_mod_gp_3 = 't' and ll.select_mod_3 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_3 = l.id and ll.module_id_3 = m.id \
 			and l.select_mod_gp_3= 't' and min_no_modules_3 = 0 \
 			and l.id = %s \
 			union \
-		select ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_4 = l.id and ll.module_id_4 = m.id \
 			and l.select_mod_gp_4 = 't' and ll.select_mod_4 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_4 = l.id and ll.module_id_4 = m.id \
 			and l.select_mod_gp_4= 't' and min_no_modules_4 = 0 \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_5 = l.id and ll.module_id_5 = m.id \
 			and l.select_mod_gp_5 = 't' and ll.select_mod_5 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_5 = l.id and ll.module_id_5 = m.id \
 			and l.select_mod_gp_5= 't' and min_no_modules_5 = 0 \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_6 = l.id and ll.module_id_6 = m.id \
 			and l.select_mod_gp_6 = 't' and ll.select_mod_6 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_6 = l.id and ll.module_id_6 = m.id \
 			and l.select_mod_gp_6= 't' and min_no_modules_6 = 0 \
 			 and l.id = %s" % (iid, iid, iid, iid, iid, iid, iid, iid, iid, iid, iid, iid)
@@ -482,8 +507,9 @@ class learner_info(osv.osv):
 			#raise osv.except_osv(_('Error!'),_("qwwxxxxxxxewew %s %s")%(i[0], i[1]))
 			#sql="insert into "
 			vals = {
-				'item_name': i[0],
-				'cost': i[1],
+				'program_name': i[0],
+				'item_name': i[1],
+				'cost': i[2],
 				'pay_id': iid
 			}
 			obj_pay.create(cr, uid, vals)
@@ -493,62 +519,62 @@ class learner_info(osv.osv):
 # Payment Module to fetch the detailed Modules		
 	def populate_payments_create(self, cr, uid, values, iid):	
 		
-		sql = "select ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		sql = "select l.program_learner, ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_1 = l.id and ll.module_id = m.id \
 			and l.select_mod_gp_1 = 't' and ll.select_mod_1 = 't' \
 			and l.id = %s \
 			union \
-		select ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_1 = l.id and ll.module_id = m.id \
 			and l.select_mod_gp_1 = 't' and min_no_modules_1 = 0 \
 			and l.id = %s \
 			union \
-		select ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_2 = l.id and ll.module_id_2 = m.id \
 			and l.select_mod_gp_2 = 't' and ll.select_mod_2 = 't' \
 			and l.id = %s \
 			union \
-		select ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_2, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_2 = l.id and ll.module_id_2 = m.id \
 			and l.select_mod_gp_2 = 't' and min_no_modules_2 = 0 \
 			and l.id = %s \
 			union \
-		select ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_3 = l.id and ll.module_id_3 = m.id \
 			and l.select_mod_gp_3 = 't' and ll.select_mod_3 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll\
+		select l.program_learner, ll.module_id_3, m.module_fee from cs_module m, learner_info l, learner_mode_line ll\
 			where ll.qualification_module_id_3 = l.id and ll.module_id_3 = m.id \
 			and l.select_mod_gp_3= 't' and min_no_modules_3 = 0 \
 			and l.id = %s \
 			union \
-		select ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_4 = l.id and ll.module_id_4 = m.id \
 			and l.select_mod_gp_4 = 't' and ll.select_mod_4 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_4, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_4 = l.id and ll.module_id_4 = m.id \
 			and l.select_mod_gp_4= 't' and min_no_modules_4 = 0 \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_5 = l.id and ll.module_id_5 = m.id \
 			and l.select_mod_gp_5 = 't' and ll.select_mod_5 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_5, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_5 = l.id and ll.module_id_5 = m.id \
 			and l.select_mod_gp_5= 't' and min_no_modules_5 = 0 \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_6 = l.id and ll.module_id_6 = m.id \
 			and l.select_mod_gp_6 = 't' and ll.select_mod_6 = 't' \
 			 and l.id = %s \
 			 union \
-		select ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
+		select l.program_learner, ll.module_id_6, m.module_fee from cs_module m, learner_info l, learner_mode_line ll \
 			where ll.qualification_module_id_6 = l.id and ll.module_id_6 = m.id \
 			and l.select_mod_gp_6= 't' and min_no_modules_6 = 0 \
 			 and l.id = %s" % (iid, iid, iid, iid, iid, iid, iid, iid, iid, iid, iid, iid)
@@ -559,19 +585,54 @@ class learner_info(osv.osv):
 
 		for i in pay_recs:
 			vals = {
-				'item_name': i[0],
-				'cost': i[1],
+				'program_name': i[0],
+				'item_name': i[1],
+				'cost': i[2],
 				'pay_id': iid
 			}
 			obj_pay.create(cr, uid, vals)
 		
 		return True
 		
-
+# Payment Module to fetch the Program name
+	def populate_payments_program_create(self, cr, uid, values, iid):
+		sql = "select program_learner from learner_info where id = %s " % (iid)
+		cr.execute(sql)
+		pay_recs = cr.fetchall()
 		
+		obj_pay = self.pool.get('payment.module')
+		
+		for i in pay_recs:
+			vals = {
+				'program_name': i[0],
+				'pay_id': iid
+			}
+			obj_pay.create(cr, uid, vals)
+		
+		return True
+
+# Payment Module to fetch the Program name
+	def populate_payments_program_write(self, cr, uid, ids, iid):
+		iid = ids[0]
+		sql = "select program_learner from learner_info where id = %s " % (iid)
+		cr.execute(sql)
+		pay_recs = cr.fetchall()
+		
+		obj_pay = self.pool.get('payment.module')
+		sql="delete from payment_module where pay_id = %s " % (iid)
+		cr.execute (sql)
+		for i in pay_recs:
+			vals = {
+				'program_name': i[0],
+				'pay_id': iid
+			}
+			obj_pay.create(cr, uid, vals)
+		
+		return True
 		
 	def create(self, cr, uid, ids, context=None):
 		
+		#values['status'] = 'Edit'
 		id = super(learner_info, self).create(cr, uid, ids, context)
 		
 #--------1-----------
@@ -684,6 +745,8 @@ class learner_info(osv.osv):
 		
 		#raise osv.except_osv(_('Warning!'),_('wwwwwww %s')%(id))
 		self.populate_payments_create( cr, uid, ids, id)
+		self.populate_payments_program_create( cr, uid, ids, id)
+		return id
 		return id
 
 	
@@ -803,7 +866,8 @@ class learner_info(osv.osv):
 				raise osv.except_osv(_('Error!'),_("Max Modules should be equal or greater than below table")) 							
 				
 		self.populate_payments_write(cr, uid, ids, id)
-		
+		#self.populate_payments_program_write(cr, uid, ids, id)
+		#return id
 		return id
 		
 #Image
@@ -1103,23 +1167,6 @@ class learner_info(osv.osv):
 			sub_lines.append( (0,0, {'learner_id':self_obj['session_no'],'learner_nric':self_obj['week_no']}) )
 			values.update({'learner_line': sub_lines})
 			learner_obj = self.pool.get("class.info")
-			
-	'''def on_change_name_search(self, cr, uid, name2, args=None, operator='ilike', context=None, limit=100):
-		if not args:
-			args = []
-		if context is None:
-			context = {}
-		ids = []
-		name2 = name2 + '%'
-		cr.execute("select name from learner_info where name2 like %s", (name2,))
-		ids = cr.dictfetchall()
-		return self.name_get(cr, uid, ids, context)
-		
-	def _auto_complete_form(self, cr, uid, ids, field_names, args,  context=None):
-		learner_nric_obj = self.pool.get('learner.info')
-		nric_learner = learner_nric_obj.browse(cr, uid, ids[0],context=context)
-		learner_mod_ids = prog_mod_obj.search(cr, uid, [('learner_nric', '=', ids[0])])
-		return'''
 		
 	def on_change_scheduling(self, cr, uid, ids, toggling):
 		val = {}
@@ -1129,17 +1176,6 @@ class learner_info(osv.osv):
 			val['class_type_schedule'] = True
 		if toggling == 'Test Schedule':
 			val['test_type_schedule'] = True
-		
-		return {'value': val}
-		
-	def on_change_nationality(self, cr, uid, ids, nationality):
-		val = {}
-		val['learner_nric'] = False
-		val['learner_non_nric'] = False
-		if nationality == 'Class Schedule':
-			val['learner_nric'] = True
-		if nationality == 'Test Schedule':
-			val['learner_non_nric'] = True
 		
 		return {'value': val}
 		
@@ -1154,7 +1190,7 @@ class learner_info(osv.osv):
 		'name': fields.char('Name', size=100,required=True, select=True),
 		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=100,required=True),
 		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality',required=True),
-		'learner_nric': fields.char('NRIC', size=9, help='Add one Prefix and one Suffix'),
+		'learner_nric': fields.char('NRIC', size=9,  help='Add one Prefix and one Suffix'),
 		'learner_non_nric': fields.char('Non-NRIC', size=44,  help='Add one Prefix and one Suffix'),
 		'learner_status': fields.selection((('Active','Active'),('InActive','InActive'),('Complete','Complete'),('InComplete','InComplete'),('Blocked','Blocked')),'Status', required=True),
 		'learner_status_display_1': fields.function(_learner_status_display_1, readonly=1, type='char'),
@@ -1204,8 +1240,10 @@ class learner_info(osv.osv):
 		'sch_date':fields.many2one('class.start.date', 'Select Date'),
 		'sch_date2':fields.char('Select Date2'),
 		#payment
-		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment', readonly=1),
+		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1),
+		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
+		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
 		#Personal Tab Fields
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
@@ -1302,6 +1340,8 @@ class learner_info(osv.osv):
 		'sponsor_ship':fields.many2one('sponsership', 'Sponsership'),
 		't_status':fields.char('Status'),
 		'actual_number':fields.function(_calculate_total_checklist, relation="learner.info",readonly=1,string='No. Checklist',type='integer'),
+		'status':fields.char('Status'),
+		'apply_all':fields.boolean('Apply to All'),
 	}
 	
 	_defaults = { 
@@ -1311,10 +1351,233 @@ class learner_info(osv.osv):
 	   'learner_nric': lambda self,cr,uid,context={}: self.pool.get('ir.sequence').get(cr, uid, 'code'),
 	   'nationality': 'Singapore',
 	   'learner_id': 'default_learner_nric',
+	   'status': 'Draft',
 	}
 	
 	_constraints = [(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_check_email, 'Error! Email is invalid.', ['work_email']),(_check_unique_id, 'Error: Email Already Exist', ['Email'])]		
 learner_info ()
+
+
+class learner_profile(osv.osv):
+
+#Module Status
+	def _learner_status_display_1(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['learner_status']
+		return res
+
+	def _learner_status_display_2(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['learner_status']
+		return res
+		
+	def _learner_status_display_3(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['learner_status']
+		return res
+		
+		
+# Payment Module Function for Grand Total
+	#_inherit = "payment.module"
+	def _amount(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_learner:
+				total += line.cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
+		
+# Payment Test Function for Grand Total
+	#_inherit = "payment.module"
+	def _amount_test(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_test_learner:
+				total += line.test_cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
+		
+	def _calculate_total_checklist(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+		for line in self.browse(cr, uid, ids, context=context):
+			mod_line_ids = line.checklist_tab or []
+			_logger.info("total id %s",mod_line_ids)
+			total_mod = len(mod_line_ids)
+			res[line.id] = total_mod
+		return res
+		
+#Table Learner Info
+	_name = "learner.profile"
+	_description = "This table is for keeping location data"
+	_columns = {
+		'learner_id': fields.char('Id',size=20),
+		#'name': fields.many2one('learner.name', 'Name', required=True, size=100, type='char'),
+		#'learnerfull_name': fields.many2one('learner.name.nric', 'Name as in NRIC/FIN', required=True, size=100),
+		#'learner_nric': fields.many2one('learner.nric', 'NRIC', size=7,required=True, help='Add one Prefix and one Suffix'),
+		'name': fields.char('Name', size=100,required=True, select=True),
+		'learnerfull_name': fields.char('Name as in NRIC/FIN', size=100,required=True),
+		'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality',required=True),
+		'learner_nric': fields.char('NRIC', size=9,  help='Add one Prefix and one Suffix'),
+		'learner_non_nric': fields.char('Non-NRIC', size=44,  help='Add one Prefix and one Suffix'),
+		'learner_status': fields.selection((('Active','Active'),('InActive','InActive'),('Complete','Complete'),('InComplete','InComplete'),('Blocked','Blocked')),'Status', required=True),
+		'learner_status_display_1': fields.function(_learner_status_display_1, readonly=1, type='char'),
+		'learner_status_display_2': fields.function(_learner_status_display_2, readonly=1, type='char'),
+		'learner_status_display_3': fields.function(_learner_status_display_3, readonly=1, type='char'),
+		'date1': fields.date('Date Created', readonly='True'),
+		'date2': fields.date('Date Created', readonly='True'),
+		'program_learner': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', select=True,required=True),
+		'selected_program': fields.many2one('learner.info', 'Selected Programs by Learner', ondelete='cascade', help='Learner', Select=True),
+		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, store=True),
+		#checklist Tab
+		'checklist_tab': fields.one2many('checklist.module','checklist_id','checklist'),
+		#Schedule Tab
+		'toggling': fields.selection((('Class Schedule','Class Schedule'),('Test Schedule','Test Schedule')),'Select Schedule'),
+		'class_type_schedule': fields.boolean('Class Schedule'),
+		'test_type_schedule': fields.boolean('Test Schedule'),
+		'select_center':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
+		'class_schedule_line': fields.one2many('class.schedule.module','session_no','Class Schedule'),
+		'test_schedule_line': fields.one2many('test.schedule.module','class_info_id','Test Schedule'),
+		#'select_module':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
+		'select_module':fields.many2one('temp.module', 'Module'),
+		'select_module2':fields.integer('Module2'),
+		
+		'class_name':fields.char('Class Name', readonly=1),
+		'class_code':fields.char('Class Code', readonly=1),
+		'start_date':fields.date('Start Date', readonly=1),
+		'end_date':fields.date('End Date', readonly=1),
+		#'sch_date':fields.selection((_onchange_populate_schedule), 'Select Date', type='char'),
+		'sch_date':fields.many2one('class.start.date', 'Select Date'),
+		'sch_date2':fields.char('Select Date2'),
+		#payment
+		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1),
+		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
+		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
+		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
+		#Personal Tab Fields
+		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
+		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
+		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
+		'birth_date':fields.date('Birth Date'),
+		#Education
+		'high_qualification':fields.selection((('No Formal Qualification & Lower Primary','No Formal Qualification & Lower Primary'),('Primary PSLE','Primary PSLE'),('Lower Secondary','Lower Secondary'),('N Level or equivalent','N Level or equivalent'),
+		('O Level or equivalent','O Level or equivalent'),('A Level or equivalent','A Level or equivalent'),('ITE Skills Certification (ISC)','ITE Skills Certification (ISC)'),('Higher NITEC','Higher NITEC'),('NITEC/Post Nitec','NITEC/Post Nitec'),
+		('Polytechnic Diploma','Polytechnic Diploma'),('WSQ Diploma','WSQ Diploma'),('Professional Qualification & Other Diploma','Professional Qualification & Other Diploma'),('University First Degree','University First Degree'),
+		('University Post-graduate Diploma & Degree/Master/Doctorate','University Post-graduate Diploma & Degree/Master/Doctorate'),('WSQ Certificate','WSQ Certificate'),('WSQ Higher Certificate','WSQ Higher Certificate'),('WSQ Advance Certificate','WSQ Advance Certificate'),
+		('WSQ Diploma','WSQ Diploma'),('WSQ Specialist Diploma','WSQ Specialist Diploma'),('WSQ Graduate Diploma','WSQ Graduate Diploma'),('Others','Others'),('Not Reported','Not Reported')),'Highest Qualification'),
+		'language_proficiency':fields.boolean('Language Proficiency'),
+		#Contact
+		'email_id': fields.char('Email'),
+		'addr_1': fields.char('Address Line 1'),
+		'addr_2': fields.char('Address Line 2'),
+		'postal_code': fields.char('Postal Code', size=6),
+		'mobile_no': fields.integer('Mobile Number', size=9),
+		'landline_no': fields.integer('Home Number', size=9),
+		'office_no': fields.integer('Office', size=9),
+		#Modules
+		'learner_mod_line': fields.one2many('learner.mode.line', 'qualification_module_id_1', 'Order Lines', select=True),
+		'learner_mod_line_2': fields.one2many('learner.mode.line', 'qualification_module_id_2', 'Order Lines', select=True),
+		'learner_mod_line_3': fields.one2many('learner.mode.line', 'qualification_module_id_3', 'Order Lines', select=True),
+		'learner_mod_line_4': fields.one2many('learner.mode.line', 'qualification_module_id_4', 'Order Lines', select=True),
+		'learner_mod_line_5': fields.one2many('learner.mode.line', 'qualification_module_id_5', 'Order Lines', select=True),
+		'learner_mod_line_6': fields.one2many('learner.mode.line', 'qualification_module_id_6', 'Order Lines', select=True),
+		# Module No.
+		'no_module_box1': fields.boolean('1'),
+		'no_module_box2': fields.boolean('2'),
+		'no_module_box3': fields.boolean('3'),
+		'no_module_box4': fields.boolean('4'),
+		'no_module_box5': fields.boolean('5'),
+		'no_module_box6': fields.boolean('6'),
+		#1
+		'mod_gp_name_1': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_1': fields.boolean('Select Group'),
+		'set_group_as_sel_1': fields.boolean('Select Group'),
+		'set_module_select_1': fields.boolean('Select'),
+		'min_no_modules_1': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_1': fields.integer('Maximum Modules', readonly=1),
+		#2
+		'mod_gp_name_2': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_2': fields.boolean('Select Group'),
+		'set_group_as_sel_2': fields.boolean('Select Group'),
+		'set_module_select_2': fields.boolean('Select'),
+		'min_no_modules_2': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_2': fields.integer('Maximum Modules', readonly=1),
+		#3
+		'mod_gp_name_3': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_3': fields.boolean('Select Group'),
+		'set_group_as_sel_3': fields.boolean('Select Group'),
+		'set_module_select_3': fields.boolean('Selectable'),
+		'min_no_modules_3': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_3': fields.integer('Maximum Modules', readonly=1),
+		#4
+		'mod_gp_name_4': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_4': fields.boolean('Select Group'),
+		'set_group_as_sel_4': fields.boolean('Select Group'),
+		'set_module_select_4': fields.boolean('Selectable'),
+		'min_no_modules_4': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_4': fields.integer('Maximum Modules', readonly=1),
+		#5
+		'mod_gp_name_5': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_5': fields.boolean('Select Group'),
+		'set_group_as_sel_5': fields.boolean('Select Group'),
+		'set_module_select_5': fields.boolean('Selectable'),
+		'min_no_modules_5': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_5': fields.integer('Maximum Modules', readonly=1),
+		#6
+		'mod_gp_name_6': fields.char('Module Group Name', readonly=1),
+		'select_mod_gp_6': fields.boolean('Select Group'),
+		'set_group_as_sel_6': fields.boolean('Select Group'),
+		'set_module_select_6': fields.boolean('Selectable'),
+		'min_no_modules_6': fields.integer('Minimum Module', readonly=1),
+		'max_no_modules_6': fields.integer('Maximum Modules', readonly=1),
+		'outstanding_line': fields.one2many('outstanding.module','outstanding_id','outstanding'),
+		'action_learn_line': fields.one2many('action.learn.module','action_id','Action'),
+		'current_class_line': fields.one2many('current.class','class_id','Current Class', readonly=1),
+		'class_history_line': fields.one2many('class.history.module','class_id','Class History', readonly=1),
+		'test_history_line': fields.one2many('test.history.module', 'test_id', 'Test'),
+		'test_score_line': fields.one2many('test.score.module','test_score_id','Test Scores',readonly=1),
+		'qualification_line': fields.one2many('qualification.module','qualify_id','Qualification & Awards',readonly=1),
+		'assets_line': fields.one2many('assets.learner.module','asset_id','Assets'),
+		'feedback_line': fields.one2many('feedback.module','feedback_id','Feedback'),
+		'remarks_line': fields.one2many('remarks.module','remarks_id','Remarks'),
+		'race':fields.many2one('race', 'Race'),
+		'gender':fields.selection((('Male','Male'),('Female','Female')),'Gender'),
+		'birth_date':fields.date('Birth Date'),
+		'emp_staus': fields.many2one('employee.status', 'Employee Status'),
+		'company_name':fields.many2one('company', 'Company'),
+		'desig_detail':fields.many2one('designation', 'Designation'),
+		'salary':fields.many2one('salary.range', 'Salary Range'),
+		'sponsor_ship':fields.many2one('sponsership', 'Sponsership'),
+		't_status':fields.char('Status'),
+		'actual_number':fields.function(_calculate_total_checklist, relation="learner.info",readonly=1,string='No. Checklist',type='integer'),
+		'status':fields.char('Status'),
+		'apply_all':fields.boolean('Apply to All'),
+	}
+	
+	_defaults = { 
+	   'date1': fields.date.context_today,
+	   'date2': fields.date.context_today,
+	   'learner_status': 'Active',
+	   'learner_nric': lambda self,cr,uid,context={}: self.pool.get('ir.sequence').get(cr, uid, 'code'),
+	   'nationality': 'Singapore',
+	   'learner_id': 'default_learner_nric',
+	   'status': 'Draft',
+	}
+	
+	#_constraints = [(_mobile_no, 'Error: Mobile Number Cannot be Negative', ['Mobile']), (_landline_no, 'Error: Landline Number Cannot be Negative', ['Landline']), (_office_no, 'Error: Office Number Cannot be Negative', ['Office']), (_check_email, 'Error! Email is invalid.', ['work_email']),(_check_unique_id, 'Error: Email Already Exist', ['Email'])]
+
+learner_profile()
 
 class learner_name(osv.osv):
 	def _check_learner_name(self, cr, uid, ids, context=None):
@@ -1502,7 +1765,7 @@ class program_mod_line(osv.osv):
 		obj_pay = self.pool.get('payment.module')
 		sql="delete from payment_module where pay_id = %s " % (module_id)
 		cr.execute (sql)
-		vals = {'pay_id': ids,'s_no': 0,'item_name': module_id,'cost': i[0],}
+		vals = {'pay_id': ids,'s_no': 0,'item_name': module_id,'cost': i[0], 'program_name': program_learner}
 		obj_pay.create(cr, uid, vals)
 
 	def views(self,cr,uid,ids,context=None):
@@ -1962,16 +2225,55 @@ class payment(osv.osv):
 			r['s_no'] = seq_number
 		
 		return res
+		
+	def _percentage_cal(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		
+		for claim in self.browse(cr, uid, ids, context=context):
+			#total = 0.0
+			cost= 0.0
+			total = float(cost)*(107.00/100.00)
+			res[claim.id] = total
+			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(total))
+		return res
 
 	_name ='payment.module'
 	_description ="payment Tab"
 	_columns = {
 		'pay_id':fields.many2one('learner.info','Id'),
 		's_no' : fields.integer('S.No', size=50, readonly=1),
+		'program_name': fields.many2one('lis.program', 'Program Name'),
 		'item_name' : fields.many2one('cs.module', 'Module Name'),
-		'cost': fields.float('Cost', size=9),
+		'cost': fields.float('Module Cost', size=9),
+		'payment_required': fields.float('Payment Req (include 7% GST)', size=6),
 	}
 payment ()
+
+# With 5 tab Payment (Learner info)
+class payment_test(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(payment_test, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+		
+	_name ='payment.test'
+	_description ="Payment Test Tab"
+	_columns = {
+		'pay_id':fields.many2one('learner.info','Learner', ondelete='cascade'),
+		's_no' : fields.integer('S.No', size=50, readonly=1),
+		'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
+		'module_name' : fields.char('Module Name'),
+		'test_name' : fields.char('Test Code'),
+		'test_cost': fields.float('Test Cost', size =9),
+		'payment_required': fields.float( 'Payment Req (include 7% GST)', size=6),
+	}
+payment_test ()
 
 #Learner Outstanding Tab
 class outstanding(osv.osv):	
