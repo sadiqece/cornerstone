@@ -60,9 +60,9 @@
       <field name="model">learner.info</field>
       <field name="arch" type="xml">
         <form string="Learner 5 tab" version="7.0">
-		  <!--header>
-			<button string="Confirm" type="action" name="%(wizard_with_step_form)d" class="oe_highlight oe_edit_only" />
-		  </header-->
+		  <header>
+			<button string="Save" type="action" name="%(wizard_with_step_form)d" class="oe_highlight" />
+		  </header>
           <sheet>
 		  <group class="col-10">
 			<label string="Learner Enrollment" class="oe_edit_only" style="font-size:20px;"/>
@@ -164,12 +164,12 @@
 				<label string="Selected Programs by Learner" invisible="1"/>
                 <field name="selected_program" options="{'create': False, 'create_edit': False}" invisible="1"/>
 			</div>
-			<group>
+			<!--group>
 				<field name = "status" invisible="1"/>
 				<group>
 					<button type="action" name="%(wizard_with_step_form)d" class="oe_edit_only" string="Add Programs" />
 				</group>
-			</group>
+			</group-->
 			
             <!-- Learner Enrollment Profile Tabs -->
 			
@@ -480,6 +480,7 @@
                     <field name="confirmation" />
                     <field name="upload_docs" filename="datas_fname"/>
                      <field name="datas_fname" invisible="1"/>
+					 <button name="views" string="Enroll" icon="view_info2" type="object"/>  
                     <!--button name="import_file" string="Upload" type="object" /-->
                   </tree>
                 </field>
@@ -625,7 +626,7 @@
 						</field>
 					</div>
 				</group>
-				<label string="Grand Module Total $:" readonly="context.get('ctx', False)" />
+				<label string="Module Total $:" readonly="context.get('ctx', False)" />
 				<field name="Grand_total" />
 				<div class="clear" />
 				<group>
@@ -643,9 +644,11 @@
 						</field>
 					</div>
 				</group>
-				<label string="Grand Test Total $:" readonly="context.get('ctx', False)" />
+				<label string="Test Total $:" readonly="context.get('ctx', False)" />
 				<field name="Grand_test_total" />
-				<div class="clear" />	
+				<div class="clear" />
+				<label string="Grand Total $:" readonly="context.get('ctx', False)" />
+				<field name="Grand_test_total" />
 				<group>
 				 <label string="Download Payment Sheet:" readonly="context.get('ctx', False)" /><br/>
 				 <a href="http://aszstaging.com/cornerstore/INVOICE_RECEIPT.pdf" target="_blank">INVOICE RECEIPT</a><br/>

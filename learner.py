@@ -630,6 +630,9 @@ class learner_info(osv.osv):
 		
 		return True
 		
+	def buttonClick():
+		self.submitButton = Button(master, text="Submit", command=buttonClick)
+
 	def create(self, cr, uid, ids, context=None):
 		
 		#values['status'] = 'Edit'
@@ -1179,6 +1182,11 @@ class learner_info(osv.osv):
 		
 		return {'value': val}
 		
+	def default_get(self, cr, uid, fields, context=None):
+		data = super(learner_info, self).default_get(cr, uid, fields, context=context)
+		data['name']=context.get('active_module')
+		return data
+		
 #Table Learner Info
 	_name = "learner.info"
 	_description = "This table is for keeping location data"
@@ -1240,7 +1248,7 @@ class learner_info(osv.osv):
 		'sch_date':fields.many2one('class.start.date', 'Select Date'),
 		'sch_date2':fields.char('Select Date2'),
 		#payment
-		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1),
+		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1, type='float'),
 		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
@@ -1461,7 +1469,7 @@ class learner_profile(osv.osv):
 		'sch_date':fields.many2one('class.start.date', 'Select Date'),
 		'sch_date2':fields.char('Select Date2'),
 		#payment
-		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1),
+		'payment_learner':fields.one2many('payment.module', 'pay_id','Payment Module', readonly=1, type='float'),
 		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
@@ -1939,7 +1947,7 @@ class program_mod_line(osv.osv):
 	_name = "learner.mode.line"
 	_description = "Module Line"
 	_columns = {
-		'qualification_module_id': fields.many2one('learner.info'),
+		'qualification_module_id': fields.many2one('learner.info', ondelete='cascade'),
 	#1
 		'prog_mod_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Program', readonly=1),
 		'qualification_module_id_1': fields.many2one('learner.info'),

@@ -3438,6 +3438,7 @@ class requirments(osv.osv):
 			return False
 		else :
 			return True
+
 	def views(self,cr,uid,ids,context=None):
 		global globvar
 		globvar = 1
@@ -3461,8 +3462,8 @@ class requirments(osv.osv):
 		'res_id': module_ids[0], # this will open particular product,
 		'view_id': view_id,
 		'view_mode': 'form',
-		'target': 'new',
 		'nodestroy': True,
+		'target': 'new',
 		'context': ctx,
 		}
 
@@ -3579,28 +3580,8 @@ class master_equip(osv.osv):
 	'name':fields.char('Equipment',size=20),
 	}
 	_constraints = [(_check_unique_name, 'Error: This Equipment Already Exists', ['name'])]
-master_equip()   
+master_equip()
 
-#Class Module Master Test
-###############
-class master_modality(osv.osv):
-	def _check_unique_name(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
-		return True
-	_name ='master.modality'
-	_description ="Modality"
-	_columns = {
-	'name':fields.char('Modality',size=20),
-	}
-	_constraints = [(_check_unique_name, 'Error: This Modality Already Exists', ['name'])]
-master_modality()
 
 #Class Module MOI
 ###############

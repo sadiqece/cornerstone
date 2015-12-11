@@ -57,7 +57,7 @@ class test(osv.osv):
 		
 	def write(self,cr, uid, ids, values, context=None):
 		sub_lines = []
-		
+
 		current_user = self.pool.get('res.users').browse(cr, uid,uid, context=context)
 		for line in self.browse(cr, uid, ids, context=context):
 			history_line_id = self.browse(cr, uid, ids[0], context=context).history_line or []
@@ -71,28 +71,17 @@ class test(osv.osv):
 			staus_changed_by  = current_user['name']
 
 		changes = values.keys()
-		test_list ={'name': 'Test Name','test_code': 'Test Code','test_fee':'Test Fee','test_max_Pax':'Max Pppl',
-				'test_status': 'Status','test_description': 'Description','modality_line':'Modalities','history_line': 'History', 'delivery_mode': 'Delivery Mode' }
+		test_list ={'name': 'Test Name','test_code': 'Test Code','modality_line':'Modalities','history_line': 'History', 'delivery_mode': 'Delivery Mode' }
 		arr={}
 		for i in range(len(changes)):
 			if changes[i] in test_list:
 				arr[i] = test_list[changes[i]]
-		today = datetime.date.today()
+		today = datetime.date.today()  
 		sub_lines.append( (0,0, {'date_created':history_line_id[0]['date_created'],'created_by':history_line_id[0]['created_by'],
 			'last_update':today.strftime('%d-%m-%Y'),'last_update_by':current_user['name'],'date_status_change':staus_changed_date,'status_change_by':staus_changed_by,'changes':arr.values()}) )
 		values.update({'history_line': sub_lines})
 		name = super(test, self).write(cr, uid, ids,values, context=context)
 		return name
-		
-	'''def _modules_applied(self, cr, uid, ids, field_names, args,  context=None):
-		modules_applied = self.pool.get('test.module.line')
-		test = modules_applied.browse(cr, uid, ids[0],context=context)
-		module_mod_ids = modules_applied.search(cr, uid, [('test_mod_id', '=', ids[0])])
-		module_ids =[]
-		res = {}
-		for prog_module_line in modules_applied.browse(cr, uid, module_mod_ids,context=context):
-			module_ids.append(prog_module_line['test_mod_id'].id)
-		return res'''
 		
 	def _modules_applied(self, cr, uid, ids, module_id, args,  context=None):
 		modules_applied = self.pool.get('test.module.line').browse(cr, uid, module_id)
@@ -112,17 +101,7 @@ class test(osv.osv):
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.test_max_Pax < 0:
 				return False
-		return True		
-		
-	'''def on_change_test_type(self, cr, uid, ids,pre_test, in_class_test, post_test):
-		test_type = 0
-		if pre_test :
-			test_type=1
-		if in_class_test :
-			test_type=1
-		if post_test :
-			test_type=1	
-		return {'value': {'test_type': test_type}}'''	
+		return True			
 
 	def views_test(self, cr, uid, ids, context=None):  
 		this = self.browse(cr, uid, ids, context=context)[0]  
@@ -149,94 +128,17 @@ class test(osv.osv):
 		's_no': fields.integer('S.No',size=3),
 		'name': fields.char('Test Name', size=100,required=True, select=True),
 		'test_code': fields.char('Test Code', size=20),
-		'test_fee': fields.float('Test Fee', size=6),
-		'test_max_Pax':fields.integer('Max Pppl', size=4),
 		'test_status': fields.selection((('Active','Active'),('InActive','InActive')),'Status'),
-		'test_description': fields.text('Description'),
-		#'test_modules': fields.many2one('test.module.line', ondelete='cascade', help='Module', select=True, required=True),
-		#'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-		'test_mod_line': fields.one2many('test.module.line', 'test_mod_id', 'Order Lines', required=True),
 		'modality_line': fields.one2many('modalities.module','modality_id','Modalities'),
 		'history_line': fields.one2many('test.history','test_id','History', limit=None),
-		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 		'test_type': fields.char('Test Type'),
 		'modules_applied': fields.function(_modules_applied, 'Modules Applied', type="one2many"),
 	}
 	_defaults = {
 		'test_status': 'Active'
 	}
-	_constraints = [(_check_test_fee, 'Error: Test Fee Cannot be Negative', ['Test Fee']),(_check_test_max_Pax, 'Error: Max Pppl Cannot be Negative', ['Max People']),
-	(_check_unique_name, 'Error: Test Name Already Exists', ['Name']),(_check_unique_code, 'Error: Test Code Already Exists', ['Test Code'])]
+	_constraints = [(_check_unique_name, 'Error: Test Name Already Exists', ['Name']),(_check_unique_code, 'Error: Test Code Already Exists', ['Test Code'])]
 test()
-
-class test_mod_line(osv.osv):
-
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-		
-		res = super(test_mod_line, self).read(cr, uid,ids, fields, context, load)
-		seq_number =0 
-		for r in res:
-			seq_number = seq_number+1
-			r['s_no'] = seq_number
-		
-		return res
-
-	def _check_unique_module(self, cr, uid, ids, context=None):
-		sr_ids = self.search(cr, 1 ,[], context=context)
-		for x in self.browse(cr, uid, sr_ids, context=context):
-			if x.id != ids[0]:
-				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.test_mod_id == self_obj.test_mod_id and x.module_id == self_obj.module_id:
-						return False
-		return True	
-	
-	_name = "test.module.line"
-	_description = "Module Line"
-	_columns = {
-		's_no' : fields.integer('S.No',size=20,readonly=1),
-		'test_mod_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
-		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-		'module_code': fields.related('module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
-		'pre_test': fields.boolean('Pre Test'),
-		'in_class_test': fields.boolean('In Test'),
-		'post_test': fields.boolean('Post Test'),
-	}
-	_constraints = [(_check_unique_module, 'Error: Module Already Exists', ['Module'])]
-	
-	def on_change_module_id(self, cr, uid, ids, module_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		return {'value': {'module_code': module_obj.module_code}}
-		
-	def views(self,cr,uid,ids,context=None):
-		global globvar
-		globvar = 1
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'module_form')
-		view_id = view_ref and view_ref[1] or False
-		prog_mod_obj = self.pool.get('test.module.line')
-		prog_mod_ids = prog_mod_obj.search(cr, uid, [('id', '=', ids[0])])
-		module_ids =[]
-		for prog_module_line in prog_mod_obj.browse(cr, uid, prog_mod_ids,context=context):
-			module_ids.append(prog_module_line['module_id'].id)
-		ctx = dict(context)
-		#this will return product tree view and form view. 
-		ctx.update({
-			'ctx': True
-		})
-		return {
-		'type': 'ir.actions.act_window',
-		'name': _('Module'),
-		'res_model': 'cs.module',
-		'view_type': 'form',
-		'res_id': module_ids[0], # this will open particular product,
-		'view_id': view_id,
-		'view_mode': 'form',
-		'target': 'new',
-		'nodestroy': True,
-		'context': ctx,
-		}
-	
-test_mod_line()
-
 
 class modalities(osv.osv):
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
@@ -249,35 +151,41 @@ class modalities(osv.osv):
 		
 		return res
 		
-	def _check_level(self, cr, uid, ids, context=None):
+	'''def _check_level(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
 			if self_obj.level < 0:
 				return False
-		return True		
+		return True	'''	
 		
 	def _check_unique_test(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			if x.id != ids[0]:
 				for self_obj in self.browse(cr, uid, ids, context=context):
-					if x.modality_id == self_obj.modality_id and x.modal_list == self_obj.modal_list:
+					if x.modality_id == self_obj.modality_id and x.modality == self_obj.modality:
 						return False
 		return True
+		
+	def on_change_master_modality(self, cr, uid, ids, module_modality):
+		if not module_modality: return {}
+		master_modalities_obj = self.pool.get('master.modality').browse(cr, uid, module_modality)
+		return {'value': {'name': master_modalities_obj.name,'cost':master_modalities_obj.cost}}
 		
 	_name ='modalities.module'
 	_description ="Modalities Tab"
 	_columns = {
 	'modality_id' : fields.integer('Id',size=20), 
 	's_no' : fields.integer('S.No',size=20,readonly=1),
-	'modal_list':fields.many2one('master.modalities', 'Test Modality', ondelete='cascade', help='Description', select=True,required=True),
-	'level':fields.integer('Minimum Level',size=3),
+	'modality':fields.many2one('master.modality', 'Test Modality', ondelete='cascade', help='Description', required=True),
+	'cost': fields.float('Cost($)', size=7, readonly=1),
+	#'level':fields.integer('Minimum Level',size=1),
 	'store_results':fields.boolean('Store Result'),
 	'store_level':fields.boolean('Store Level'),
 	'store_scores':fields.boolean('Store Scores'),
 	'store_outcome':fields.boolean('Store Outcome'),
 	}
-	_constraints = [(_check_level, 'Error: Minimum Level Cannot be negative', ['Level']),(_check_unique_test, 'Error: Test Modality Already Exists', ['Name'])]
+	_constraints = [(_check_unique_test, 'Error: Test Modality Already Exists', ['Name'])]
 modalities	()
 
 class master_modalities(osv.osv):
@@ -325,7 +233,28 @@ class test_history(osv.osv):
 	'changes':fields.char('Changes',size=200),
 	'test_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
 	}
-test_history	()
+test_history()
 
+#Class Module Master Test
+###############
+class master_modality(osv.osv):
+	def _check_unique_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				return False
+		return True
+	_name ='master.modality'
+	_description ="Modality"
+	_columns = {
+	'name':fields.char('Modality',size=20),
+	'cost': fields.float('Cost', size=7),
+	}
+	_constraints = [(_check_unique_name, 'Error: This Modality Already Exists', ['name'])]
+master_modality()
 
 	

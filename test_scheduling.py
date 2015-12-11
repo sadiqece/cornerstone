@@ -31,7 +31,7 @@ dupliacte_mod_found_create = False
 class test_info(osv.osv):
 
 	
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+	'''def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		_logger.info("Value in read %s",ids)
 		res = super(test_info, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
@@ -39,7 +39,7 @@ class test_info(osv.osv):
 			seq_number = seq_number+1
 			r['s_no'] = seq_number
 		
-		return res
+		return res'''
 		
 	def default_get(self, cr, uid, fields, context=None):
 		_logger.info("Calleing Default %s",fields)
@@ -62,22 +62,70 @@ class test_info(osv.osv):
 			res[line.id] = total_mod
 		return res
 	
+#Test Status
+	def _test_status_display_1(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['test_status']
+		return res
+		
+	def _test_status_display_2(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['test_status']
+		return res
+		
+	def _test_status_display_3(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['test_status']
+		return res
+		
+	def _test_status_display_4(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['test_status']
+		return res
+		
+	def _test_status_display_5(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line['test_status']
+		return res
+		
+	def _check_modality(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.min_modality > self_obj.max_modality:
+				raise osv.except_osv(_('Error:'),_('Max Modality should be greater')%(self_obj))
+		return True
 
 	_name = "test.info"
 	_description = "This table is for keeping Test Schedules"
 	_columns = {
+		'test_id': fields.integer('Id',size=20),
 		's_no': fields.integer('S_No', size=100),
-		'test_def_id': fields.many2one('test', 'Test Definition',  ondelete='cascade', help='Test', select=True, required=True),
-		'name': fields.related('test_def_id','name',type="char",relation="test",string="Name", readonly=1,),
+		'parent_id': fields.integer('Parent Id',size=20),
+		'name': fields.char('Test Name', size=100,required=True, select=True),
+		'test_code': fields.char('Test Code', size=999),
+		'test_status': fields.selection((('Open','Open'),('Closed','Closed'),('Completed','Completed'),('Cancelled','Cancelled'),('Postponed','Postponed')),'Status',required=True, select=True, help='Status show wheather the Program is on going.'),
 		'test_type_id':fields.integer('Test Type Id'),
 		'test_pre_type':fields.selection((('Pre Test','Pre Test'),),'Test Type', ),
 		'test_type':fields.selection((('Pre Test','Pre Test'),('Post Test','Post Test')),'Test Type', ),
 		'test_post_type':fields.selection((('Post Test','Post Test'),),'Test Type', ),
 		'test_type_char':fields.char('Test Type'),
 		'class_info': fields.many2one('class.info', 'Select Class',  ondelete='cascade', help='Module', select=True, ),
-		'test_code': fields.char('Test Code', size=20, readonly=1),
 		'test_code_compliance': fields.char('Test Code (Compliance)', size=20),
-		'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, required=True),
 		'module_ids': fields.char('Module_Ids'),
 		'module_code': fields.char('Module Code', size=20, readonly=1),
 		'start_date': fields.datetime('Start Date', required=True),
@@ -89,16 +137,31 @@ class test_info(osv.osv):
 		'delivery_mode': fields.selection((('English','English'),('Singli','Singli'),('Malyi','Malyi')),'Delivery Mode'),
 		'learner_line': fields.one2many('test.learner', 'learner_mod_id', 'Learner Lines', select=True, required=True),
 		'test_scores': fields.one2many('test.scores','test_scores_id','Test Scores'),
-		'status': fields.related('test_def_id','test_status',type="char",relation="test",string="Status", readonly=1,),
-		'test_status': fields.related('test_def_id','test_status',type="char",relation="test",string="Status", readonly=1,),
-		'capacity':fields.related('test_def_id','test_max_Pax',type="integer",relation="test",string="Capacity", readonly=1,),
 		'actual_number':fields.function(_calculate_total_learners, relation="test.info",readonly=1,string='No. Learners',type='integer'),
-		't_status':fields.char('Status')
+		't_status':fields.char('Status'),
+		'max_modality': fields.integer('Max Modality', size=1),
+		'min_modality': fields.integer('Min Modality', size=1),
+		'max_people': fields.integer('Max People', size=3),
+		'test_status_display_1': fields.function(_test_status_display_1, readonly=1, type='char'),
+		'test_status_display_2': fields.function(_test_status_display_2, readonly=1, type='char'),
+		'test_status_display_3': fields.function(_test_status_display_3, readonly=1, type='char'),
+		'test_status_display_4': fields.function(_test_status_display_4, readonly=1, type='char'),
+		'test_status_display_5': fields.function(_test_status_display_5, readonly=1, type='char'),
+		'date1': fields.date('Date Created', readonly='True'),
+		'date2': fields.date('Date Created', readonly='True'),
+		'date3': fields.date('Date Created', readonly='True'),
+		'date4': fields.date('Date Created', readonly='True'),
+		'date5': fields.date('Date Created', readonly='True'),
 	}
 	_defaults = { 
 		't_status': 'Draft',
+		'date1': fields.date.context_today,
+		'date2': fields.date.context_today,
+		'date3': fields.date.context_today,
+		'date4': fields.date.context_today,
+		'date5': fields.date.context_today,
 	} 
-	
+	_constraints = [(_check_modality, 'Error: Max Modality should be greater', ['Modality'])]
 
 	def create(self,cr, uid, values, context=None):
 		values['t_status'] = 'Edit'
@@ -433,7 +496,7 @@ class test_info(osv.osv):
 		module_id = super(test_info, self).write(cr, uid, ids,values, context=context)
 		return module_id
 	
-	def on_change_test_definition(self, cr, uid, ids, test,context):
+	'''def on_change_test_definition(self, cr, uid, ids, test,context):
 		code = ""
 		module_info  = {} 
 		module_id_array  = []
@@ -443,7 +506,7 @@ class test_info(osv.osv):
 		for y in test_obj_id.test_mod_line or [] :
 			module_id_array.append(y.module_id.id)
 			
-		return {'domain':{'module_id':[('id','in',module_id_array)]},'value': {'test_code':code,'name':test_obj_id.name,'capacity':test_obj_id.test_max_Pax,'status':test_obj_id.test_status,'module_id':False}}
+		return {'domain':{'module_id':[('id','in',module_id_array)]},'value': {'test_code':code,'name':test_obj_id.name,'capacity':test_obj_id.test_max_Pax,'status':test_obj_id.test_status,'module_id':False}}'''
 	
 	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False,context=None):
 		value = {}
@@ -500,7 +563,8 @@ class test_modality(osv.osv):
 	_description ="Trainer Learner Tab"
 	_columns = {
 	'test_modality_id' :  fields.many2one('test.info', 'Test', ondelete='cascade', help='Test', select=True),
-	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),	'm_active':fields.boolean('Active'),
+	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),	
+	'm_active':fields.boolean('Active'),
 
 	}
 	_constraints = [(_check_unique_test_modality, 'Error: Item Already Exists', ['master_modality'])]
@@ -604,16 +668,37 @@ class test_learner(osv.osv):
 			class_code = class_obj.class_code
 		return {'value': {'learner_nric': module_obj.learner_nric,'class_code':class_code,'compliance_code':context.get('test_code')}}
 	
-	def _test_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
+	def _test_hist(self, cr, uid, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('test.history.module')
 			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
 			for ch in values:
 				vals = {
-					'test_type':ed,
+					#'test_type':ed,
 					'test_id':ch['learner_id'],
 					'test_code':cc,
 					'test_date': sd,
 					'test_status':mn
+				}
+				obj_res_hist.create(cr, uid, vals, context=context)
+			return True
+			
+	def _payment_test(self, cr, uid, mon, csc, mc, values, context=None):
+			obj_res_hist = self.pool.get('payment.test')
+			
+			for ch in values:
+			
+				sql="select program_learner from learner_info where id = %s " % (ch['learner_id'])
+				cr.execute(sql)
+				itm = cr.fetchall()
+				for s in itm:
+					pna = s[0]
+				
+				vals = {
+					'program_name': pna,
+					'pay_id':ch['learner_id'],
+					'module_name': mon,
+					'test_name':csc,
+					'test_cost': mc,
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
@@ -626,14 +711,23 @@ class test_learner(osv.osv):
 		test_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('test.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
-		ed = class_info_obj_id.test_def_id.id
+		#ed = class_info_obj_id.name
 		sd = class_info_obj_id.start_date
 		mn = class_info_obj_id.test_status
 		cc = class_info_obj_id.test_code
-		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.end_date))
+		#Supreeth
+		test_id = values['learner_mod_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		mon = values['module_id']
+		mc = values['modality_cost']
+		csc = class_info_obj_id.test_code
+		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.test_code))
 		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		#Masih
-		self._test_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+		self._test_hist(cr, uid, sd, mn, cc,[values], context=context)
+		self._payment_test(cr, uid, mon, csc, mc,[values], context=context)
+		return id
 		return id
 		
 	def write(self,cr, uid, ids, values, context=None):
@@ -643,7 +737,25 @@ class test_learner(osv.osv):
 			scores_obj = self.pool.get('test.scores')
 			scores_obj_id = scores_obj.search(cr,uid,[('learner_id','=',learner_obj['learner_id'].id)])
 			scores_obj.write(cr,uid,scores_obj_id,values)
+		#Masih
+		test_id = values['learner_mod_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		#ed = class_info_obj_id.name
+		sd = class_info_obj_id.start_date
+		mn = class_info_obj_id.test_status
+		cc = class_info_obj_id.test_code
 		id = super(test_learner, self).write(cr, uid, ids,values, context=context)
+		#Supreeth
+		test_id = values['learner_mod_id']
+		class_info_obj = self.pool.get('test.info')
+		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
+		csc = class_info_obj_id.test_code
+		mon = values['module_id']
+		mc = values['modality_cost']
+		self._test_hist(cr, uid, sd, mn, cc,[values], context=context)
+		self._payment_test(cr, uid, mon, csc, mc,[values], context=context)
+		return id
 		return id
 
 	def unlink(self, cr, uid, ids, context=None):
@@ -662,6 +774,10 @@ class test_learner(osv.osv):
 	'learner_mod_id': fields.many2one('test.info', 'Test', ondelete='cascade', help='Class', select=True),
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
 	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1,),
+	'learner_non_nric': fields.related('learner_id','learner_non_nric',type="char",relation="learner.info",string="Learner Non-NRIC", readonly=1),
+	'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, required=True),
+	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description', required=True),
+	'modality_cost': fields.related('modality', 'cost', type="float",relation="master.modality",string="Cost", readonly=1,),
 	'class_code':fields.char('Class Code',size=25),
 	'compliance_code':fields.char('Compliance Code',size=25),
 	'level':fields.char('Level',size=25),
@@ -840,7 +956,7 @@ class test_scores(osv.osv):
 		obj_res_hist = self.pool.get('test.score.module')
 		sql="select ti.start_date, t.id, ti.test_code  \
 			from test_info ti, test_scores ts, test t \
-			where ti.id = ts.test_scores_id and t.id = ti.test_def_id and ts.learner_id = %s" % (lid)
+			where ti.id = ts.test_scores_id and t.id = ti.name and ts.learner_id = %s" % (lid)
 			
 		cr.execute(sql)
 		itm = cr.fetchall()

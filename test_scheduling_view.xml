@@ -12,137 +12,177 @@
 			<sheet>
 				<group>
 					<group class="oe_title" style="width:350px;">
-							<field name = "test_def_id"  options="{'create': False, 'create_edit': False}" on_change="on_change_test_definition(test_def_id,context)" attrs="{'readonly':[('t_status','=','Edit')]}"/>
-							<field name = "status"  invisible="1"/>
-							<field name = "t_status"  invisible="1"/>
-							<field name = "test_status"  invisible="1"/>
-			        </group>
-					<div>
+						<div class="oe_title">
+							<field name = "parent_id" invisible='1'/>
+							<label for="name" class="oe_edit_only"/>
+							<h1 style="width:380px;">
+								<field name = "name" attrs="{'readonly':[('parent_id','!=',0)]}"/>
+							</h1>
+							<label for="test_code" class="oe_edit_only"/>
+							<h2 style="width:280px;">
+								<field name = "test_code" />
+							</h2>	
+						</div>
+					</group>
+					<div class="col-35">
+						<group>
+							<div class="col-2" style="margin:0px;">
+								<div class="openerp oe_form_readonly test_learner_1 ">
+								  <div class="test_no_learners_1">No. of Learner</div>
+								  <div class="clear" />
+								  <div class="test_learner_box_1">
+									<field name = "actual_number" />
+								  </div>
+								</div>
+							</div>
 							<group col="4">
-								<tree string="Program Status Order Lines" create="false" delete="false">
-									<div class="openerp oe_form_readonly test_schedule_status_box">
-										<div class="test_schedule_no_learners">	
-												No. of Learner
+								<div attrs="{'invisible': [('test_status_display_1', 'in' ,('Open', 'Closed', 'Completed', 'Cancelled', 'Postponed', 'False'))]}">
+									<div id="div_status1" class="openerp oe_form_readonly test_status_box_2">
+										<div class="test_status_box_label_2 ">Status</div>
+										<div class="test_status_box_status_2">
+											<field name="test_status_display_1" readline="1" />
 										</div>
-										<div class="test_schedule_learner_box">	
-												 <field name = "actual_number" />
+										<div class="test_status_box_date_2">
+											<field name="date5" />
 										</div>
 									</div>
-								</tree>
-								
-								<div attrs="{'invisible': [('status', 'in' , ('Incomplete', 'InActive', 'False'))]}">
-								<tree string=" Program Status Order Lines" create="false" delete="false">
-								<div class="openerp oe_form_readonly test_schedule_status_box_1">
-									<div class="test_schedule_no_learners_1">	
-											Status
-									</div>
-									<div class="test_schedule_learner_box_1">	
-											Active
-									</div>
-								</div>
-								</tree>
-								</div>
-								<div attrs="{'invisible': [('status', 'in' ,('Active','Completed', 'False'))]}">
-								<tree string=" Program Status Order Lines" create="false" delete="false">
-								<div class="openerp oe_form_readonly test_schedule_status_box_2">
-									<div class="test_schedule_no_learners">	
-											Status
-									</div>
-									<div class="test_schedule_learner_box">	
-											In Active
-									</div>
-								</div>
-								</tree>
 								</div>
 								
+								<div attrs="{'invisible': [('test_status_display_2', 'in' , ('Closed', 'Cancelled', 'Completed', 'Postponed', 'False'))]}">
+									<div id="div_status2" class="openerp oe_form_readonly test_status_box">
+										<div class="test_status_box_label">Status</div>
+										<div class="test_status_box_status">
+											<field name="test_status_display_2" readline="1" />
+										</div>
+										<div class="test_status_box_date">
+											<field name="date4" />
+										</div>
+									</div>
+								</div>
+								
+								<div attrs="{'invisible': [('test_status_display_3', 'in' ,('Open', 'Closed', 'Completed', 'False'))]}">
+									<div id="div_status1" class="openerp oe_form_readonly test_status_box_1">
+										<div class="test_status_box_label_1 ">Status</div>
+										<div class="test_status_box_status_1">
+											<field name="test_status_display_3" readline="1" />
+										</div>
+										<div class="test_status_box_date_1">
+											<field name="date3" />
+										</div>
+									</div>
+								</div>
+								
+								<div attrs="{'invisible': [('test_status_display_4', 'in' ,('Open', 'Cancelled', 'Completed', 'Postponed', 'False'))]}">
+									<div id="div_status1" class="openerp oe_form_readonly test_status_box_3">
+										<div class="test_status_box_label_3 ">Status</div>
+										<div class="test_status_box_status_3">
+											<field name="test_status_display_4" readline="1" />
+										</div>
+										<div class="test_status_box_date_3">
+											<field name="date2" />
+										</div>
+									</div>
+								</div>
+								
+								<div attrs="{'invisible': [('test_status_display_5', 'in' ,('Open', 'Cancelled', 'Closed', 'Postponed', 'False'))]}">
+									<div id="div_status1" class="openerp oe_form_readonly test_status_box_4">
+										<div class="test_status_box_label_4 ">Status</div>
+										<div class="test_status_box_status_4">
+											<field name="test_status_display_5" readline="1" />
+										</div>
+										<div class="test_status_box_date_4">
+											<field name="date1" />
+										</div>
+									</div>
+								</div>
 							</group>
+						</group>
 					</div>
-					<group>
-                            <field name = "test_code" string="Test Code"/>
-                            <field name = "test_code_compliance" string="Test Code(compliance)"/>
-							<field name = "location_id" options="{'create': False, 'create_edit': False}" string="Location" on_change="on_change_location_id(location_id)" />
-							<field name = "room_id" options="{'create': False, 'create_edit': False}" domain="[('location_id','=',location_id)]" string="Room"/>
-					</group>
-					<group>
-							<field name = "module_ids" invisible="1"/>
-                            <field name = "module_id" on_change="on_change_module_id(module_id, test_def_id, context)" options="{'create': False, 'create_edit': False}" string="Module Name"/>
-                            <field name = "module_code" string="Module Code" />
-							<field name = "test_type_id" invisible="1" />
-							<field name = "test_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',1)]}"  />
-							<field name = "test_pre_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',2)]}"/>
-							<field name = "test_post_type" string="Test Type" attrs="{'invisible':[('test_type_id','!=',3)]}"/>
-                            <field name = "class_info" domain="[('module_id','=',module_id),('parent_id','=',0)]" attrs="{'invisible':[('test_type','!=','Post Test')]}" string="Select Class" options="{'create': False, 'create_edit': False}"/>
-					</group>
-					
-					<group style="width:400px;" >
-                	
-					</group>
 				</group>
-				<group>
-					<group col="6">
-						<field name = "start_date" string="Start Date" on_change="onchange_dates(start_date,duration,False)"/>
-						 <field name="duration" widget="float_time"  on_change="onchange_dates(start_date,duration,False)" />
-						<field name = "end_date" readonly="1" />
-					</group>
-				</group>
-					
 				
-					<notebook colspan="5" col="10">
-						<page string="Test Modality">
-							<h2>	
-								<label for="test_modality" class="oe_edit_only"/>
-							</h2>
-							<group style="width:300px;">
-								<field name='delivery_mode' string="Delivery Mode"/>
-							</group>
-							<field name='test_modality' nolabel='1'>
-									<tree string='List' editable="bottom">
-										<field name='master_modality' />
-										<field name='m_active'/>
-									</tree>
-							</field>
-						</page>
-						<page string="Learner">
-							<h2>	
-								<label for="learner" class="oe_edit_only"/>
-							</h2>
-							<field name='learner_line' nolabel='1'  context="{'class_id': class_info,'test_code':test_code_compliance}">
-								<tree string='List' editable="bottom">
-									<field name='learner_mod_id' invisible ="1" />
-									<field name='learner_id'  options="{'create': False, 'create_edit': False}" on_change="on_change_learner_id(learner_id,context)" 
-									domain = "['|',('learner_mod_line.module_id','=',parent.module_id),										('learner_mod_line_2.module_id_2','=',parent.module_id),'|',
-										('learner_mod_line_3.module_id_3','=',parent.module_id),'|',
-										('learner_mod_line_4.module_id_4','=',parent.module_id),'|',
-										('learner_mod_line_5.module_id_5','=',parent.module_id),'|',
-										('learner_mod_line_6.module_id_6','=',parent.module_id)]" /> 
+				<div class="col-3">
+					<label for="location_id" />
+					<field name="location_id" options="{'create': False, 'create_edit': False}" on_change="on_change_location_id(location_id)" />
+				</div>
+				<div class="col-3">
+					<label for="room_id" />
+					<field name="room_id" options="{'create': False, 'create_edit': False}" domain="[('location_id','=',location_id)]"/>
+				</div>
+				<div class="col-3">
+					<label for="test_status" />
+					<field name="test_status" />
+				</div>
+
+				<div class="clear" />
+				
+				<div class="col-3">
+					<label for="max_modality" />
+					<field name="max_modality"/>
+				</div>
+				<div class="col-3">
+					<label for="min_modality" />
+					<field name="min_modality"/>
+				</div>
+				<div class="col-3">
+					<label for="max_people" />
+					<field name="max_people"/>
+				</div>
+				
+				<div class="clear" />
+				
+				<div class="col-3">
+					<label for="start_date" />
+					<field name="start_date" on_change="onchange_dates(start_date,duration,False)"/>
+				</div>
+				<div class="col-3">
+					<label for="duration" />
+					<field name="duration" on_change="onchange_dates(start_date,duration,False)"/>
+				</div>
+				<div class="col-3">
+					<label for="end_date" />
+					<field name="end_date" readonly="1"/>
+				</div>
+
+				
+				<notebook colspan="5" col="10">
+					<page string="Learner">
+						<h2>	
+							<label for="learner" class="oe_edit_only"/>
+						</h2>
+						<field name='learner_line' nolabel='1'>
+							<tree string='List' editable="bottom">
+								<field name='learner_mod_id' invisible ="1" />
+								<field name='learner_id'  on_change="on_change_learner_id(learner_id,context)" /> 
+								<field name='learner_nric'/>
+								<field name='learner_non_nric'/>
+								<field name='module_id' options="{'create': False, 'create_edit': False}"/>
+								<field name='modality' options="{'create': False, 'create_edit': False}" string="Modalities"/>
+								<field name='modality_cost'/>
+								<field name='class_code'/>
+								<field name='compliance_code'/>
+								<field name='level'/>
+								<field name='attendance'/>
+								<button  name="view_learner_modality"  string="Add Modality" type="object" icon="view_modalities"/>
+								</tree>
+						</field>
+					</page>
+					<page string="Scores">
+						<h2>	
+							<label for="test_scores" class="oe_edit_only"/>
+						</h2>
+						<field name='test_scores' nolabel='1'>
+								<tree string='List' create="false" delete="false">
+									<field name='learner_id' />
 									<field name='learner_nric'/>
-									<field name='class_code'/>
-									<field name='compliance_code'/>
-									<field name='level'/>
-									<field name='attendance'/>
-									<button  name="view_learner_modality"  string="Add Modality" type="object" icon="view_modalities"/>
-									</tree>
-							</field>
-						</page>
-						<page string="Scores">
-							<h2>	
-								<label for="test_scores" class="oe_edit_only"/>
-							</h2>
-							<field name='test_scores' nolabel='1'>
-									<tree string='List' create="false" delete="false">
-										<field name='learner_id' />
-										<field name='learner_nric'/>
-										<button  name="view_scores"  string="View Scores" type="object" icon="view_modalities"/>
-									</tree>
-							</field>
-						</page>
-					</notebook>
+									<button  name="view_scores"  string="View Scores" type="object" icon="view_modalities"/>
+								</tree>
+						</field>
+					</page>
+				</notebook>
 			</sheet>
 			</form>
 		</field>
 	</record>
-
-
 
 	<record id="scores_form" model="ir.ui.view">
             <field name="name">test.scores.form</field>
@@ -215,12 +255,9 @@
             <field name="model">test.info</field>
             <field name="arch" type="xml">
                 <tree string="Calendar">
-					<field name = "name"/>
-					<field name = "test_type_char"/>
 					<field name = "test_code"/>
-					<field name = "start_date" string="Date"/>
-					<field name = "status" />
-					<field name = "capacity" />
+					<field name = "start_date" string="Start Date &amp; Time"/>
+					<field name = "duration"/>
 					<field name = "actual_number" />
                 </tree>
             </field>
@@ -238,8 +275,6 @@
                     <field name= "test_code"/>
 					<field name = "start_date"/>
 					<field name = "end_date"/>
-					<field name = "status" />
-					<field name = "capacity" />
 					<field name = "actual_number" />
                 </calendar>
             </field>
@@ -270,7 +305,6 @@
             </field>
         </record>
 		
-
 <menuitem name = "Test Calendar" id = "test_listing_page" parent = "menu_sub3" action = "action_test_listing_page" />
 
 
