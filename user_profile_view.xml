@@ -2,160 +2,268 @@
 <openerp>
   <data>
   
-	<!-- ===================== Create User List View ============================= -->
+	<!-- ===================== Create User Role List View ============================= -->
   
 	<record id="create_user_tree" model="ir.ui.view">
       <field name="name">Users</field>
-      <field name="model">manage.users</field>
+      <field name="model">manage.role</field>
       <field name="arch" type="xml">
         <tree string="Users">
           <field name="name" />
-          <field name="login_name" />
-		  <field name="active" />
+		  <field name="status" />
+        </tree>
+      </field>
+    </record>
+	
+	<!-- ===================== Create User Profiles List View ============================= -->
+  
+	<record id="create_user_profiles_tree" model="ir.ui.view">
+      <field name="name">Users Profile</field>
+      <field name="model">user.profiles</field>
+      <field name="arch" type="xml">
+        <tree string="Users">
+          <field name="name" />
+		  <field name="sur_name" />
+		  <field name="given_name" />
+		  <field name="name_nric" />
+		  <field name="user_name" />
         </tree>
       </field>
     </record>
 
-	<!-- ========================= Create Users ============================= -->
+	<!-- ========================= Create Users Roles Form View ============================= -->
 	<record id="create_user_form" model="ir.ui.view">
       <field name="name">Create Users</field>
-      <field name="model">manage.users</field>
+      <field name="model">manage.role</field>
       <field name="arch" type="xml">
         <form string="User" version="7.0">
           <sheet>
 			<!-- <field name="image_medium" widget="image"  /> -->
-              <div class="oe_title">
-                <label for="name" class="oe_edit_only"/>
-                <h1 style="width:380px;">
-                  <field name="name" />
-                </h1>
-              </div>
+              <group>
+				  <div class="oe_title">
+					<label for="name" class="oe_edit_only"/>
+					<h1 style="width:380px;">
+					  <field name="name" />
+					</h1>
+				  </div>
+			  </group>
 			  
 			  <group style="width:280px;">
-                  <field name="login_name" />
-			   </group>
-			   
-			   <group style="width:280px;">
-                  <field name="password" />
-			   </group>
-			   
-			   <group style="width:280px;">
-                  <field name="active" />
-			   </group>
+                  <div class="oe_title">
+					<label for="status" class="oe_edit_only" />
+					<h1 style="width:380px;">
+					  <field name="status" style="width:220px;"/>
+					</h1>
+				  </div>
+			  </group>
+			  
+			<notebook colspan="5" col="10">
+				<page string="Pages and Actions">
+					<h3>
+					  <label string="Pages and Actions" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="pages_actions_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+						<field name="view" />
+						<field name="create" />
+						<field name="update" />
+					  </tree>
+					</field>
+				</page>
+				
+				<page string="Notifications">
+					<h3>
+					  <label string="Notifications" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="notification_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
+				
+				<page string="Documentations">
+					<h3>
+					  <label string="Documentations" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="documentation_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
+			
+			</notebook>
 		  </sheet>
 		</form>
 	  </field>
 	</record>
-  
-	<!-- ===================== User Management List View ============================= -->
-  
-	<record id="user_panel_tree" model="ir.ui.view">
-      <field name="name">User Access Rights</field>
-      <field name="model">user.manage</field>
+	
+	<!-- ========================= Create Users Profile Form View ============================= -->
+	
+	<record id="users_pro" model="ir.ui.view">
+      <field name="name">User Profile</field>
+      <field name="model">user.profiles</field>
       <field name="arch" type="xml">
-        <tree string="Users">
-          <field name="user_group" />
-          <field name="users" />
-        </tree>
-      </field>
-    </record>
-  
-  
-	<!-- ========================= User Management Form View ============================= -->
-	<record id="user_panel_form" model="ir.ui.view">
-      <field name="name">Settings</field>
-      <field name="model">user.manage</field>
-      <field name="arch" type="xml">
-        <form string="User" version="7.0" create="false" delete="false">
+        <form string="User Profile" version="7.0">
           <sheet>
-			<div class="col-2">
-			  <group>
-				<field name="user_group" style="width:250px;" />
-			  </group>
+			<group class="col-10">
+				<label string="User Profile" class="oe_edit_only" style="font-size:20px;"/>
+			</group>
+			<div class="col-10">
+				<field name="image_medium" widget="image" class="oe_left oe_avatar" />
 			</div>
+			  
 			<div class="col-2">
-			  <group>
-				<field name="users" style="width:250px;" options="{'create': False, 'create_edit': False}"/>
-			  </group>
+				<label for="name" class="oe_edit_only" />
+				<h1>
+				   <field name="name"/>
+				</h1>
 			</div>
-			<!--div attrs="{'invisible': [('users', '=' , False)]}"-->
+			  
+			<div class="clear" />
+			<div class="col-3">
+			  <label for="sur_name" />
+			  <field name="sur_name" />
+			</div>
+			<div class="col-3">
+			  <label for="given_name" />
+			  <field name="given_name" />
+			</div>
+			<div class="col-3">
+			  <label for="name_nric" />
+			  <field name="name_nric" />
+			</div>
+			
+			<div class="clear" />
+			<div class="col-2" style="width:300px;">
+				<label for="user_name" />
+				<field name="user_name" />
+				<label for="password" />
+				<field name="password" />
+			</div>
+			
+			<div class="col-2" style="width:300px;">
+				<label for="status" />
+				<field name="status" />
+				<label for="role" />
+				<field name="role" />
+			</div>
+			
 			<notebook colspan="5" col="10">
 			
-			   <page string="Access Rights">
-                <field name="user_line" nolabel="1">
-                  <tree string="List" editable="bottom">
-					<!--field name='module_list' /-->
-					<field name="id" />
-					<field name="name" />
-					<field name="model_id:id" />
-					<field name="group_id:id" />
-                    <field name="perm_read" />
-                    <field name="perm_write" />
-                    <field name="perm_create" />
-                    <field name="perm_unlink" />
-                  </tree>
-                </field>
-				<!--field name="model_access">
-					<tree string="Access Rules" editable="top">
-						<field name="name"/>
-						<field name="model_id"/>
-						<field name="group_id"/>
-						<field name="perm_read"/>
-						<field name="perm_write"/>
-						<field name="perm_create"/>
-						<field name="perm_unlink"/>
-					</tree>
-				</field-->
-              </page>
+				<page string="Personal Details">
+					<h3>
+					  <label string="Personal Details" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="profile_personal_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
+			
+				<page string="Pages and Actions">
+					<h3>
+					  <label string="Pages and Actions" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="profile_pages_actions_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+						<field name="view" />
+						<field name="create" />
+						<field name="update" />
+					  </tree>
+					</field>
+				</page>
+				
+				<page string="Notifications">
+					<h3>
+					  <label string="Notifications" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="profile_notification_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
+				
+				<page string="Documentations">
+					<h3>
+					  <label string="Documentations" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="profile_documentation_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
+				
+				<page string="History">
+					<h3>
+					  <label string="History" readonly="context.get('ctx', False)" />
+					</h3>
+					<field name="profile_history_tab" nolabel="1">
+					  <tree string="List" editable="bottom">
+						<field name="name" />
+					  </tree>
+					</field>
+				</page>
 			
 			</notebook>
-			<!--/div-->
 			
 		  </sheet>
 		</form>
-	  </field>
+	   </field>
 	</record>
   
 	<!-- ========================= Action Tabs ============================= -->
 	
-	<!-- Create Users -->
-	<record model="ir.actions.act_window" id="create_users">
-      <field name="name">User Groups</field>
+	<!-- Create Role -->
+	<record model="ir.actions.act_window" id="users_roles">
+      <field name="name">User Role</field>
       <field name="type">ir.actions.act_window</field>
-      <field name="res_model">manage.users</field>
+      <field name="res_model">manage.role</field>
       <field name="view_type">form</field>
-      <field name="limit">12</field>
       <field name="view_mode">tree,form</field>
 	   <field name="view_id" ref="create_user_tree" />
       <field name="search_view_id" ref="view_settings_filter" />
 		<field name="help" type="html">
 		<p class="oe_view_nocontent_create">
-			Click to create a user.
+			Click to create a user role.
 		</p>
 		</field>
     </record>
-
-	<!-- Access Rights --> 
-	<record model="ir.actions.act_window" id="access_rights">
-      <field name="name">User Groups</field>
+	
+	<!-- Create Users -->
+	<record model="ir.actions.act_window" id="profiles">
+      <field name="name">User Profiles</field>
       <field name="type">ir.actions.act_window</field>
-      <field name="res_model">user.manage</field>
+      <field name="res_model">user.profiles</field>
       <field name="view_type">form</field>
-      <field name="limit">12</field>
       <field name="view_mode">tree,form</field>
-	   <field name="view_id" ref="user_panel_tree" />
+	   <field name="view_id" ref="create_user_profiles_tree" />
       <field name="search_view_id" ref="view_settings_filter" />
 		<field name="help" type="html">
 		<p class="oe_view_nocontent_create">
-			Click to define user access rights.
+			Click to create a user profiles.
 		</p>
 		</field>
     </record>
   
   
-    <menuitem name="User Profile" id="menu_user_profile" parent="menu_lis_lab" />
-     <!--menuitem name="Manage User Groups" id="user_groups" parent="menu_user_profile" action="create_groups" /-->
-	 <menuitem name="Manage Users " id="manage_users" parent="menu_user_profile" action="create_users" />
-	 <menuitem name="Manage Access Rights" id="manage_access_rights" parent="menu_user_profile" action="access_rights"/>
+    <menuitem name="User Management" id="menu_user_management" parent="menu_lis_lab" />
+		<menuitem name="Role" id="user_role" parent="menu_user_management" action="users_roles" />
+		<menuitem name="User Profiles" id="user_profiles" parent="menu_user_management" action="profiles"/>
   </data>
 </openerp>
+
+
+
+
+
+
+
+
+

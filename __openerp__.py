@@ -26,7 +26,7 @@
 		'class_status_dashboard.xml',
 		'trainer_enrollment.xml',
 		'client_enrollment.xml',
-		#'user_profile_view.xml',
+		'user_profile_view.xml',
 		'reports_view.xml',
 		'payment_report.xml',
     ],
