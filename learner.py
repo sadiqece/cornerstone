@@ -44,14 +44,21 @@ class learner_info(osv.osv):
 			res[claim.id] = total
 		return res
 		
+	def _total(self, cr, uid, ids, field_names, args, context=None):
+		res = {}
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line.Grand_total + line.Grand_test_total
+			
+		return res
+		
 # Serial number for Learner_info Profile file
-	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):		
+	'''def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):		
 		res = super(learner_info, self).read(cr, uid,ids, fields, context, load)
 		seq_number =0 
 		for r in res:
 			seq_number = seq_number+100
 			r['s_no'] = seq_number		
-		return res
+		return res'''
 		
 #Load Module Groups
 	def load_module_groups(self, cr, uid, ids, progid, context=None):
@@ -1252,6 +1259,7 @@ class learner_info(osv.osv):
 		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
+		'total_amt':fields.function(_total, 'Total', readonly=1),
 		#Personal Tab Fields
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
@@ -1426,6 +1434,33 @@ class learner_profile(osv.osv):
 			res[line.id] = total_mod
 		return res
 		
+	def _amount(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_learner:
+				total += line.cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
+		
+# Payment Test Function for Grand Total
+	#_inherit = "payment.module"
+	def _amount_test(self, cr, uid, ids, field_name, arg, context=None):
+		res= {}
+		for claim in self.browse(cr, uid, ids, context=context):
+			total = 0.0
+			for line in claim.payment_test_learner:
+				total += line.test_cost#line.unit_amount * line.unit_quantity
+			res[claim.id] = total
+		return res
+		
+	def _total(self, cr, uid, ids, field_names, args, context=None):
+		res = {}
+		for line in self.browse(cr, uid, ids, context=context):
+			res[line.id] = line.Grand_total + line.Grand_test_total
+			
+		return res
+		
 #Table Learner Info
 	_name = "learner.profile"
 	_description = "This table is for keeping location data"
@@ -1473,6 +1508,7 @@ class learner_profile(osv.osv):
 		'payment_test_learner':fields.one2many('payment.test', 'pay_id','Payment Test', readonly=1),
 		'Grand_total':fields.function(_amount, 'Grand Total', readonly=1),
 		'Grand_test_total':fields.function(_amount_test, 'Grand Total', readonly=1),
+		'total_amt':fields.function(_total, 'Total', readonly=1),
 		#Personal Tab Fields
 		'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
 		'race':fields.selection((('Race1','Race1'),('Race2','Race2')),'Race'),
@@ -1679,8 +1715,8 @@ globvar = 0
 class program_mod_line(osv.osv):
 
 	def check_box_value(self, cr, uid, ids, iId, abc, context=None):
+
 		val = {}
-		#idate=''
 		sql="select name from cs_module where id = ('%s') " % (iId)
 		cr.execute(sql)
 		modName = cr.fetchall()
@@ -1693,38 +1729,14 @@ class program_mod_line(osv.osv):
 			cr.execute("delete from temp_module where module_id = %s " % (iId))
 			sql="insert into temp_module (module_id,name) values (%s,'%s') " % (iId,idd)
 			r = cr.execute(sql)
-
-		'''sql="select start_date from class_info where id = (%s) " % (iId)
-		cr.execute(sql)
-		modDate = cr.fetchall()
-		for i in modDate:
-			idate = i[0]
-			
-		if abc == True:
-			#cr.execute("delete from class_start_date where name = %s " % (iId))
-			sql="insert into class_start_date (name) values (%s) " % (idate)
-			#raise osv.except_osv(_('Warning!'),_('Nationality %s')%(sql))
-			d = cr.execute(sql)
-			
-		sql="select start_date from class_info where id = ('%s') " % (iId)
-		cr.execute(sql)
-		r = cr.fetchall()
-		raise osv.except_osv(_('Warning!'),_('Nationality %s')%(r))
-		for i in r:
-			s_date2=i[0]
-			
-		sql="insert into class_start_date (name) values ('%s') " % (iId)
-		r = cr.execute(sql)'''
-
 		return True
-
 		return True
 		
 	def onchange_populate_schedule2(self, cr, uid, ids, i_centre, i_mod, s_date, context=None):
 		val2 ={}
 		sub_lines = []			
 		if s_date:
-			sql="select name from class_start_date where module_id = %s" % (s_date)
+			sql="select name from cs_module where module_id = %s" % (s_date)
 			cr.execute(sql)
 			r = cr.fetchall()
 			for i in r:

@@ -720,7 +720,7 @@ class test_learner(osv.osv):
 		class_info_obj = self.pool.get('test.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
 		mon = values['module_id']
-		mc = values['modality_cost']
+		mc = '05.50'
 		csc = class_info_obj_id.test_code
 		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.test_code))
 		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
@@ -775,8 +775,8 @@ class test_learner(osv.osv):
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
 	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1,),
 	'learner_non_nric': fields.related('learner_id','learner_non_nric',type="char",relation="learner.info",string="Learner Non-NRIC", readonly=1),
-	'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True, required=True),
-	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description', required=True),
+	'module_id':fields.many2one('cs.module', 'Module Name', ondelete='cascade', help='Module', select=True),
+	'modality':fields.many2one('master.modality', 'Modality', ondelete='cascade', help='Description'),
 	'modality_cost': fields.related('modality', 'cost', type="float",relation="master.modality",string="Cost", readonly=1,),
 	'class_code':fields.char('Class Code',size=25),
 	'compliance_code':fields.char('Compliance Code',size=25),
