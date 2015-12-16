@@ -183,17 +183,51 @@
               <!--Module Tab -->
               <page string="Module">
                 <h3>
+                  <label string="Category" readonly="context.get('ctx', False)" />
+                </h3>
+				<field name="trainer_modules_category" nolabel="1" readonly="context.get('ctx', False)" >
+                  <tree string="List" editable="bottom">
+                    <field name="category"/>
+                    <field name="selected_date" />
+                  </tree>
+                </field>
+				<h3>
                   <label string="Module" readonly="context.get('ctx', False)" />
                 </h3>
                 <field name="trainer_module_line" nolabel="1" readonly="context.get('ctx', False)">
                   <tree string="List" editable="bottom">
                     <field name="trainer_module_id" options="{'create': False, 'create_edit': False}"/>
                     <field name="trainer_code" />
+					<field name="category" options="{'create': False, 'create_edit': False}"/>
                     <field name="trainer_rate" />
+					<field name="core" />
+					<field name="key" />
+					<field name="support" />
                     <field name="trainer_mod_status" />
                     <field name="trainer_date"/>
                   </tree>
                 </field>
+              </page>
+			  <!--Non-Availability Tab -->
+              <page string="Non-Availability">
+                <h3>
+                  <label string="Non-Availability" readonly="context.get('ctx', False)" />
+                </h3>
+				<group>
+					<div>
+						<label string="Category" readonly="context.get('ctx', False)" />
+						<field name="non_avaliable" nolabel="1">
+						  <tree string="List" editable="bottom">
+							<field name="s_no" />
+							<field name="start_date" />
+							<field name="end_date" />
+							<field name="total_days" />
+							<field name="half_day" />
+							<field name="am_pm" attrs="{'invisible':[('half_day', '!=', True)]}"/>
+						  </tree>
+						</field>
+					</div>
+				</group>
               </page>
               <!--Qualifications Tab -->
               <page string="Qualifications">

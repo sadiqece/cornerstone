@@ -187,6 +187,8 @@ class trainer_profile_info(osv.osv):
 	'assignment_current': fields.function(_ass_func_1,type='one2many',obj="trainers.assignment.avaliable",method=True,string='Session'),
 	'assignment_history': fields.function(_ass_func_2,type='one2many',obj="trainers.assignment.avaliable",method=True,string='Session'),
 	'trainer_module_line': fields.one2many('trainer.module.line','trainers_id','Module',),
+	'trainer_modules_category': fields.one2many('trainer.module.category','trainers_category_id','Category'),
+	'non_avaliable': fields.one2many('non.availability','s_no','Non-Avaliablity'),
 	#'personal_line': fields.one2many('personal.detail.module','personal_detail_id','Personal Details'),
 	'nationality':fields.selection((('Singapore','Singapore'),('Malaysia','Malaysia'),('South Korea','South Korea'),('North Korea','North Korea'),('India','India'),('Indonesia','Indonesia'),('Vietnam','Vietnam')),'Nationality'),
 	'marital_status':fields.selection((('Single','Single'),('Married','Married')),'Marital Status'),
@@ -266,6 +268,27 @@ class avaliable(osv.osv):
 avaliable	()
 
 # Module Tab
+class trainer_module_category(osv.osv):
+
+	_name = "trainer.module.category"
+	_description = "Module Category Tab"
+	_columns = {
+	'trainers_category_id' : fields.many2one('trainer.profile.info', 'Module'), 
+	'category':fields.many2one('master.category', 'Category', ondelete='cascade', help='Category', select=True, required=True),
+	'selected_date':fields.date('Selected'),
+	}
+trainer_module_category()
+
+class master_category(osv.osv):
+	
+	_name = "master.category"
+	_description = "Master Category Tab"
+	_columns = {
+		'name': fields.char('Category', size=25)
+	}
+master_category()
+
+# Module Tab
 class trainer_module(osv.osv):
 
 	def _check_unique_module_name(self, cr, uid, ids, context=None):
@@ -308,6 +331,10 @@ class trainer_module(osv.osv):
 	'trainer_module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
 	'trainer_code': fields.related('trainer_module_id','module_code',type="char",relation="cs.module",string="Module Code", readonly=1),
 	'trainer_rate': fields.integer('Trainer Rate', size=6),
+	'category':fields.many2one('master.category', 'Category', ondelete='cascade', help='Category', select=True, required=True),
+	'core': fields.boolean('Core'),
+	'key': fields.boolean('Key'),
+	'support': fields.boolean('Support'),
 	'trainer_mod_status': fields.selection((('Active','Active'),('Pending','Pending')),'Status', required=True),
 	'trainer_date':fields.date('Date', required=True),
 	}
@@ -318,6 +345,65 @@ class trainer_module(osv.osv):
 	
 	_constraints = [(_check_unique_module_name, 'Error: Module Already Exists', ['Module Name']), (_trainer_rate, 'Error: Trainer Rate Cannot be Negative', ['Trainer Rate'])]
 trainer_module()
+
+#Non-Avaliablity
+class non_avaliablity(osv.osv):
+
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(non_avaliablity, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+		
+#Validate Unique Start Date
+	def _check_unique_start_date(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.s_no == self_obj.s_no and x.start_date == self_obj.start_date:
+						raise osv.except_osv(_('Error:'),_('Start Date Already Exists')%(self_obj))
+		return True
+		
+#Validate Unique End Date
+	def _check_unique_end_date(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.s_no == self_obj.s_no and x.end_date == self_obj.end_date:
+						raise osv.except_osv(_('Error:'),_('End Date Already Exists')%(self_obj))
+		return True
+		
+	def _get_days(self, cr, uid, ids, field_name, arg ,context=None):
+		res = {}
+		fmt = '%Y-%m-%d'
+		for object in self.browse(cr, uid, ids, context=context):
+			res[object.id] = {'total_days':0, } 
+			from_date = object.start_date 
+			to_date = object.end_date
+			d1 = datetime.strptime(from_date, fmt)
+			d2 = datetime.strptime(to_date, fmt)
+			daysDiff = str((d2-d1).days)
+			res[object.id]['total_days'] = daysDiff
+			return res
+	
+	_name = "non.availability"
+	_description = "Non Availability"
+	_columns = {
+		's_no' : fields.integer('S.No',size=20,readonly=1),
+		'start_date': fields.date('Start Date', required=True),
+		'end_date': fields.date('End Date', required=True),
+		'total_days': fields.function(_get_days, string="Diff days", multi='sums', store=True),
+		'half_day': fields.boolean('1/2 Day'),
+		'am_pm': fields.selection((('AM','AM'),('PM','PM'),('Empty','Empty')), 'am/pm')
+	}
+	_constraints = [(_check_unique_start_date, 'Error: Start Date Already Exists', ['Start Date']),(_check_unique_end_date, 'Error: End Date Already Exists', ['End Date'])]
+non_avaliablity()
 
 # Personal Details Tab
 class personal_detail(osv.osv):
