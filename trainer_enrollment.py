@@ -388,7 +388,7 @@ class non_avaliablity(osv.osv):
 			to_date = object.end_date
 			d1 = datetime.strptime(from_date, fmt)
 			d2 = datetime.strptime(to_date, fmt)
-			daysDiff = str((d2-d1).days)
+			daysDiff = str((d2-d1).days+1)
 			res[object.id]['total_days'] = daysDiff
 			return res
 	
