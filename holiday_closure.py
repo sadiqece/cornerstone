@@ -369,8 +369,8 @@ class holiday_line(osv.osv):
 				else :
 					raise osv.except_osv(_('Error:'),_('Holiday Error : Class [ %s ]conflicts  exists for this day')%(u.class_code))
 		self.pool.get("class.info").create(cr, uid, {'name':values['description'],
-		'class_code':'Holiday','module_id':1,'start_date':values['date_start'],'end_date':values['date_end'],'client':'Public',
-		'room_id':1,'location_id':3,'parent_id':-1,'class_id':id}, context=context,holidays=True)
+		'class_code':'Holiday','start_date':values['date_start'],'end_date':values['date_end'],'client':'Public',
+		'parent_id':-1,'class_id':id}, context=context,holidays=True)
 
 		return id
 	def write(self,cr, uid, ids, values, context=None):
