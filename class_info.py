@@ -2256,13 +2256,12 @@ class learner_asset(osv.osv):
 	'learner_asset_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True, required=True),
 	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="NRIC/FIN", readonly=1),
-	'binder_issue_date':fields.date('Binder Issue Date'),
-	'tablet_type': fields.char('Tablet Type',size=20),
-	'tablet_serial_num': fields.char('Tablet Serial Number',size=20),
-	'tablet_issue_date': fields.date('Tablet Issue Date'),
-	'blended_type': fields.char('Blended Type',size=20),
-	'blended_serial_number': fields.char('Blended Serial Number',size=20),
-	'blended_issue_date': fields.date('Blended Issue Date'),
+	'asset': fields.char('Asset'),
+	'brand': fields.char('Brand'),
+	'model': fields.char('Model'),
+	'vendor': fields.char('Vendor'),
+	'asset_serial_number': fields.char('Asset Serial Number'),
+	'asset_issue_date': fields.date('Asset Issue Date'),
 	}
 	_constraints = [(_check_unique_learner, 'Error: Learner Already Exists', ['learner_id'])]
 learner_asset()

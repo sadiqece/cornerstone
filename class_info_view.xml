@@ -349,13 +349,12 @@
 							<tree string="PF Order Lines" editable="bottom">
 								<field name = "learner_id" required='True' on_change="on_change_learner_id(learner_id)" options="{'create': False, 'create_edit': False}"/>
 								<field name = "learner_nric" required='True'/>
-								<field name = "binder_issue_date"/>
-								<field name = "tablet_type" />
-								<field name = "tablet_serial_num"/>
-								<field name = "tablet_issue_date" />
-								<field name = "blended_type" />
-								<field name = "blended_serial_number"/>
-								<field name = "blended_issue_date"/>
+								<field name = "asset"/>
+								<field name = "brand" />
+								<field name = "model"/>
+								<field name = "vendor" />
+								<field name = "asset_serial_number" />
+								<field name = "asset_issue_date"/>
 							</tree>
 						</field>
 					</page>
