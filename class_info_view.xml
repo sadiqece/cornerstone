@@ -53,15 +53,17 @@
 						<field name = "start_date"  attrs="{'readonly':[('class_code','=','Holiday') or (context.get('ctx', False)) ]}"  string="Start Date" on_change="onchange_dates(start_date,duration,False,total_hrs)"/>
 						<field name = "duration" widget="float_time"  on_change="onchange_dates(start_date,duration,False,total_hrs)" attrs="{'readonly':[('class_code','=','Holiday')]}"/>
 						<field name = "end_date" readonly="1" />
-						<field name = "start_time" readonly="1" invisible="1" />
-						<field name = "start_yy_mm" readonly="1" invisible="1" />
-						<field name = "end_time" readonly="1" invisible="1"/>
-						<field name = "start_end_time" readonly="1" invisible="1"/>
-						<field name = "class_end_date" readonly="1" invisible="1"/>
-						<field name = "class_days" readonly="1" invisible="1"/>
-							<field name = "apply_all" class="oe_edit_only" attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_all(apply_all)"/>
-							<field name = "apply_to_future" class="oe_edit_only"  attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_future(apply_to_future)"/>
-					</group>
+            <field name = "start_time" readonly="1" invisible="1" />
+            <field name = "start_yy_mm" readonly="1" invisible="1" />
+            <field name = "end_time" readonly="1" invisible="1"/>
+            <field name = "start_end_time" readonly="1" invisible="1"/>
+            <field name = "class_end_date" readonly="1" invisible="1"/>
+            <field name = "class_days" readonly="1" invisible="1"/>
+            <field name = "apply_all" class="oe_edit_only" attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_all(apply_all)"/>
+						<field name = "apply_to_future" class="oe_edit_only"  attrs="{'invisible':[('status','=','Draft')]}" on_change="onchange_apply_to_future(apply_to_future)"/>
+					<field name = "end_class_date" readonly="1" />
+          <field name = "lunch_duration"  widget="float_time"  on_change="onchange_dates(start_date,duration,False,total_hrs)" />
+        	</group>
 		        </group>
 				<!--group>
 					<group>
@@ -117,7 +119,7 @@
 										</h4>
 									</group>
 									<group col="16">
-										<field name="include_1"  readonly="1" attrs="{'invisible':['|',('day_1','=',False),('day_1','=',''),],}" nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
+                    <field name="include_1"  readonly="1" attrs="{'invisible':['|',('day_1','=',False),('day_1','=',''),],}" nolabel='1' on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
 										<h4>
 											<field name="day_1"  nolabel='1'  attrs="{'invisible': [('include_1','=', False)]}"/>
 										</h4>
@@ -132,7 +134,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_2"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_2','=',False),('day_2','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
+                    <field name="include_2"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_2','=',False),('day_2','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
 										<h4>
 											<field name="day_2"  nolabel='1' attrs="{'invisible': [('include_2','=', False)]}"/>
 										</h4>
@@ -147,7 +149,7 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_3"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_3','=',False),('day_3','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
+                    <field name="include_3"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_3','=',False),('day_3','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
 										<h4>
 											<field name="day_3"  nolabel='1' attrs="{'invisible': [('include_3','=', False)]}"/>
 										</h4>
@@ -162,7 +164,8 @@
 										</div>
 									</group>
 									<group col="16">
-										<field name="include_4"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_4','=',False),('day_4','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
+                    <field name="include_4"  nolabel='1'  attrs="{'readonly':[('status','=','Edit')],'invisible':['|',('day_4','=',False),('day_4','=','')]}" on_change='on_change_sess_week(include_1,include_2,include_3,include_4,include_5,include_6,include_7,end_date1,end_date2,end_date3,end_date4,end_date5,end_date6,end_date7,day_1,day_2,day_3,day_4,day_5,day_6,day_7)'/>
+
 										<h4>
 											<field name="day_4"  nolabel='1' attrs="{'invisible': [('include_4','=', False)]}"/>
 										</h4>
@@ -329,9 +332,9 @@
 										('learner_mod_line_3.module_id_3','=',parent.module_id),'|',
 										('learner_mod_line_4.module_id_4','=',parent.module_id),'|',
 										('learner_mod_line_5.module_id_5','=',parent.module_id),'|',
-										('learner_mod_line_6.module_id_6','=',parent.module_id)]" /> 
+										('learner_mod_line_6.module_id_6','=',parent.module_id)]" />
 										<field name = "learner_nric"/>
-										<field name = "learner_non_nric"/>
+                    <field name = "learner_non_nric"/>
 										<field name = "binder"/>
 										<field name = "tablet"/>
 										<field name = "blended"/>
@@ -463,26 +466,28 @@
 			<field name="name">Move Learner</field>
 			<field name="model">learner.move</field>
 			<field name="arch" type="xml">
-				<form string="test" version="7.0" >
-					<sheet>
-						<group>
-						<field name = "module_id" readonly="1" on_change="onchange_module(module_id,class_id)"/>
-						<field name = "parent_id" invisible='1'/>
-						<field name = "class_id" domain="[('module_id','=',module_id),('parent_id','=',0),('id','not in',[context.get('active_parent_id')])]" on_change="onchange_class(class_id,module_id)"/>
-						</group>
-						<group col="6">
-							<field name = "class_code"/>
-							<field name = "start_date"/>
-							<field name = "end_date"/>
-							<field name = "available_seats"/>
-						 </group>
-						 <group col="2">
-						 <button  name="move_learner_save"  string="Confirm" type="object"/>
-						 <button  name="move_learner_cancel"  string="Cancel" type="object"/>
-						</group>
 
-				   </sheet>
-				</form>
+        <form string="test" version="7.0" >
+          <sheet>
+            <group  col="9">
+                  <field name = "module_id" readonly="1"/>
+                  <field name = "class_code" readonly="1" invisible="1"/>
+                  <button  name="move_learner_save"  string="Move" type="object" icon="gtk-convert" />
+             </group>
+             <group col="2">
+                  <field name='class_line'  nolabel='1' >
+                      <tree string="Location"  editable="bottom" create="false" delete="false">
+                        <field name = "class_code"/>
+                        <field name = "start_date"/>
+                        <field name = "end_date"/>
+                          <field name = "available_slots"/>
+                        <field name = "move" string="Select"/>
+                      </tree>
+                 </field>
+             </group>
+           </sheet>
+        </form>
+
 		   </field>
 		</record>
 

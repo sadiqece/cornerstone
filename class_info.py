@@ -39,7 +39,7 @@ called_swap = False
 
 class class_info(osv.osv):
 
-	def _property_expense_preset_expenses(self, cr, uid, ids, expenses, arg, context):
+	def _create_session_info_line(self, cr, uid, ids, expenses, arg, context):
 		spus = self.pool.get("class.info").browse(cr, uid, ids)
 		module_ids =[]
 		parent_id = spus[0]['parent_id']
@@ -58,7 +58,7 @@ class class_info(osv.osv):
 		return dict([(id, value_ids) for id in ids])
 
 
-	def _property_expense_preset_expenses1(self, cr, uid, ids, expenses, arg, context):
+	def _create_session_info_line1(self, cr, uid, ids, expenses, arg, context):
 		spus = self.pool.get("class.info").browse(cr, uid, ids)
 		module_ids =[]
 		parent_id = spus[0]['parent_id']
@@ -76,14 +76,17 @@ class class_info(osv.osv):
 		value_ids =  self.pool.get("class.info").search(cr, uid, [('id', 'in', module_ids)])
 		return dict([(id, value_ids) for id in ids])
 
-	def _property_expense_preset_expenses2(self, cr, uid, ids, expenses, arg, context):
-		trainer_ids =[]
-		for trainer_obj in  self.browse(cr, uid, ids).trainers_line or [] :
-			if trainer_obj.t_status == "Confirmed" :
-				trainer_ids.append(trainer_obj.id)
-		return dict([(id, trainer_ids) for id in ids])
-
-
+	def _calculate_end_class_date(self, cr, uid, ids, field_names, args,  context=None):
+		if not ids: return {}
+		res = {}
+		for j in self.browse(cr, uid, ids, context=context):
+			if (j.parent_id == 0):
+				h  = self.browse(cr,uid,self.search(cr,uid,[("parent_id","=",j.id)],order ="start_date desc",limit=1,context=context))
+				res[j.id]=  h[0].start_date
+			else:
+				h  = self.browse(cr,uid,self.search(cr,uid,[("parent_id","=",j.parent_id)],order ="start_date desc",limit=1,context=context))
+				res[j.id]=  h[0].start_date
+		return res
 
 
 	def _calculate_total_learners(self, cr, uid, ids, field_names, args,  context=None):
@@ -109,11 +112,20 @@ class class_info(osv.osv):
 			raise osv.except_osv(_('Error!'),_("Please select learners to move"))
 
 
+		class_id_loc = self.search(cr, uid, [('module_id', '=', self_obj.module_id.id) and ('parent_id', '=', 0)])
+		dws = []
+		for search_class_obj in self.browse(cr,uid,class_id_loc):
+			if ((search_class_obj.id != self_obj.id)):
+				dws.append(self_obj.id);
+
+		if(len(dws) == 0):
+			raise osv.except_osv(_('Error!'),_("There are no matching classes to move."))
+
 		parent_id = self_obj['parent_id']
 		if parent_id == 0:
 			parent_id = self_obj.id
 
-		ctx.update({'class_id': ids[0],'learner_id': learner_move_array,'active_module':self_obj.module_id.id,'active_parent_id':parent_id})
+		ctx.update({'class_id': self_obj.id,'class_code': self_obj.class_code,'learner_id': learner_move_array,'active_module':self_obj.module_id.id,'active_parent_id':parent_id})
 
 		return {
 			'type': 'ir.actions.act_window',
@@ -155,8 +167,6 @@ class class_info(osv.osv):
 		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 		for search_class_obj in self.browse(cr,uid,class_id_loc):
 			search_class_start = datetime.strptime(search_class_obj['start_date'], "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
-			_logger.info("called from start_date %s %s",search_class_start,class_start_date)
-			_logger.info("called from start_date %s %s",search_class_start,class_start_date)
 			if ((search_class_obj.id != self_obj.id) and (search_class_start == class_start_date)):
 				dws.append(self_obj.id);
 
@@ -227,7 +237,7 @@ class class_info(osv.osv):
 			return new_rs;
 	    #['module_id', 'location_id', 'room_id', 'start_date', 'end_date', 'name', 'class_code']
 		return res
-		
+
 	def _combine(self, cr, uid, ids, field_name, args, context=None):
 		values = {}
 		for id in ids:
@@ -236,6 +246,7 @@ class class_info(osv.osv):
 			values[id] = '%s - %s' % (rec.start_time, rec.end_time)
 		return values
 
+
 	_name = "class.info"
 	_description = "This table is for keeping Class data"
 	_columns = {
@@ -243,10 +254,10 @@ class class_info(osv.osv):
 		'parent_id': fields.integer('Parent Id',size=20),
 		'name': fields.char('Class Name', size=100, select=True),
 		'class_code': fields.char('Class Code',size=40, select=True),
-		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True, required=True),
+		'location_id':fields.many2one('location', 'Location', ondelete='cascade', help='Location', select=True),
         'segment_code': fields.selection((('CP (Corporate Public)','CP (Corporate Public)'),('CI (Corporate In-House)','CI (Corporate In-House)'),('RP (Retail Public)','RP (Retail Public)'),('HP (HE Public)','HP (HE Public)'),('HI  (HE In-House)','HI  (HE In-House)')),'Segment Code'),
-		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True, required=True),
-		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
+		'room_id':fields.many2one('room', 'Room', ondelete='cascade', help='Room', select=True),
+		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 		'start_date': fields.datetime('Start Date', required=True),
 		'start_time': fields.char('Start Time'),
 		'start_yy_mm': fields.char('Start YYMM'),
@@ -258,6 +269,7 @@ class class_info(osv.osv):
 		'duration': fields.float('Duration(Hrs)'),
 		'class_end_date': fields.datetime('End Date'),
 		'class_days': fields.char('Class Conducting Days 1'),
+		'lunch_duration': fields.float('Lunch Duration(Hrs)'),
 		#'client_type_id':fields.integer('Client Type Id'),
 		'client': fields.selection((('Public','Public'),('Corporate','Corporate')),'Client', required=True),
 		'client_type_public': fields.boolean('Public'),
@@ -268,8 +280,8 @@ class class_info(osv.osv):
 		'total_hrs': fields.integer('Total Hours', readonly=1),
 		'total_sessions': fields.integer('Total Sessions', readonly=1),
 		'total_weeks': fields.integer('Total Weeks', readonly=1),
-		'sess_info_line': fields.function(_property_expense_preset_expenses,type='one2many',obj="class.info",method=True,string='Session'),
-		'sess_info_line1': fields.function(_property_expense_preset_expenses1,type='one2many',obj="class.info",method=True,string='Session'),
+		'sess_info_line': fields.function(_create_session_info_line,type='one2many',obj="class.info",method=True,string='Session'),
+		'sess_info_line1': fields.function(_create_session_info_line1,type='one2many',obj="class.info",method=True,string='Session'),
 		'include_1':fields.boolean('Include'),
 		'include_2':fields.boolean('Include'),
 		'include_3':fields.boolean('Include'),
@@ -324,6 +336,7 @@ class class_info(osv.osv):
 		'apply_all':fields.boolean('Apply to All'),
 		'apply_to_future':fields.boolean('Apply to Future'),
 		'no_of_learners':fields.function(_calculate_total_learners, relation="class.info",readonly=1,string='No. Learners',type='integer'),
+		'end_class_date':fields.function(_calculate_end_class_date, relation="class.info",readonly=1,string='Last Session Date',type='date'),
 		'status':fields.char('Status')
 	}
 	_defaults = {
@@ -348,6 +361,16 @@ class class_info(osv.osv):
 		if holidays == False :
 			global class_create
 			class_create = True
+
+			if 'module_id' not in values or values['module_id'] == False:
+				raise osv.except_osv(_('Error!'),_("Module cannot be empty"))
+			if 'location_id' not in values or values['location_id'] == False:
+				raise osv.except_osv(_('Error!'),_("Location cannot be empty"))
+			if 'room_id' not in values or values['room_id'] == False:
+				raise osv.except_osv(_('Error!'),_("Room cannot be empty"))
+			if 'segment_code' not in values or values['segment_code'] == False:
+				raise osv.except_osv(_('Error!'),_("Segment cannot be empty"))
+
 
 			if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
@@ -430,13 +453,15 @@ class class_info(osv.osv):
 						segment_cd =  new_array["segment_code"]
 						d = parser.parse(new_array["start_date"])
 						date_cd =  dt = str(d.year)[2:] + str(d.month)[:2]
-						count = self.search(cr, uid, [('module_id', '=', new_array["module_id"])
-						and ('location_id', '=', new_array["location_id"]) and ('parent_id', '=', 0) ])
+						count = self.search(cr, uid, [('parent_id', '=', 0)])
 						counter = 1
 						for c in self.browse(cr,uid,count,context):
-						  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
+						  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year
+						  	and c.location_id.id == new_array["location_id"] and c.module_id.id == new_array["module_id"]):
 						     counter = counter+1;
+
 						class_code_gen = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
+
 					new_array['class_code'] = class_code_gen
 					id = super(class_info, self).create(cr, uid, new_array, context=context)
 					if(no_of_sess == 1):
@@ -481,19 +506,20 @@ class class_info(osv.osv):
 								continue
 							else:
 								overlap = False
-						if k == 1 :
-							module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
-							location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
-							segment_cd =   new_array["segment_code"]
-							date_cd =  dt = str(new_array["start_date"].year)[2:] + str(new_array["start_date"].month)[:2]
-							count = self.search(cr, uid, [('module_id', '=', new_array["module_id"]) and ('location_id', '=', new_array["location_id"])  and ('parent_id', '=', 0) ])
-							counter = 1
-							for c in self.browse(cr,uid,count,context):
-							  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year):
-							     counter = counter+1;
-							class_code_gen = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
-						new_array['class_code'] = class_code_gen
-						id = super(class_info, self).create(cr, uid, new_array, context=context)
+				if k == 1 :
+					module_cd =  self.pool.get('cs.module').browse(cr, uid, new_array["module_id"], context=context).module_code
+					location_cd =  self.pool.get('location').browse(cr, uid, new_array["location_id"], context=context).location_code
+					segment_cd =   new_array["segment_code"]
+					date_cd =  dt = str(new_array["start_date"].year)[2:] + str(new_array["start_date"].month)[:2]
+					count = self.search(cr, uid, [('parent_id', '=', 0) ])
+					counter = 1
+					for c in self.browse(cr,uid,count,context):
+					  if(d.month ==  parser.parse(c['start_date']).month and d.year == parser.parse(c['start_date']).year
+						and c.location_id.id == new_array["location_id"] and c.module_id.id == new_array["module_id"]):
+						 counter = counter+1;
+					class_code_gen = location_cd[:2]+module_cd+"-"+date_cd+"-"+str(counter)+"-"+segment_cd[:2]
+					new_array['class_code'] = class_code_gen
+					id = super(class_info, self).create(cr, uid, new_array, context=context)
 
 				no_of_days = no_of_days + 7
 
@@ -1330,6 +1356,7 @@ class class_info(osv.osv):
 		dClassDays_5 = ''
 		dClassDays_6 = ''
 		dClassDays_7 = ''
+
 		if include_1 :
 			sessions_per_week+=1
 			dEndDate=end_date1
@@ -1358,6 +1385,7 @@ class class_info(osv.osv):
 			sessions_per_week+=1
 			dEndDate=end_date7
 			dClassDays_7 = day_7
+
 		return {'value': {'sessions_per_week': sessions_per_week,'class_end_date':dEndDate, 'class_days':dClassDays_1+' '+dClassDays_2+' '+dClassDays_3+' '+dClassDays_4+' '+dClassDays_5+' '+dClassDays_6+' '+dClassDays_7}}
 
 	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
@@ -1388,6 +1416,7 @@ class class_info(osv.osv):
 				tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 				ran = pytz.utc.localize(end).astimezone(tz)
 				value['end_time'] = ran.strftime("%H:%M")
+
 
 			if duration and total_hrs:
 				sessions_duration_in_hrs = duration
@@ -1490,106 +1519,140 @@ class_info
 
 class move_learner(osv.osv):
 
-	def move_learner_save(self, cr, uid, ids, context=None):
-		learner_array = context.get('learner_id')
-		for self_obj in self.browse(cr,uid,ids):
-			if self_obj.available_seats > len(learner_array) :
-				class_info = self.pool.get('class.info')
+	global from_create
+	from_create =False
+	def create(self,cr, uid, values, context=None):
+		global from_create
+		from_create = True
+		if 'class_line' in values:
+			for i in values['class_line']:
+				swp_id = self.pool.get('move.learner.table').browse(cr,uid,i[1])['move_class_id']
+				self.unlink(cr, uid,swp_id, context=context)
+			move_class_id = super(move_learner, self).create(cr, uid, values, context=context)
+			for j in values['class_line']:
+				self.pool.get('move.learner.table').write(cr, uid, j[1],{'move_class_id':move_class_id}, context=context)
+			return move_class_id
 
-				for learner_id in context.get('learner_id') :
-					self.pool.get('learner.line').create(cr, uid,{'learner_mod_id':self_obj.class_id.id,'learner_id':learner_id}, context=context)
-
-				class_obj = class_info.browse(cr,uid,context.get('class_id'))
-				parent_id = class_obj['parent_id']
-				if parent_id > 0:
-					prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', parent_id)])
-					prog_mod_ids.append(parent_id)
-				else:
-					prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', class_obj.id)])
-					prog_mod_ids.append(class_obj.id)
-
-				from_to_ids = self.pool.get('learner.line').search(cr,uid,[('learner_mod_id','in',prog_mod_ids),('learner_id','in',context.get('learner_id'))])
-
-				self.pool.get('learner.line').unlink(cr, uid, from_to_ids, context)
-			else:
-				raise osv.except_osv(_('Error!'),_("Cannot move learners as available seats are low"))
-
-
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'class_form')
-		view_id = view_ref and view_ref[1] or False,
-		ctx = dict(context)
-		#this will return product tree view and form view.
-		ctx.update({
-			'active_id': ids[0]
-		})
-		return {
-			'type': 'ir.actions.act_window',
-			'name': 'Class',
-			'view_mode': 'form',
-			'view_type': 'form',
-			'view_id': view_id,
-			'res_model': 'class.info',
-			'res_id':context.get('active_id'),
-			'nodestroy': True,
-			'target':'current',
-			'context': ctx,
-		}
-
-	def move_learner_cancel(self, cr, uid, ids, context=None):
-		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'class_form')
-		view_id = view_ref and view_ref[1] or False,
-		ctx = dict(context)
-		#this will return product tree view and form view.
-		ctx.update({
-			'active_id': ids[0]
-		})
-		return {
-			'type': 'ir.actions.act_window',
-			'name': 'Class',
-			'view_mode': 'form',
-			'view_type': 'form',
-			'view_id': view_id,
-			'res_model': 'class.info',
-			'res_id':context.get('active_id'),
-			'nodestroy': True,
-			'target':'current',
-			'context': ctx,
-		}
-
+		move_class_id = super(move_learner, self).create(cr, uid, values, context=context)
+		return move_class_id
 
 	def default_get(self, cr, uid, fields, context=None):
+		if from_create :
+			data = super(move_learner, self).default_get(cr, uid, fields, context=context)
+			return data
 		data = super(move_learner, self).default_get(cr, uid, fields, context=context)
 		data['module_id']=context.get('active_module')
+		class_info = self.pool.get('class.info')
+		parent_class = class_info.browse(cr,uid,context.get('class_id'))
+		data['class_code'] = parent_class.class_code
+		data['class_id'] = parent_class.id
+ 		#start_date = parent_class['start_date']
+		#start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+		swpa_class_ids = self.search(cr,uid,[('module_id', '=', data['module_id']) and
+		('class_code', '=',data['class_code'])])
+		dwz = self.pool.get('move.learner.table')
+		dwz.unlink(cr, uid,dwz.search(cr, uid, [('class_id', '=',data['class_id']) and
+		('move_class_id', 'in', swpa_class_ids) ]), context=context)
+		self.unlink(cr,uid,swpa_class_ids,context=context)
+		swap_class_id = self.create(cr,uid,{'module_id':data['module_id'],'class_code':data['class_code'],'class_id':data['class_id']},context =context)
+		class_id_loc = class_info.search(cr, uid, [('module_id', '=', data['module_id']) and ('parent_id', '=', 0)])
+		module_obj = self.pool.get("cs.module").browse(cr,uid,data['module_id'])
+		dws = []
+		user = self.pool.get('res.users').browse(cr, uid, uid)
+		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
+		for self_obj in class_info.browse(cr,uid,class_id_loc):
+			self_obj_start_date = self_obj['start_date']
+			self_obj_start = datetime.strptime(self_obj_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			if ((self_obj.id != context.get('class_id'))):
+				h  = class_info.browse(cr,uid,class_info.search(cr,uid,[("parent_id","=",self_obj.id)],order ="start_date desc",limit=1,context=context))
+				dw = dwz.create(cr, uid,{
+					'move_class_id':swap_class_id,
+					'class_code': self_obj.class_code,
+					'class_id': self_obj.id,
+					'start_date':self_obj.start_date,
+					'end_date':h[0].end_date,
+					'available_slots':module_obj.max_num_ppl_class - self_obj.no_of_learners
+				}, context=context)
+				dws.append(dw)
+		data['class_line'] = dws
 		return data
+
+	def move_learner_save(self, cr, uid, ids, context=None):
+		learner_array = context.get('learner_id')
+		dwz = self.pool.get('move.learner.table')
+		swap_ids = []
+		for j in dwz.browse(cr,uid,dwz.search(cr, uid,[])):
+			if(j.move and ids[0] == j.move_class_id):
+				swap_ids.append(j)
+
+		if(len(swap_ids) > 1 or len(swap_ids) == 0):
+			raise osv.except_osv(_('Error!'),_("Please select one class to move to."))
+
+		class_info = self.pool.get('class.info')
+
+		#for learner_id in context.get('learner_id') :
+		#	self.pool.get('learner.line').create(cr, uid,{'learner_mod_id':self_obj.class_id.id,'learner_id':learner_id}, context=context)
+
+		#class_obj = class_info.browse(cr,uid,context.get('class_id'))
+		#		parent_id = class_obj['parent_id']
+		#		if parent_id > 0:
+		#			prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', parent_id)])
+		#			prog_mod_ids.append(parent_id)
+		#		else:
+		#			prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', class_obj.id)])
+		#			prog_mod_ids.append(class_obj.id)
+
+		#		from_to_ids = self.pool.get('learner.line').search(cr,uid,[('learner_mod_id','in',prog_mod_ids),('learner_id','in',context.get('learner_id'))])
+
+		#		self.pool.get('learner.line').unlink(cr, uid, from_to_ids, context)
+		#	else:
+		#		raise osv.except_osv(_('Error!'),_("Cannot move learners as available seats are low"))
+
+
+		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'class_form')
+		view_id = view_ref and view_ref[1] or False,
+		ctx = dict(context)
+		#this will return product tree view and form view.
+		ctx.update({
+			'active_id': ids[0]
+		})
+		return {
+			'type': 'ir.actions.act_window',
+			'name': 'Class',
+			'view_mode': 'form',
+			'view_type': 'form',
+			'view_id': view_id,
+			'res_model': 'class.info',
+			'res_id':context.get('active_id'),
+			'nodestroy': True,
+			'target':'current',
+			'context': ctx,
+		}
 
 	_name = "learner.move"
 	_description = "Move Learner Line"
 	_columns = {
-		'name':fields.char('Name'),
-		'learner_move_id': fields.many2one('class.info', 'Class', ondelete='cascade', help='Class', select=True),
 		'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, required=True),
-		'class_id':fields.many2one('class.info', 'Class', ondelete='cascade', help='Learner', select=True, required=True),
-		'parent_id': fields.related('class_id','parent_id',type="integer",relation="class.info",string="Parent Id", readonly=1, required=True),
-		'class_code': fields.related('class_id','class_code',type="char",relation="class.info",string="Class Code", readonly=1, required=True),
-		'start_date': fields.related('class_id','start_date',type="datetime",relation="class.info",string="Start Date", readonly=1, required=True),
-		'end_date': fields.related('class_id','start_date',type="datetime",relation="class.info",string="End Date", readonly=1, required=True),
-		'available_seats':fields.integer('Available Slots', readonly=1),
+		'class_line': fields.one2many('move.learner.table','move_class_id', ondelete='cascade',string='Class'),
+		'class_code':fields.char('Class Code'),
+		'class_id':fields.integer('Class Id'),
 	}
-
-	def onchange_class(self, cr, uid, ids, class_id,module_id):
-		class_obj = self.pool.get('class.info').browse(cr, uid, class_id)
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		avail = module_obj.max_num_ppl_class - class_obj.no_of_learners
-		return {'value': {'class_code': class_obj.class_code,'start_date': class_obj.start_date,'end_date': class_obj.end_date,'available_seats': avail}}
-
-	def onchange_module(self, cr, uid, ids, module_id,class_id):
-		module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-		class_obj = self.pool.get('class.info').browse(cr, uid, class_id)
-		avail = module_obj.max_num_ppl_class - class_obj.no_of_learners
-		return {'value': {'available_seats': avail}}
-
-
 move_learner
+
+class move_learner_table(osv.osv):
+	_name = "move.learner.table"
+	_description = "Move Learner "
+	_columns = {
+		'id':fields.integer('id'),
+		'move_class_id':fields.integer('id',readonly=1),
+		'class_code': fields.char('Class Code',readonly=1),
+		'class_id':fields.char('Class Id'),
+		'start_date': fields.datetime('Start Date',readonly=1),
+		'end_date': fields.datetime('End Date',readonly=1),
+		'available_slots': fields.integer('Availbale Slots',readonly=1),
+		'move':fields.boolean('Move'),
+	}
+move_learner_table
 
 class swap_class(osv.osv):
 	global from_create
@@ -1745,10 +1808,10 @@ class learner_mod_line(osv.osv):
 			return False
 		else :
 			return True
-			
+
 	def _current_class(self, cr, uid, ed, sd, cc, st, cs, ns, csp, values, context=None):
 			obj_current_class = self.pool.get('current.class')
-			
+
 			global isSaved
 			for sh in values:
 				if isSaved==False:
@@ -1757,7 +1820,7 @@ class learner_mod_line(osv.osv):
 					itms = cr.fetchall()
 					for r in itms:
 						prn = r[0]
-					
+
 						vals = {
 							'program_name': prn,
 							'class_id':sh['learner_id'],
@@ -1774,7 +1837,8 @@ class learner_mod_line(osv.osv):
 						isSaved=True
 				return True
 
-	def _create_hist(self, cr, uid, sdt,  mn, cc, values, context=None):
+
+	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
 
 			for ch in values:
@@ -1786,6 +1850,8 @@ class learner_mod_line(osv.osv):
 					pn = s[0]
 					es = s[1]
 					ss = s[2]
+				#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed,
+				#obj_li=self.pool.get('learner.info').browse(cr, uid, ch['learner_id'])
 
 				vals = {
 					'program_name': pn,
@@ -1796,12 +1862,12 @@ class learner_mod_line(osv.osv):
 					'start_date': sdt,
 					'module_name':mn,
 					#'end_date': edt,
+
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
 
 	def create(self,cr, uid, values, context=None):
-		_logger.info("Create Called")
 		global class_create
 		if class_create == True :
 			id = super(learner_mod_line, self).create(cr, uid, values, context=context)
@@ -1823,29 +1889,13 @@ class learner_mod_line(osv.osv):
 			cc = class_info_obj_id.class_code
 			self._create_hist(cr, uid, sdt, mn, cc,[values], context=context)
 			return id
-		
+
 		id = super(learner_mod_line, self).create(cr, uid, values, context=context)
 		class_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('class.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,class_id)
-		#Masih
-		'''edt = class_info_obj_id.end_date
-		sdt = class_info_obj_id.start_date
-		mn = class_info_obj_id.module_id.id
-		cc = class_info_obj_id.class_code
-		self._create_hist(cr, uid, edt, sdt, mn, cc, [values], context=context)
-		#Supreeth Current Class
-		_logger.info("Learner Class Details")
-		sd = class_info_obj_id.start_date
-		ed = class_info_obj_id.end_date
-		cc = class_info_obj_id.class_code
-		st = class_info_obj_id.start_end_time
-		cs = 'In Progress'
-		ns = class_info_obj_id.total_sessions
-		csp = class_info_obj_id.day_1
-		self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)'''
+
 		parent_id = class_info_obj_id['parent_id']
-		#raise osv.except_osv(_('Error:'),_("Iddddd %s")%(parent_id))
 		if parent_id > 0:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', parent_id)])
 			ids = class_info_obj.search(cr, uid, [('id', '=', parent_id)])
@@ -1853,7 +1903,7 @@ class learner_mod_line(osv.osv):
 		else:
 			prog_mod_ids = class_info_obj.search(cr, uid, [('parent_id', '=', class_info_obj_id.id)])
 			prog_mod_ids.append(class_info_obj_id.id)
-		
+
 		for prog_module_line in prog_mod_ids:
 			if prog_module_line != class_id:
 				new_array = values
@@ -1861,12 +1911,11 @@ class learner_mod_line(osv.osv):
 				new_array['attendance'] = False
 				local_id = super(learner_mod_line, self).create(cr, uid, new_array, context=context)
 				#created_line_ids.append(local_id)
-		#created_line_ids.append(local_id)	
+		#created_line_ids.append(local_id)
 
 		return id
 
 	def write(self,cr, uid, ids, values, context=None):
-		_logger.info("Wriet Called %s",ids)
 		id = super(learner_mod_line, self).write(cr, uid, ids,values, context=context)
 		values_obj = self.browse(cr,uid,ids,context)[0]
 		class_id = values_obj['learner_mod_id']
@@ -1887,6 +1936,7 @@ class learner_mod_line(osv.osv):
 		mn = class_info_obj_id.module_id
 		cc = class_info_obj_id.class_code
 		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
+
 		parent_id = class_id['parent_id']
 		if parent_id > 0:
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', parent_id)])
@@ -1896,8 +1946,6 @@ class learner_mod_line(osv.osv):
 			prog_mod_ids = self.pool.get('class.info').search(cr, uid, [('parent_id', '=', class_id.id)])
 			prog_mod_ids.append(class_id.id)
 		line_ids = self.search(cr,uid,[('learner_mod_id','in',prog_mod_ids) and ('learner_id','=',values_obj['learner_id'].id)])
-		_logger.info("Write prog_mod_ids %s",prog_mod_ids)
-		_logger.info("Write line_ids %s",line_ids)
 		for prog_module_line in self.browse(cr,uid,line_ids,context):
 			if prog_module_line.id != class_id.id:
 				if 'attendance' in values :
