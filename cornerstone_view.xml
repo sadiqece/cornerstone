@@ -658,7 +658,27 @@
 ************************ MODULES *********************
  ================================================== -->
     <!-- ===================== Module List View =============================-->
-    <record id="matser_req_form" model="ir.ui.view">
+	<record id="category_form" model="ir.ui.view">
+			<field name="name">Module Category</field>
+			<field name="model">module.categories</field>
+			<field name="arch" type="xml">
+				<form string="Module Category" version="7.0" >
+					<sheet>
+						<group  col="9">
+						    <field name = "name"/>
+						</group>
+						 <group col="2">
+						  <field name='module_levels'  nolabel='1' >
+							  <tree string="Module Level" editable="bottom" class="grey_border">
+								<field name = "name" placeholder="Enter Levels"/>
+							  </tree>
+						  </field>
+						 </group>
+					</sheet>
+				</form>
+		   </field>
+	</record>
+	<record id="matser_req_form" model="ir.ui.view">
       <field name="name">Master Req</field>
       <field name="model">master.req</field>
       <field name="arch" type="xml">
@@ -791,14 +811,14 @@
               <label for="module_credit_value" />
               <field name="module_credit_value" readonly="context.get('ctx', False)" string="Credit Value" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
+			<div class="col-3">
+              <label for="module_category" />
+              <field name="module_category"  on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+            </div>
+			<div class="clear" />
             <div class="col-3">
               <label for="module_level" />
-              <field name="module_level" widget="selection/" group="cornerstone_user" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
-            </div>
-            <div class="clear" />
-            <div class="col-3">
-              <label for="module_category" />
-              <field name="module_category" widget="selection/" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
+              <field name="module_level" domain="[('module_category','=',module_category)]"   options="{'create': False, 'create_edit': False}" readonly="context.get('ctx', False)" on_change="on_change_module_status(module_code,module_crscode,module_certification,module_level,module_credit_value,module_duration,module_fee,description,module_category,module_pathway,req_line,max_num_ppl_class,synopsis,outline,delivery_mode,room_arr,pf_line,pre_test_line,in_class_test_line,post_test_line,alert_line)"/>
             </div>
             <div class="col-3">
               <label for="module_pathway" />

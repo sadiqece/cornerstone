@@ -3317,12 +3317,9 @@ class cs_module(osv.osv):
        'module_code': fields.char('Module Code', size=20),
 	   'module_crscode': fields.char('CRS Code', size=80),
 	   'module_certification': fields.char('Certification Achieved (if any)', size=100),
-	   'module_level': fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level', type='one2many'),
-	   'module_category': fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category', type='one2many'),
-	   'module_pathway': fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway', type='one2many'),
-	   #'module_level': fields.many2one('module.level', 'Level', size=25, help='Module Level'),
-	   #'module_category': fields.many2one('module.category', 'Category', size=25, help='Module Category'),
-	   #'module_pathway': fields.many2one('module.pathway', 'Pathway', size=25, help='Module Pathway'),
+	   'module_category': fields.many2one('module.categories', 'Category', ondelete='cascade', help='Category', select=True),
+	   'module_level': fields.many2one('module.levels', 'Level', ondelete='cascade', help='Level', select=True),
+	   'module_pathway': fields.many2one('module.pathway', 'Pathway', size=25, help='Module Pathway'),
 	   'module_credit_value': fields.integer('Credits', size=4),
 	   'orientation': fields.selection((('Yes','Yes'),('No','No')),'Orientation'),
 	   'synopsis':fields.text('Synopsis', size=500),
@@ -3397,33 +3394,34 @@ class cs_module(osv.osv):
 
 cs_module()
 
-class module_level(osv.osv):
+class module_categories(osv.osv):
 
-	_name ='module.level'
-	_description ="Module Level"
-	_columns = {
-	'mod_level': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
-	'name':fields.selection((('Level 1','Level 1'),('Level 2','Level 2'),('Level 3','Level 3'),('Level 4','Level 4'),('Level 5','Level 5'),('Level 6','Level 6'),('Level 7','Level 7'),('Level 8','Level 8'),('Operations','Operations'),('Supervisory','Supervisory'),('Managerial','Managerial'),('Leadership','Leadership')),'Level'),
-	}
-module_level()
-
-class module_category(osv.osv):
-
-	_name ='module.category'
+	_name ='module.categories'
 	_description ="Module Category"
 	_columns = {
-	'mod_category': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
-	'name':fields.selection((('WPL','WPL'),('WPN','WPN'),('WPS','WPS'),('EDGE','EDGE'),('LPM','LPM'),('SV','SV'),('Non WSQ','Non WSQ')),'Category'),
+	'mod_cat_id':fields.integer('id'),
+	'name':fields.char('Category', size=20),
+	'module_levels':fields.one2many('module.levels', 'module_category', 'Level', select=True, required=True),
 	}
-module_category()
+module_categories()
+
+class module_level(osv.osv):
+
+	_name ='module.levels'
+	_description ="Module Level"
+	_columns = {
+	'module_category': fields.many2one('module.categories', 'Category', ondelete='cascade', help='Module Category', select=True, readonly=1),
+	'name':fields.char('Enter Levels', size=20),
+	}
+	
+module_level()
 
 class module_pathway(osv.osv):
 
 	_name ='module.pathway'
 	_description ="Module Pathway"
 	_columns = {
-	'mod_pathway': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
-	'name':fields.selection((('Generic','Generic'),('Sectorial','Sectorial'),('Contextualized','Contextualized')),'Pathway'),
+	'name':fields.char('Pathway', size=20),
 	}
 module_pathway()
 
