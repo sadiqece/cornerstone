@@ -1388,7 +1388,7 @@ class class_info(osv.osv):
 
 		return {'value': {'sessions_per_week': sessions_per_week,'class_end_date':dEndDate, 'class_days':dClassDays_1+' '+dClassDays_2+' '+dClassDays_3+' '+dClassDays_4+' '+dClassDays_5+' '+dClassDays_6+' '+dClassDays_7}}
 
-	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
+	def onchange_dates(self, cr, uid, ids, start_date, duration=False,lunch_duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
 
 		if len(ids) == 0:
@@ -1419,12 +1419,12 @@ class class_info(osv.osv):
 
 
 			if duration and total_hrs:
-				sessions_duration_in_hrs = duration
+				sessions_duration_in_hrs = duration - lunch_duration
 				if sessions_duration_in_hrs > 0 :
 					if total_hrs % sessions_duration_in_hrs == 0 :
-						value['total_sessions'] = total_hrs/sessions_duration_in_hrs
+						value['total_sessions'] = total_hrs/(sessions_duration_in_hrs)
 					else:
-						value['total_sessions'] = (total_hrs/sessions_duration_in_hrs)+1
+						value['total_sessions'] = (total_hrs/(sessions_duration_in_hrs))+1
 				else :
 					value['total_sessions'] = 0
 
@@ -1468,7 +1468,7 @@ class class_info(osv.osv):
 			return {'value': value}
 
 
-	def onchange_duration(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
+	def onchange_duration(self, cr, uid, ids, start_date, duration=False,lunch_duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
 		if not start_date:
 			return value
@@ -1483,12 +1483,12 @@ class class_info(osv.osv):
 			value['end_date'] = end.strftime("%Y-%m-%d %H:%M:%S")
 
 		if duration and total_hrs:
-			sessions_duration_in_hrs = duration
+			sessions_duration_in_hrs = duration - lunch_duration
 			if sessions_duration_in_hrs > 0 :
 				if total_hrs % sessions_duration_in_hrs == 0 :
-					value['total_sessions'] = total_hrs/sessions_duration_in_hrs
+					value['total_sessions'] = total_hrs/(sessions_duration_in_hrs)
 				else:
-					value['total_sessions'] = (total_hrs/sessions_duration_in_hrs)+1
+					value['total_sessions'] = (total_hrs/(sessions_duration_in_hrs))+1
 			else :
 				value['total_sessions'] = 0
 
@@ -1555,22 +1555,20 @@ class move_learner(osv.osv):
 		('move_class_id', 'in', swpa_class_ids) ]), context=context)
 		self.unlink(cr,uid,swpa_class_ids,context=context)
 		swap_class_id = self.create(cr,uid,{'module_id':data['module_id'],'class_code':data['class_code'],'class_id':data['class_id']},context =context)
-		class_id_loc = class_info.search(cr, uid, [('module_id', '=', data['module_id']) and ('parent_id', '=', 0)])
+		class_id_loc = class_info.search(cr, uid, [('module_id', '=', data['module_id'])])
 		module_obj = self.pool.get("cs.module").browse(cr,uid,data['module_id'])
 		dws = []
 		user = self.pool.get('res.users').browse(cr, uid, uid)
 		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 		for self_obj in class_info.browse(cr,uid,class_id_loc):
-			self_obj_start_date = self_obj['start_date']
-			self_obj_start = datetime.strptime(self_obj_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			self_obj_start = datetime.strptime(self_obj['start_date'], "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
 			if ((self_obj.id != context.get('class_id'))):
-				h  = class_info.browse(cr,uid,class_info.search(cr,uid,[("parent_id","=",self_obj.id)],order ="start_date desc",limit=1,context=context))
 				dw = dwz.create(cr, uid,{
 					'move_class_id':swap_class_id,
 					'class_code': self_obj.class_code,
 					'class_id': self_obj.id,
 					'start_date':self_obj.start_date,
-					'end_date':h[0].end_date,
+					'end_date':self_obj.end_date,
 					'available_slots':module_obj.max_num_ppl_class - self_obj.no_of_learners
 				}, context=context)
 				dws.append(dw)
@@ -1585,6 +1583,7 @@ class move_learner(osv.osv):
 			if(j.move and ids[0] == j.move_class_id):
 				swap_ids.append(j)
 
+		_logger.info("Class Move %s",swap_ids)
 		if(len(swap_ids) > 1 or len(swap_ids) == 0):
 			raise osv.except_osv(_('Error!'),_("Please select one class to move to."))
 
@@ -1838,7 +1837,7 @@ class learner_mod_line(osv.osv):
 				return True
 
 
-	def _create_hist(self, cr, uid, ed, sd, mn, cc, values, context=None):
+	def _create_hist(self, cr, uid, sdt,  mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('class.history.module')
 
 			for ch in values:

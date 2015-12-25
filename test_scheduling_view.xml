@@ -12,17 +12,10 @@
 			<sheet>
 				<group>
 					<group class="oe_title" style="width:350px;">
-						<div class="oe_title">
-							<field name = "parent_id" invisible='1'/>
-							<label for="name" class="oe_edit_only"/>
-							<h1 style="width:380px;">
-								<field name = "name" attrs="{'readonly':[('parent_id','!=',0)]}"/>
-							</h1>
-							<label for="test_code" class="oe_edit_only"/>
-							<h2 style="width:280px;">
-								<field name = "test_code" />
-							</h2>	
-						</div>
+						<h2 style="width:280px;">
+							<field name = "test_code"  readonly="1" attrs="{'invisible':[('test_code','=','Holiday')]}"/>
+							<field name = "name"  readonly="1" attrs="{'invisible':[('test_code','!=','Holiday')]}"/>
+						</h2>
 					</group>
 					<div class="col-35">
 						<group>
@@ -47,7 +40,7 @@
 										</div>
 									</div>
 								</div>
-								
+
 								<div attrs="{'invisible': [('test_status_display_2', 'in' , ('Closed', 'Cancelled', 'Completed', 'Postponed', 'False'))]}">
 									<div id="div_status2" class="openerp oe_form_readonly test_status_box">
 										<div class="test_status_box_label">Status</div>
@@ -59,7 +52,7 @@
 										</div>
 									</div>
 								</div>
-								
+
 								<div attrs="{'invisible': [('test_status_display_3', 'in' ,('Open', 'Closed', 'Completed', 'False'))]}">
 									<div id="div_status1" class="openerp oe_form_readonly test_status_box_1">
 										<div class="test_status_box_label_1 ">Status</div>
@@ -71,7 +64,7 @@
 										</div>
 									</div>
 								</div>
-								
+
 								<div attrs="{'invisible': [('test_status_display_4', 'in' ,('Open', 'Cancelled', 'Completed', 'Postponed', 'False'))]}">
 									<div id="div_status1" class="openerp oe_form_readonly test_status_box_3">
 										<div class="test_status_box_label_3 ">Status</div>
@@ -83,7 +76,7 @@
 										</div>
 									</div>
 								</div>
-								
+
 								<div attrs="{'invisible': [('test_status_display_5', 'in' ,('Open', 'Cancelled', 'Closed', 'Postponed', 'False'))]}">
 									<div id="div_status1" class="openerp oe_form_readonly test_status_box_4">
 										<div class="test_status_box_label_4 ">Status</div>
@@ -99,7 +92,7 @@
 						</group>
 					</div>
 				</group>
-				
+
 				<div class="col-3">
 					<label for="location_id" />
 					<field name="location_id" options="{'create': False, 'create_edit': False}" on_change="on_change_location_id(location_id)" />
@@ -114,7 +107,7 @@
 				</div>
 
 				<div class="clear" />
-				
+
 				<div class="col-3">
 					<label for="max_modality" />
 					<field name="max_modality"/>
@@ -127,9 +120,9 @@
 					<label for="max_people" />
 					<field name="max_people"/>
 				</div>
-				
+
 				<div class="clear" />
-				
+
 				<div class="col-3">
 					<label for="start_date" />
 					<field name="start_date" on_change="onchange_dates(start_date,duration,False)"/>
@@ -143,16 +136,16 @@
 					<field name="end_date" readonly="1"/>
 				</div>
 
-				
+
 				<notebook colspan="5" col="10">
 					<page string="Learner">
-						<h2>	
+						<h2>
 							<label for="learner" class="oe_edit_only"/>
 						</h2>
 						<field name='learner_line' nolabel='1'>
 							<tree string='List' editable="bottom">
 								<field name='learner_mod_id' invisible ="1" />
-								<field name='learner_id'  on_change="on_change_learner_id(learner_id,context)" /> 
+								<field name='learner_id'  on_change="on_change_learner_id(learner_id,context)" />
 								<field name='learner_nric'/>
 								<field name='learner_non_nric'/>
 								<field name='module_id' options="{'create': False, 'create_edit': False}"/>
@@ -167,7 +160,7 @@
 						</field>
 					</page>
 					<page string="Scores">
-						<h2>	
+						<h2>
 							<label for="test_scores" class="oe_edit_only"/>
 						</h2>
 						<field name='test_scores' nolabel='1'>
@@ -212,7 +205,7 @@
 							<field name='w_scores'/>
 							<field name='n_scores'/>
 						</group>
-						
+
 					</group>
 					<button  name="save_scores"  string="Save" type="object"/>
 					<button  name="cancel_scores"  string="Cancel" type="object"/>
@@ -220,7 +213,7 @@
 				</form>
             </field>
         </record>
-	
+
 	<record id="learner_modality_form" model="ir.ui.view">
             <field name="name">test.learner.form</field>
             <field name="model">test.learner</field>
@@ -245,11 +238,11 @@
 				</form>
             </field>
         </record>
-	
-	
+
+
 	<!-- ========================= Action Layout ============================= -->
-	
-	
+
+
 	<record id="test_listing_page_tree" model="ir.ui.view">
             <field name="name">test.listing.page.tree</field>
             <field name="model">test.info</field>
@@ -262,7 +255,7 @@
                 </tree>
             </field>
         </record>
-		
+
 		<!-- Event calendar view -->
         <record model="ir.ui.view" id="event_calendar_view">
             <field name="name">test.listing.page.calendar</field>
@@ -278,8 +271,8 @@
 					<field name = "actual_number" />
                 </calendar>
             </field>
-        </record> 
-		
+        </record>
+
 		<record id="view_test_listing_filter" model="ir.ui.view">
             <field name="name">Test Listing Page</field>
             <field name="model">test.info</field>
@@ -289,7 +282,7 @@
 	           </search>
             </field>
         </record>
-		
+
 		<record model="ir.actions.act_window" id="action_test_listing_page">
             <field name="name">Test Listing</field>
 			<field name="type">ir.actions.act_window</field>
@@ -304,9 +297,9 @@
               </p>
             </field>
         </record>
-		
+
 <menuitem name = "Test Calendar" id = "test_listing_page" parent = "menu_sub3" action = "action_test_listing_page" />
 
 
-</data> 
+</data>
 </openerp>

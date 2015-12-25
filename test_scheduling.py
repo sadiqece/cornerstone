@@ -30,17 +30,17 @@ dupliacte_mod_found_create = False
 
 class test_info(osv.osv):
 
-	
+
 	'''def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 		_logger.info("Value in read %s",ids)
 		res = super(test_info, self).read(cr, uid,ids, fields, context, load)
-		seq_number =0 
+		seq_number =0
 		for r in res:
 			seq_number = seq_number+1
 			r['s_no'] = seq_number
-		
+
 		return res'''
-		
+
 	def default_get(self, cr, uid, fields, context=None):
 		_logger.info("Calleing Default %s",fields)
 		data = super(test_info, self).default_get(cr, uid, fields, context=context)
@@ -51,7 +51,7 @@ class test_info(osv.osv):
 			invoice_lines.append((0,0,{'master_modality':p.id,}))
 		data['test_modality'] = invoice_lines
 		return data
-		
+
 	def _calculate_total_learners(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
@@ -61,7 +61,7 @@ class test_info(osv.osv):
 			total_mod = len(mod_line_ids)
 			res[line.id] = total_mod
 		return res
-	
+
 #Test Status
 	def _test_status_display_1(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
@@ -70,7 +70,7 @@ class test_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['test_status']
 		return res
-		
+
 	def _test_status_display_2(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
@@ -78,7 +78,7 @@ class test_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['test_status']
 		return res
-		
+
 	def _test_status_display_3(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
@@ -86,7 +86,7 @@ class test_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['test_status']
 		return res
-		
+
 	def _test_status_display_4(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
@@ -94,7 +94,7 @@ class test_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['test_status']
 		return res
-		
+
 	def _test_status_display_5(self, cr, uid, ids, field_names, args,  context=None):
 		if not ids: return {}
 		res = {}
@@ -102,7 +102,7 @@ class test_info(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['test_status']
 		return res
-		
+
 	def _check_modality(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for self_obj in self.browse(cr, uid, ids, context=context):
@@ -116,7 +116,7 @@ class test_info(osv.osv):
 		'test_id': fields.integer('Id',size=20),
 		's_no': fields.integer('S_No', size=100),
 		'parent_id': fields.integer('Parent Id',size=20),
-		'name': fields.char('Test Name', size=100,required=True, select=True),
+		'name': fields.char('Test Name', size=100,select=True),
 		'test_code': fields.char('Test Code', size=999),
 		'test_status': fields.selection((('Open','Open'),('Closed','Closed'),('Completed','Completed'),('Cancelled','Cancelled'),('Postponed','Postponed')),'Status',required=True, select=True, help='Status show wheather the Program is on going.'),
 		'test_type_id':fields.integer('Test Type Id'),
@@ -153,30 +153,30 @@ class test_info(osv.osv):
 		'date4': fields.date('Date Created', readonly='True'),
 		'date5': fields.date('Date Created', readonly='True'),
 	}
-	_defaults = { 
+	_defaults = {
 		't_status': 'Draft',
 		'date1': fields.date.context_today,
 		'date2': fields.date.context_today,
 		'date3': fields.date.context_today,
 		'date4': fields.date.context_today,
 		'date5': fields.date.context_today,
-	} 
+	}
 	_constraints = [(_check_modality, 'Error: Max Modality should be greater', ['Modality'])]
 
 	def create(self,cr, uid, values, context=None):
 		values['t_status'] = 'Edit'
 		if 'duration' in values and values['duration'] < 0:
 				raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
-		
+
 		t1start= datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
 		t1end = datetime.strptime(values['end_date'],"%Y-%m-%d %H:%M:%S")
-		
+
 		if datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")  < datetime.now() :
 			raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
-		
+
 		Range = namedtuple('Range', ['start', 'end'])
 		r1 = Range(start=t1start, end=t1end)
-	
+
 		sr_ids = self.search(cr, 1 ,[], context=context)
 		for x in self.browse(cr, uid, sr_ids, context=context):
 			r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
@@ -206,21 +206,21 @@ class test_info(osv.osv):
 					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
 				elif (t2start <= t1start <= t1end <= t2end):
 					raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-	
-		
+
+
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
-			values['test_type_char']  = values['test_pre_type'] 
+			values['test_type_char']  = values['test_pre_type']
 		elif 'test_post_type' in values  and values['test_post_type'] != False :
-			values['test_type_char']  = values['test_post_type'] 
+			values['test_type_char']  = values['test_post_type']
 		elif 'test_type' in values  and values['test_type'] != False :
 			values['test_type_char']  = values['test_type']
-			
+
 		global dupliacte_found_create
-		dupliacte_found_create = False	
-		
+		dupliacte_found_create = False
+
 		global dupliacte_mod_found_create
 		dupliacte_mod_found_create = False
-			
+
 		if 'learner_line' in values :
 			if values['learner_line']  > 1:
 				ids_test_lear = self.pool.get('test.learner').search(cr,1,[])
@@ -231,7 +231,7 @@ class test_info(osv.osv):
 				updated_ids = []
 				for dd in self.pool.get('test.learner').browse(cr,1,ids_test_lear):
 					if dd.learner_mod_id.id == True:
-						table_ids.append(dd.learner_id.id)	
+						table_ids.append(dd.learner_id.id)
 				for x in values['learner_line'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('test.learner').browse(cr,uid,x[1])
@@ -264,7 +264,7 @@ class test_info(osv.osv):
 						if found == 1 :
 							global dupliacte_found_create
 							dupliacte_found_create = True
-							
+
 		if 'test_modality' in values :
 			if values['test_modality']  > 1:
 				ids_test_lear = self.pool.get('test.modality').search(cr,1,[])
@@ -274,7 +274,7 @@ class test_info(osv.osv):
 				deleted_ids =[]
 				updated_ids = []
 				for dd in self.pool.get('test.modality').browse(cr,1,ids_test_lear):
-						table_ids.append(dd.master_modality.id)	
+						table_ids.append(dd.master_modality.id)
 				for x in values['test_modality'] :
 					if x[0] == 2 and x[2] ==  False :
 						obj = self.pool.get('test.modality').browse(cr,uid,x[1])
@@ -307,9 +307,16 @@ class test_info(osv.osv):
 						if found == 1 :
 							global dupliacte_mod_found_create
 							dupliacte_mod_found_create = True
-		
-		
-		_logger.info("Create Values %s",values)
+
+
+		location_cd =  self.pool.get('location').browse(cr, uid, values["location_id"], context=context).location_code
+		start_date = datetime.strptime(str(values["start_date"]),"%Y-%m-%d %H:%M:%S")
+		date_cd =  dt = str(start_date.year)[2:] + str(start_date.month)[:2]+ str(start_date.day)[:2]
+		count = "P"
+		if start_date.hour >= 12 :
+			count = "A"
+		class_code_gen = location_cd[:2]+"-"+date_cd+"-"+count
+		values['test_code'] = class_code_gen
 		module_id = super(test_info, self).create(cr, uid, values, context=context)
 		return module_id
 
@@ -317,8 +324,8 @@ class test_info(osv.osv):
 		_logger.info("write write Called %s",values)
 		if 'duration' in values and values['duration'] < 0:
 			raise osv.except_osv(_('Error!'),_("Duration cannot be negative value"))
-			
-			
+
+
 		if 'room_id' in values :
 			Range = namedtuple('Range', ['start', 'end'])
 			test_obj = self.browse(cr,uid,ids[0])
@@ -326,15 +333,15 @@ class test_info(osv.osv):
 				t1start = values['start_date']
 			else :
 				t1start = test_obj['start_date']
-			
+
 			if 'end_date' in values :
 				t1end = values['end_date']
 			else :
 				t1end = test_obj['end_date']
-				
-				
+
+
 			r1 = Range(start=datetime.strptime(t1start, "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(t1end, "%Y-%m-%d %H:%M:%S"))
-	
+
 			sr_ids = self.search(cr, 1 ,[], context=context)
 			for x in self.browse(cr, uid, sr_ids, context=context):
 				r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
@@ -343,25 +350,38 @@ class test_info(osv.osv):
 				overlap = (earliest_end - latest_start)
 				if overlap.days == 0 and x.room_id.id == values['room_id']:
 					raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
-			
-				
+
+		if 'location_id' in values :
+			test_obj1 = self.browse(cr,uid,ids[0])
+			if 'start_date' in values :
+				start_date = datetime.strptime(str(values["start_date"]),"%Y-%m-%d %H:%M:%S")
+			else:
+				start_date = datetime.strptime(str(test_obj1["start_date"]),"%Y-%m-%d %H:%M:%S")
+			location_cd =  self.pool.get('location').browse(cr, uid, values["location_id"], context=context).location_code
+			date_cd =  dt = str(start_date.year)[2:] + str(start_date.month)[:2]+ str(start_date.day)[:2]
+			count = "P"
+			if start_date.hour >= 12 :
+				count = "A"
+			class_code_gen = location_cd[:2]+"-"+date_cd+"-"+count
+			values['test_code'] = class_code_gen
+
 		if 'start_date' in values :
 			t1start= datetime.strptime(values['start_date'],"%Y-%m-%d %H:%M:%S")
 			if t1start < datetime.now() :
 				raise osv.except_osv(_('Error!'),_("Start Date cannot be in past"))
-			
+
 			if 'duration' in values :
 				duration = values['duration']
 			else :
 				test_info_obj = self.browse(cr,uid,ids[0])
 				duration = test_info_obj['duration']
-			
-						
+
+
 			t1end = t1start + timedelta(hours=duration)
 			Range = namedtuple('Range', ['start', 'end'])
-		
+
 			r1 = Range(start=t1start, end=t1end)
-	
+
 			sr_ids = self.search(cr, 1 ,[], context=context)
 			for x in self.browse(cr, uid, sr_ids, context=context):
 				r2 = Range(start=datetime.strptime(x['start_date'], "%Y-%m-%d %H:%M:%S"), end=datetime.strptime(x['end_date'], "%Y-%m-%d %H:%M:%S"))
@@ -370,7 +390,7 @@ class test_info(osv.osv):
 				overlap = (earliest_end - latest_start)
 				if overlap.days == 0 and x.room_id.id == test_info_obj['room_id'].id:
 					raise osv.except_osv(_('Error!'),_("Room Conflicts with other test schedule"))
-			
+
 			holiday = self.pool.get('holiday')
 			holiday_obj_id = holiday.search(cr, uid, [('year', '=', datetime.now().year)])
 			if len(holiday_obj_id) > 0 :
@@ -389,13 +409,27 @@ class test_info(osv.osv):
 						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
 					elif (t2start <= t1start <= t1end <= t2end):
 						raise osv.except_osv(_('Error!'),_("Holiday/Closure Found - "+holiday_line_obj['description']))
-		
+
+			test_obj1 = self.browse(cr,uid,ids[0])
+			if 'location_id' in values:
+				location_cd =  self.pool.get('location').browse(cr, uid, values["location_id"], context=context).location_code
+			else:
+				location_cd =  self.pool.get('location').browse(cr, uid, test_obj1["location_id"].id, context=context).location_code
+
+			start_date = datetime.strptime(str(values["start_date"]),"%Y-%m-%d %H:%M:%S")
+			date_cd =  dt = str(start_date.year)[2:] + str(start_date.month)[:2]+ str(start_date.day)[:2]
+			count = "P"
+			if start_date.hour >= 12 :
+				count = "A"
+			class_code_gen = location_cd[:2]+"-"+date_cd+"-"+count
+			values['test_code'] = class_code_gen
+
 		if 'test_pre_type' in values  and values['test_pre_type'] != False :
-			values['test_type_char']  = values['test_pre_type'] 
+			values['test_type_char']  = values['test_pre_type']
 		elif 'test_post_type' in values  and values['test_post_type'] != False :
-			values['test_type_char']  = values['test_post_type'] 
+			values['test_type_char']  = values['test_post_type']
 		elif 'test_type' in values  and values['test_type'] != False :
-			values['test_type_char']  = values['test_type'] 
+			values['test_type_char']  = values['test_type']
 
 		if 'class_info' in values and values['class_info'] != False :
 			class_obj =self.pool.get("class.info").browse(cr,uid,values['class_info'])
@@ -404,15 +438,15 @@ class test_info(osv.osv):
 			for x in learner_ids :
 				learner_obj.write(cr,uid,x,{'class_code':class_obj.class_code})
 		global dupliacte_found
-		dupliacte_found = False	
-		
+		dupliacte_found = False
+
 		global dupliacte_mod_found
-		dupliacte_mod_found = False	
-		
+		dupliacte_mod_found = False
+
 		if 'learner_line' in values :
 			if values['learner_line']  > 1:
 				ids_test_lear = self.pool.get('test.learner').search(cr,1,[])
-				table_ids = [] 
+				table_ids = []
 				added_ids = []
 				deleted_ids =[]
 				updated_ids = []
@@ -427,7 +461,7 @@ class test_info(osv.osv):
 						added_ids.append(x[2]['learner_id'])
 					elif x[0] == 1  and 'learner_id' in x[2]:
 						updated_ids.append(x[2]['learner_id'])
-				'''create check'''		
+				'''create check'''
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_found
 					dupliacte_found = True
@@ -452,7 +486,7 @@ class test_info(osv.osv):
 		if 'test_modality' in values :
 			if values['test_modality']  > 1:
 				ids_test_lear = self.pool.get('test.modality').search(cr,1,[])
-				table_ids = [] 
+				table_ids = []
 				added_ids = []
 				deleted_ids =[]
 				updated_ids = []
@@ -467,7 +501,7 @@ class test_info(osv.osv):
 						added_ids.append(x[2]['master_modality'])
 					elif x[0] == 1  and 'master_modality' in x[2]:
 						updated_ids.append(x[2]['master_modality'])
-				'''create check'''		
+				'''create check'''
 				if len(added_ids) - len(set(added_ids)) >  0 :
 					global dupliacte_mod_found
 					dupliacte_mod_found = True
@@ -491,23 +525,22 @@ class test_info(osv.osv):
 							dupliacte_mod_found = True
 
 
-								
-			_logger.info("dupliacte_found %s",dupliacte_found)	
+
 		module_id = super(test_info, self).write(cr, uid, ids,values, context=context)
 		return module_id
-	
+
 	'''def on_change_test_definition(self, cr, uid, ids, test,context):
 		code = ""
-		module_info  = {} 
+		module_info  = {}
 		module_id_array  = []
 		test_obj = self.pool.get('test')
-		test_obj_id = test_obj.browse(cr, uid, test) 
+		test_obj_id = test_obj.browse(cr, uid, test)
 		code = test_obj_id.test_code
 		for y in test_obj_id.test_mod_line or [] :
 			module_id_array.append(y.module_id.id)
-			
+
 		return {'domain':{'module_id':[('id','in',module_id_array)]},'value': {'test_code':code,'name':test_obj_id.name,'capacity':test_obj_id.test_max_Pax,'status':test_obj_id.test_status,'module_id':False}}'''
-	
+
 	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False,context=None):
 		value = {}
 		if not start_date:
@@ -524,7 +557,7 @@ class test_info(osv.osv):
 	def on_change_module_id(self, cr, uid, ids, module_id,test_name,context):
 		if module_id != False :
 			test_obj = self.pool.get('test')
-			test_obj_id = test_obj.browse(cr, uid, test_name) 
+			test_obj_id = test_obj.browse(cr, uid, test_name)
 			type_id = -1
 			for y in test_obj_id.test_mod_line or [] :
 				if y.module_id.id  == module_id :
@@ -534,18 +567,18 @@ class test_info(osv.osv):
 						type_id = 2
 					elif y.post_test :
 						type_id = 3
-		
-		
+
+
 			module_obj = self.pool.get('cs.module').browse(cr, uid, module_id)
-			
+
 			return {'value': {'module_code': module_obj.module_code,'no_of_hrs':module_obj.module_duration,'test_type_id':type_id,'test_type':False,'test_pre_type':False,'test_post_type':False,}}
 		else:
 			return{}
 
 	def on_change_location_id(self, cr, uid, ids, location_id):
 		return {'value': {'room_id': False}}
-	
-	
+
+
 test_info()
 
 class test_modality(osv.osv):
@@ -557,18 +590,18 @@ class test_modality(osv.osv):
 					if x.test_modality_id == self_obj.test_modality_id and x.master_modality == self_obj.master_modality:
 						return False
 		return True
-	
-	
+
+
 	_name ='test.modality'
 	_description ="Trainer Learner Tab"
 	_columns = {
 	'test_modality_id' :  fields.many2one('test.info', 'Test', ondelete='cascade', help='Test', select=True),
-	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),	
+	'master_modality':fields.many2one('test.master.modality', 'Modality', ondelete='cascade', help='Modality', select=True, required=True),
 	'm_active':fields.boolean('Active'),
 
 	}
 	_constraints = [(_check_unique_test_modality, 'Error: Item Already Exists', ['master_modality'])]
-	
+
 test_modality()
 
 class test_matser_modality(osv.osv):
@@ -582,7 +615,7 @@ class test_matser_modality(osv.osv):
 			if self_obj.name and self_obj.name.lower() in  lst:
 				return False
 		return True
-		
+
 	_name ='test.master.modality'
 	_description ="Trainer Learner Tab"
 	_columns = {
@@ -596,13 +629,13 @@ class test_learner(osv.osv):
 	def _get_learner_id(self, cr, uid, ids, field_name, arg, context=None):
 		_logger.info("Hello There")
 		return result
-	def view_learner_modality(self, cr, uid, ids, context=None): 
+	def view_learner_modality(self, cr, uid, ids, context=None):
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'learner_modality_form')
 		view_id = view_ref and view_ref[1] or False,
 		ctx = dict(context)
 		self_obj  = self.browse(cr, uid, ids[0], context=context)
 		ctx.update({'class_id': ids[0],'active_learner':self_obj.learner_id.id})
-	
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Modality Form',
@@ -615,12 +648,12 @@ class test_learner(osv.osv):
 			'target':'new',
 			'context': ctx,
 		}
-	
-	def save_modality(self, cr, uid, ids, context=None): 
+
+	def save_modality(self, cr, uid, ids, context=None):
 		obj = self.browse(cr,uid,ids)
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_listing_page_form')
 		view_id = view_ref and view_ref[1] or False,
-		
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Test',
@@ -633,12 +666,12 @@ class test_learner(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-	
-	def cancel_modality(self, cr, uid, ids, context=None): 
+
+	def cancel_modality(self, cr, uid, ids, context=None):
 		obj = self.browse(cr,uid,ids)
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_listing_page_form')
 		view_id = view_ref and view_ref[1] or False,
-		
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Test',
@@ -651,7 +684,7 @@ class test_learner(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-		
+
 	def _check_unique_learner(self, cr, uid, ids, context=None):
 		if dupliacte_found == True:
 			return False
@@ -659,7 +692,7 @@ class test_learner(osv.osv):
 			return False
 		else :
 			return True
-			
+
 	def on_change_learner_id(self, cr, uid, ids, learner_id,context):
 		module_obj = self.pool.get('learner.info').browse(cr, uid, learner_id)
 		class_code = "N/A"
@@ -667,7 +700,7 @@ class test_learner(osv.osv):
 			class_obj = self.pool.get('class.info').browse(cr, uid, context.get('class_id'))
 			class_code = class_obj.class_code
 		return {'value': {'learner_nric': module_obj.learner_nric,'class_code':class_code,'compliance_code':context.get('test_code')}}
-	
+
 	def _test_hist(self, cr, uid, sd, mn, cc, values, context=None):
 			obj_res_hist = self.pool.get('test.history.module')
 			#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
@@ -681,18 +714,18 @@ class test_learner(osv.osv):
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
-			
+
 	def _payment_test(self, cr, uid, mon, csc, mc, values, context=None):
 			obj_res_hist = self.pool.get('payment.test')
-			
+
 			for ch in values:
-			
+
 				sql="select program_learner from learner_info where id = %s " % (ch['learner_id'])
 				cr.execute(sql)
 				itm = cr.fetchall()
 				for s in itm:
 					pna = s[0]
-				
+
 				vals = {
 					'program_name': pna,
 					'pay_id':ch['learner_id'],
@@ -702,7 +735,7 @@ class test_learner(osv.osv):
 				}
 				obj_res_hist.create(cr, uid, vals, context=context)
 			return True
-	
+
 	def create(self,cr, uid, values, context=None):
 		_logger.info("create Called %s",values)
 		id = super(test_learner, self).create(cr, uid, values, context=context)
@@ -729,7 +762,7 @@ class test_learner(osv.osv):
 		self._payment_test(cr, uid, mon, csc, mc,[values], context=context)
 		return id
 		return id
-		
+
 	def write(self,cr, uid, ids, values, context=None):
 		_logger.info("write Called %s",ids)
 		learner_obj = self.browse(cr,uid,ids[0])
@@ -765,8 +798,8 @@ class test_learner(osv.osv):
 		score_leraner_id = self.pool.get('test.scores').search(cr, uid, [('learner_id', '=', learner_id.id)])
 		self.pool.get('test.scores').unlink(cr, uid, score_leraner_id, context=context)
 		return super(test_learner, self).unlink(cr, uid, ids, context=context)
-	
-	
+
+
 	_name ='test.learner'
 	_description ="Learner Tab"
 	_columns = {
@@ -789,18 +822,18 @@ class test_learner(osv.osv):
 	'numeracy':fields.boolean('Numeracy'),
 	}
 	_constraints = [(_check_unique_learner,'Error: Learner Already Exists', ['learner_id'])]
-	
-	
+
+
 test_learner()
 
 class test_scores(osv.osv):
-	def view_scores(self, cr, uid, ids, context=None): 
+	def view_scores(self, cr, uid, ids, context=None):
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'scores_form')
 		view_id = view_ref and view_ref[1] or False,
 		ctx = dict(context)
 		self_obj  = self.browse(cr, uid, ids[0], context=context)
 		ctx.update({'class_id': ids[0],'active_learner':self_obj.learner_id.id})
-	
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Scores Form',
@@ -813,12 +846,12 @@ class test_scores(osv.osv):
 			'target':'new',
 			'context': ctx,
 		}
-	
-	def save_scores(self, cr, uid, ids, context=None): 
+
+	def save_scores(self, cr, uid, ids, context=None):
 		obj = self.browse(cr,uid,ids)
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_listing_page_form')
 		view_id = view_ref and view_ref[1] or False,
-		
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Test',
@@ -831,12 +864,12 @@ class test_scores(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-	
-	def cancel_scores(self, cr, uid, ids, context=None): 
+
+	def cancel_scores(self, cr, uid, ids, context=None):
 		obj = self.browse(cr,uid,ids)
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'test_listing_page_form')
 		view_id = view_ref and view_ref[1] or False,
-		
+
 		return {
 			'type': 'ir.actions.act_window',
 			'name': 'Test',
@@ -849,7 +882,7 @@ class test_scores(osv.osv):
 			'target':'current',
 			'context': context,
 		}
-		
+
 	def _test_scores(self, cr, uid, values, context=None):
 		obj_res_hist = self.pool.get('test.score.module')
 		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s %s %s %s")%(ed, sd, mn, cc,))
@@ -872,7 +905,7 @@ class test_scores(osv.osv):
 			nl=""
 			ns=""
 			woe=""
-			
+
 			for s in itm:
 				cc = s[0]
 				co = s[1]
@@ -888,8 +921,8 @@ class test_scores(osv.osv):
 				nl = s[11]
 				ns = s[12]
 				woe = s[13]
-				
-			
+
+
 			vals = {
 				'test_compre': cc,
 				'test_conv': co,
@@ -912,7 +945,7 @@ class test_scores(osv.osv):
 			}
 			obj_res_hist.create(cr, uid, vals, context=context)
 		return True
-	
+
 	def write(self,cr, uid, ids, values, context=None):
 		if 'r_scores' in values and values['r_scores'] < 0:
 			raise osv.except_osv(_('Error!'),_("Scores - Cannot be negative"))
@@ -932,7 +965,7 @@ class test_scores(osv.osv):
 		id = super(test_scores, self).write(cr, uid, ids,values, context=context)
 		#self.pool.get('test.scores').create(cr, uid,{'test_scores_id':values['learner_mod_id'],'learner_id':values['learner_id'],'learner_nric':values['learner_nric']}, context=context)
 		id = super(test_scores, self).write(cr, uid, ids,values, context=context)
-		
+
 		ts = self.browse(cr, uid, ids)
 		for i in ts:
 			lid = i.learner_id.id
@@ -950,17 +983,17 @@ class test_scores(osv.osv):
 			nl = values['n_level']
 			ns = values['n_scores']
 			#woe = values['n_outcome']
-			
+
 			#raise osv.except_osv(_('Error!'),_("fffgfdfdf %s")%(ddd))
-			
+
 		obj_res_hist = self.pool.get('test.score.module')
 		sql="select ti.start_date, t.id, ti.test_code  \
 			from test_info ti, test_scores ts, test t \
 			where ti.id = ts.test_scores_id and t.id = ti.name and ts.learner_id = %s" % (lid)
-			
+
 		cr.execute(sql)
 		itm = cr.fetchall()
-	
+
 		for i in itm:
 			vals = {
 					'test_compre': cc,
