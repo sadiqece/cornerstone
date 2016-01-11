@@ -752,9 +752,15 @@ class test_learner(osv.osv):
 		test_id = values['learner_mod_id']
 		class_info_obj = self.pool.get('test.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
-		mon = values['module_id']
-		mc = '05.50'
 		csc = class_info_obj_id.test_code
+		modu_id = values['module_id']
+		module_info_obj = self.pool.get('cs.module')
+		module_info_obj_id = module_info_obj.browse(cr,uid,modu_id)
+		mon = module_info_obj_id.name
+		mod_id = values['modality']
+		module_info_obj = self.pool.get('master.modality')
+		module_info_obj_id = module_info_obj.browse(cr,uid,mod_id)
+		mc = module_info_obj_id.cost
 		#raise osv.except_osv(_('Error!'),_("Duration cannot be negative value %s")%(class_info_obj_id.test_code))
 		#self._create_hist(cr, uid, ed, sd, mn, cc,[values], context=context)
 		#Masih
@@ -784,8 +790,14 @@ class test_learner(osv.osv):
 		class_info_obj = self.pool.get('test.info')
 		class_info_obj_id = class_info_obj.browse(cr,uid,test_id)
 		csc = class_info_obj_id.test_code
-		mon = values['module_id']
-		mc = values['modality_cost']
+		modu_id = values['module_id']
+		module_info_obj = self.pool.get('cs.module')
+		module_info_obj_id = module_info_obj.browse(cr,uid,modu_id)
+		mon = module_info_obj_id.name
+		mod_id = values['modality']
+		module_info_obj = self.pool.get('master.modality')
+		module_info_obj_id = module_info_obj.browse(cr,uid,mod_id)
+		mc = module_info_obj_id.cost
 		self._test_hist(cr, uid, sd, mn, cc,[values], context=context)
 		self._payment_test(cr, uid, mon, csc, mc,[values], context=context)
 		return id
