@@ -6,9 +6,9 @@
 		<field name="name">test.form</field>
 		<field name="model">test</field>
 		<field name="arch" type="xml">
-			<form string="test" version="7.0" delete="false" duplicate="false">
+			<form string="test" version="7.0" delete="false" duplicate="false" create="false">
 				<sheet>
-				<field name = "name" invisible="1"/>
+				
 				<notebook colspan="5" col="10">
 					<page string="Modalities">
 						<group style="width:300px;">
@@ -52,7 +52,7 @@
 		<field name="name">test.tree</field>
 		<field name="model">test</field>
 		<field name="arch" type="xml">
-			<tree string="Test" delete="false">
+			<tree string="Test" delete="false" create="false">
 				<field name = "name"/>
 				<!--field name = "modality_line" string="Modalities"/-->
 			</tree>

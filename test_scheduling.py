@@ -1036,6 +1036,7 @@ class test_scores(osv.osv):
 	'test_scores_id': fields.many2one('test.info', 'Test', ondelete='cascade', help='Class', select=True),
 	'learner_id':fields.many2one('learner.info', 'Learner', ondelete='cascade', help='Learner', select=True),
 	'learner_nric': fields.related('learner_id','learner_nric',type="char",relation="learner.info",string="Learner NRIC", readonly=1,),
+	'learner_non_nric': fields.related('learner_id','learner_non_nric',type="char",relation="learner.info",string="Learner Non-NRIC", readonly=1),
 	'compr':fields.integer('Compr',size=2),
 	'conv':fields.integer('Conv',size=2),
 	'r_level':fields.integer('Reading(Level)',size=1),

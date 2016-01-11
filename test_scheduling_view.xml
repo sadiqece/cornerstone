@@ -8,7 +8,7 @@
 		<field name="name">test.listing.page.form</field>
 		<field name="model">test.info</field>
 		<field name="arch" type="xml">
-			<form string="Calendar" version="7.0">
+			<form string="Calendar" version="7.0" duplicate="false">
 			<sheet>
 				<group>
 					<group class="oe_title" style="width:350px;">
@@ -167,6 +167,7 @@
 								<tree string='List' create="false" delete="false">
 									<field name='learner_id' />
 									<field name='learner_nric'/>
+									<field name='learner_non_nric'/>
 									<button  name="view_scores"  string="View Scores" type="object" icon="view_modalities"/>
 								</tree>
 						</field>
