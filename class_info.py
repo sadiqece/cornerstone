@@ -1388,7 +1388,7 @@ class class_info(osv.osv):
 
 		return {'value': {'sessions_per_week': sessions_per_week,'class_end_date':dEndDate, 'class_days':dClassDays_1+' '+dClassDays_2+' '+dClassDays_3+' '+dClassDays_4+' '+dClassDays_5+' '+dClassDays_6+' '+dClassDays_7}}
 
-	def onchange_dates(self, cr, uid, ids, start_date, duration=False,lunch_duration=False, end_date=False, total_hrs=False, context=None):
+	def onchange_dates(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
 
 		if len(ids) == 0:
@@ -1419,12 +1419,12 @@ class class_info(osv.osv):
 
 
 			if duration and total_hrs:
-				sessions_duration_in_hrs = duration - lunch_duration
+				sessions_duration_in_hrs = duration
 				if sessions_duration_in_hrs > 0 :
 					if total_hrs % sessions_duration_in_hrs == 0 :
-						value['total_sessions'] = total_hrs/(sessions_duration_in_hrs)
+						value['total_sessions'] = total_hrs/sessions_duration_in_hrs
 					else:
-						value['total_sessions'] = (total_hrs/(sessions_duration_in_hrs))+1
+						value['total_sessions'] = (total_hrs/sessions_duration_in_hrs)+1
 				else :
 					value['total_sessions'] = 0
 
@@ -1468,7 +1468,7 @@ class class_info(osv.osv):
 			return {'value': value}
 
 
-	def onchange_duration(self, cr, uid, ids, start_date, duration=False,lunch_duration=False, end_date=False, total_hrs=False, context=None):
+	def onchange_duration(self, cr, uid, ids, start_date, duration=False, end_date=False, total_hrs=False, context=None):
 		value = {}
 		if not start_date:
 			return value
@@ -1483,12 +1483,12 @@ class class_info(osv.osv):
 			value['end_date'] = end.strftime("%Y-%m-%d %H:%M:%S")
 
 		if duration and total_hrs:
-			sessions_duration_in_hrs = duration - lunch_duration
+			sessions_duration_in_hrs = duration
 			if sessions_duration_in_hrs > 0 :
 				if total_hrs % sessions_duration_in_hrs == 0 :
-					value['total_sessions'] = total_hrs/(sessions_duration_in_hrs)
+					value['total_sessions'] = total_hrs/sessions_duration_in_hrs
 				else:
-					value['total_sessions'] = (total_hrs/(sessions_duration_in_hrs))+1
+					value['total_sessions'] = (total_hrs/sessions_duration_in_hrs)+1
 			else :
 				value['total_sessions'] = 0
 
@@ -1555,20 +1555,22 @@ class move_learner(osv.osv):
 		('move_class_id', 'in', swpa_class_ids) ]), context=context)
 		self.unlink(cr,uid,swpa_class_ids,context=context)
 		swap_class_id = self.create(cr,uid,{'module_id':data['module_id'],'class_code':data['class_code'],'class_id':data['class_id']},context =context)
-		class_id_loc = class_info.search(cr, uid, [('module_id', '=', data['module_id'])])
+		class_id_loc = class_info.search(cr, uid, [('module_id', '=', data['module_id']) and ('parent_id', '=', 0)])
 		module_obj = self.pool.get("cs.module").browse(cr,uid,data['module_id'])
 		dws = []
 		user = self.pool.get('res.users').browse(cr, uid, uid)
 		tz = pytz.timezone(user.tz) if user.tz else pytz.utc
 		for self_obj in class_info.browse(cr,uid,class_id_loc):
-			self_obj_start = datetime.strptime(self_obj['start_date'], "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
+			self_obj_start_date = self_obj['start_date']
+			self_obj_start = datetime.strptime(self_obj_start_date, "%Y-%m-%d %H:%M:%S").replace(second=0, microsecond=0)
 			if ((self_obj.id != context.get('class_id'))):
+				h  = class_info.browse(cr,uid,class_info.search(cr,uid,[("parent_id","=",self_obj.id)],order ="start_date desc",limit=1,context=context))
 				dw = dwz.create(cr, uid,{
 					'move_class_id':swap_class_id,
 					'class_code': self_obj.class_code,
 					'class_id': self_obj.id,
 					'start_date':self_obj.start_date,
-					'end_date':self_obj.end_date,
+					'end_date':h[0].end_date,
 					'available_slots':module_obj.max_num_ppl_class - self_obj.no_of_learners
 				}, context=context)
 				dws.append(dw)
@@ -1583,30 +1585,10 @@ class move_learner(osv.osv):
 			if(j.move and ids[0] == j.move_class_id):
 				swap_ids.append(j)
 
-		_logger.info("Class Move %s",swap_ids)
 		if(len(swap_ids) > 1 or len(swap_ids) == 0):
 			raise osv.except_osv(_('Error!'),_("Please select one class to move to."))
 
 		class_info = self.pool.get('class.info')
-
-		#for learner_id in context.get('learner_id') :
-		#	self.pool.get('learner.line').create(cr, uid,{'learner_mod_id':self_obj.class_id.id,'learner_id':learner_id}, context=context)
-
-		#class_obj = class_info.browse(cr,uid,context.get('class_id'))
-		#		parent_id = class_obj['parent_id']
-		#		if parent_id > 0:
-		#			prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', parent_id)])
-		#			prog_mod_ids.append(parent_id)
-		#		else:
-		#			prog_mod_ids = class_info.search(cr, uid, [('parent_id', '=', class_obj.id)])
-		#			prog_mod_ids.append(class_obj.id)
-
-		#		from_to_ids = self.pool.get('learner.line').search(cr,uid,[('learner_mod_id','in',prog_mod_ids),('learner_id','in',context.get('learner_id'))])
-
-		#		self.pool.get('learner.line').unlink(cr, uid, from_to_ids, context)
-		#	else:
-		#		raise osv.except_osv(_('Error!'),_("Cannot move learners as available seats are low"))
-
 
 		view_ref = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'cornerstone', 'class_form')
 		view_id = view_ref and view_ref[1] or False,
@@ -1808,7 +1790,7 @@ class learner_mod_line(osv.osv):
 		else :
 			return True
 
-	def _current_class(self, cr, uid, ed, sd, cc, st, cs, ns, csp, values, context=None):
+	def _current_class(self, cr, uid, ed, sd, mn, cc, st, cs, ns, csp, values, context=None):
 			obj_current_class = self.pool.get('current.class')
 
 			global isSaved
@@ -1823,6 +1805,7 @@ class learner_mod_line(osv.osv):
 						vals = {
 							'program_name': prn,
 							'class_id':sh['learner_id'],
+							'module_name':mn,
 							'class_code':cc,
 							'start_date': sd,
 							'end_date': ed,
@@ -1876,12 +1859,13 @@ class learner_mod_line(osv.osv):
 			_logger.info("Learner Class Details")
 			sd = class_info_obj_id.start_date
 			ed = class_info_obj_id.class_end_date
+			mn = class_info_obj_id.module_id.id
 			cc = class_info_obj_id.class_code
 			st = class_info_obj_id.start_end_time
 			cs = 'In Progress'
 			ns = class_info_obj_id.total_sessions
 			csp = class_info_obj_id.class_days
-			self._current_class(cr, uid, ed, sd, cc, st, cs, ns, csp, [values], context=context)
+			self._current_class(cr, uid, ed, sd, mn, cc, st, cs, ns, csp, [values], context=context)
 			#Masih Class History
 			sdt = class_info_obj_id.start_date
 			mn = class_info_obj_id.module_id.id
