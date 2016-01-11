@@ -122,6 +122,9 @@ class test(osv.osv):
 			#'views': [(True, 'form')],  
 		}
 		
+	def copy(self, cr, uid, id, default=None, context=None):
+		raise osv.except_osv(_('Forbbiden to duplicate'), _('Is not possible to duplicate the record, please create a new one.'))
+		
 	_name = "test"
 	_description = "This table is for keeping test data"
 	_columns = {
@@ -252,7 +255,7 @@ class master_modality(osv.osv):
 	_description ="Modality"
 	_columns = {
 	'name':fields.char('Modality',size=20),
-	'cost': fields.float('Cost', size=7),
+	'cost': fields.float('Cost', size=7, required=True),
 	}
 	_constraints = [(_check_unique_name, 'Error: This Modality Already Exists', ['name'])]
 master_modality()
