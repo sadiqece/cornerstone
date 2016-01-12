@@ -261,7 +261,7 @@ class class_info(osv.osv):
 		'start_date': fields.datetime('Start Date', required=True),
 		'start_time': fields.char('Start Time'),
 		'start_yy_mm': fields.char('Start YYMM'),
-		'class_count': fields.integer('Employee Id', required=True, size=3),
+		#'class_count': fields.integer('Employee Id', required=True, size=3),
 		'end_time': fields.char('End Time'),
 		'start_end_time': fields.function(_combine, string='Start End Time!', type='char',
                     arg=('start_time','end_time'), method=True),
@@ -1793,30 +1793,30 @@ class learner_mod_line(osv.osv):
 	def _current_class(self, cr, uid, ed, sd, mn, cc, st, cs, ns, csp, values, context=None):
 			obj_current_class = self.pool.get('current.class')
 
-			global isSaved
+			#global isSaved
 			for sh in values:
-				if isSaved==False:
-					sql = "select program_learner from learner_info where id = %s " % (sh['learner_id'])
-					cr.execute(sql)
-					itms = cr.fetchall()
-					for r in itms:
-						prn = r[0]
+				#if isSaved==False:
+				sql = "select program_learner from learner_info where id = %s " % (sh['learner_id'])
+				cr.execute(sql)
+				itms = cr.fetchall()
+				for r in itms:
+					prn = r[0]
 
-						vals = {
-							'program_name': prn,
-							'class_id':sh['learner_id'],
-							'module_name':mn,
-							'class_code':cc,
-							'start_date': sd,
-							'end_date': ed,
-							'session_timings': st,
-							'class_status': cs,
-							'no_of_sessions': ns,
-							'class_schedule_paltform': csp
-						}
-						obj_current_class.create(cr, uid, vals, context=context)
-						#raise osv.except_osv(_('Error:'),_("Iddddd"))
-						isSaved=True
+					vals = {
+						'program_name': prn,
+						'class_id':sh['learner_id'],
+						'module_name':mn,
+						'class_code':cc,
+						'start_date': sd,
+						'end_date': ed,
+						'session_timings': st,
+						'class_status': cs,
+						'no_of_sessions': ns,
+						'class_schedule_paltform': csp
+					}
+					obj_current_class.create(cr, uid, vals, context=context)
+					#raise osv.except_osv(_('Error:'),_("Iddddd"))
+					#isSaved=True
 				return True
 
 

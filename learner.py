@@ -2531,7 +2531,7 @@ class current_class(osv.osv):
 		'class_iid': fields.many2one('class.info', ondelete='cascade'),
 		's_no' : fields.integer('S.No',size=20,readonly=1),
 		'program_name': fields.many2one('lis.program','Program', 'program_learner', ondelete='cascade', help='Program', select=True),
-		'module_name':fields.char('Module Name'),
+		'module_name':fields.many2one('cs.module', 'Module', ondelete='cascade'),
 		'class_code':fields.char('Class Code'),
 		'start_date': fields.date('Start Date'),
 		'end_date': fields.date('End Date'),
