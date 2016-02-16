@@ -1623,7 +1623,7 @@ class program(osv.osv):
               ]
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.name and self_obj.name.lower() in  lst:
-               return False
+               raise osv.except_osv(_('Error:'),_('Program Name Already Exists')%(self_obj))
         return True
 
 #Validate Program Code
@@ -1635,7 +1635,7 @@ class program(osv.osv):
               ]
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.program_code and self_obj.program_code.lower() in  lst:
-               return False
+               raise osv.except_osv(_('Error:'),_('Program Code Already Exists')%(self_obj))
         return True
 
 #Validate Min Max values for Module Blocks
@@ -1720,6 +1720,13 @@ class program(osv.osv):
 		cr.execute("SELECT id FROM lis_program WHERE name like %s", (name,))
 		ids = cr.dictfetchall()
 		return self.name_get(cr, uid, ids, context)
+		
+    def copy(self, cr, uid, id, default=None, context=None):
+		group_name = self.read(cr, uid, [id], ['name'])[0]['name']
+		group_name_one = self.read(cr, uid, [id], ['program_code'])[0]['program_code']
+		default.update({'name': _('%s (copy)')%group_name})
+		default.update({'program_code': _('%s (copy)')%group_name_one})
+		return super(program, self).copy(cr, uid, id, default, context)
 
 #Table For Class Program 'lis_program'
     _name = "lis.program"
@@ -2082,6 +2089,7 @@ class program_show_do(osv.osv):
 	'master_show_do':fields.many2one('master.show.do', 'Item', ondelete='cascade', help='Show & Do', select=True, required=True),
 	'supp_doc_req':fields.boolean('Supporting Document Required'),
 	'program_id': fields.many2one('lis.program', 'Program', ondelete='cascade', help='Module'),
+	'module_id':fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True, store=True),
 	}
 	_constraints = [(_check_unique_prog_show_do, 'Error: Item Already Exists', ['Show and Do'])]
 program_show_do()
@@ -3193,8 +3201,16 @@ class cs_module(osv.osv):
 		if module_code and module_crscode and module_certification and module_level and module_credit_value and module_duration and module_fee and description and module_category and module_pathway and req_line and max_num_ppl_class and synopsis and outline and delivery_mode and room_arr and pf_line and pre_test_line and in_class_test_line and post_test_line and alert_line:
 			return {'value': {'module_status': 'Completed'}}
 		else:
+			return {'value': {'synopsis': description}}
 			return {'value': {'module_status': 'Incomplete'}}
 			
+#Module Desc 
+    def on_change_module_desc(self, cr, uid, ids, description):
+       return {'value': {'synopsis': description}}
+
+#Module Synopsis 
+    def on_change_module_synopsis(self, cr, uid, ids, synopsis):
+       return {'value': {'description': synopsis}}	
 	 
 #Module Fee
     def on_change_module_fee_gst(self, cr, uid, ids, module_fee_gst):
@@ -3222,24 +3238,6 @@ class cs_module(osv.osv):
 
     def on_change_req_line(self, cr, uid, ids, module_duration):
        return {'value': {'req_line': req_dropdown}}
-	   
-#Module Desc 
-    def on_change_module_desc(self, cr, uid, ids, description):
-       return {'value': {'synopsis': description}}
-
-#Module Synopsis 
-    def on_change_module_synopsis(self, cr, uid, ids, synopsis):
-       return {'value': {'description': synopsis}}
-
-    def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-        
-        res = super(cs_module, self).read(cr, uid,ids, fields, context, load)
-        seq_number =0 
-        for r in res:
-        	seq_number = seq_number+1
-        	r['s_no'] = seq_number
-        
-        return res
 
 #Validate Module Name
     def _check_unique_name(self, cr, uid, ids, context=None):
@@ -3250,7 +3248,7 @@ class cs_module(osv.osv):
               ]
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.name and self_obj.name.lower() in  lst:
-               return False
+               raise osv.except_osv(_('Error:'),_('Module Name Already Exists')%(self_obj))
         return True
 		
 #Validate Module Code
@@ -3262,7 +3260,7 @@ class cs_module(osv.osv):
               ]
         for self_obj in self.browse(cr, uid, ids, context=context):
             if self_obj.module_code and self_obj.module_code.lower() in  lst:
-               return False
+               raise osv.except_osv(_('Error:'),_('Module Code Already Exists')%(self_obj))
         return True
 
 #To show Status in  Popup
@@ -3306,13 +3304,23 @@ class cs_module(osv.osv):
 			invoice_lines.append((0,0,{'mode':p.id,}))
 		data['mode_of_instr'] = invoice_lines
 		return data
-
-#Table For cs Modules		
+		
+    def copy(self, cr, uid, id, default=None, context=None):
+		group_name = self.read(cr, uid, [id], ['name'])[0]['name']
+		group_name_one = self.read(cr, uid, [id], ['module_code'])[0]['module_code']
+		group_name_two = self.read(cr, uid, [id], ['pf_line'])[0]['pf_line']
+		group_name_four = self.read(cr, uid, [id], ['req_line'])[0]['req_line']
+		default.update({'name': _('%s (copy)')%group_name})
+		default.update({'module_code': _('%s (copy)')%group_name_one})
+		default.update({'pf_line': _('%s (copy)')%group_name_two})
+		default.update({'req_line': _('%s (copy)')%group_name_four})
+		return super(cs_module, self).copy(cr, uid, id, default, context)
+		
     _name = "cs.module"
     _description = "Modules"
     _columns = {
-       'program_id': fields.integer('Id',size=20),
-	   's_no': fields.integer('S.No',size=20),
+       'module_id': fields.integer('Id',size=20),
+	   's_no' : fields.integer('S.No',size=20,readonly=1),
        'name': fields.char('Module Name', size=128, required=True, select=True),
        'module_code': fields.char('Module Code', size=20),
 	   'module_crscode': fields.char('CRS Code', size=80),
@@ -3327,62 +3335,32 @@ class cs_module(osv.osv):
 	   'module_duration': fields.float('Duration in hours'),
 	   'module_fee': fields.float('Fee $',size=9),
 	   'module_status': fields.selection((('Incomplete','Incomplete'),('Active','Active'),('InActive','InActive'),('Completed','Completed')),'Status', required=True, select=True),
-	   'module_center': fields.selection((('Hougang','Hougang'),('Jurong','Jurong'),('Tampines','Tampines'),('Woodlands','Woodlands')),'Select Center'),
-	   'select_program': fields.selection((('Program 1','Program 1'),('Program 2','Program 2'),('Program 3','Program 3'),('Program 4','Program 4')),'Select Program'),
 	   'description': fields.text('Description', size=500),
 	   'delivery_mode': fields.selection((('English','English'),('Mandarin','Mandarin'),('Bilingual','Bilingual'),('Malay','Malay'),('Others','Others')),'Delivery Mode',type='one2many'),
 	   'binder_in_use':fields.boolean('Binder'),
 	   'tablet_in_use':fields.boolean('Tablet'),
 	   'primary': fields.selection((('Binder','Binder'),('Tablet','Tablet'),('Blended','Blended')),'Primary'),
 	   'mode_of_instr': fields.one2many('mode.of.instruction', 'mod_id', 'Mode of Instructions'),
-	   #'modalities_in_use' : fields.function(_calculate_modalities_in_use, relation="cs.module",string='Modalities In Use',readonly=1,type='char',store=True),
 	   'max_num_ppl_class': fields.integer('Max Number of People in a Class', size=3),
 	   'room_arr': fields.selection((('Default','Default'),('Active','Active'),('Cluster','Cluster'),('U-Shape','U-Shape'),('Lecture','Lecture'),('Theater','Theater'),('Classroom','Classroom')),'Room Arrangment'),
 	   'pre_test': fields.boolean('Pre-Training Assesment Required'),
 	   'in_class_test': fields.boolean('In Class Assesment Required'),
 	   'post_test': fields.boolean('Post-Training Assesment Required'),
-	   'module_fee_gst': fields.float('Module Fee w/o GST'),
-	   'total_duration': fields.integer('Total Duration in Hours'),
-	   'min_hr_session': fields.integer('Minimum Hours Per Session'),
-	   'max_hr_session': fields.integer('Maximum Hours Per Session'),
-	   'max_session_week': fields.integer('Maximum Sessions Per Week'),
 	   'req_line': fields.one2many('req.module','mod_id','Requirments'),
 	   'pf_line': fields.one2many('pf.module','mod_id','Equipment List'),
 	   'pre_test_line': fields.one2many('pre.test.module','mod_id','Pre Test'),
 	   'in_class_test_line': fields.one2many('in.class.test.module','mod_id','In Class'),
 	   'post_test_line': fields.one2many('post.test.module','mod_id','Post Test'),
-	   'show_do_line': fields.one2many('show.do.module','mod_id','Show Do'),
-	   'eductor_requirment_line': fields.one2many('educator.requirment','mod_id','Alerts', type='integer'),
 	   'alert_line': fields.one2many('alert.module','mod_id','Alerts', type='integer'),
 	   'history_line': fields.one2many('history.module','mod_id','History', limit=None),
 	   'status_display': fields.function(_status_display, readonly=1, type='char'),
 	   'status_display_1': fields.function(_status_display_1, readonly=1, type='char'),
 	   'date1': fields.date('Date Created', readonly='True'),
 	   'date2': fields.date('Date Created', readonly='True'),
-	   'show_status':fields.boolean("Show Status"),
-	   'show_do_item':fields.char('Item', size=20),
-	   'show_do_verification':fields.boolean("Verification Required"),
-	   'limit': fields.integer('Limit', help='Default limit for the list view'),
-	   'no_of_alerts': fields.integer('No. of Alerts'),
-	   'program_modules': fields.one2many('program.modules','s_no', 'Modules'),
-	   'no_of_modules': fields.integer('No. of Modules',size=1),
-	   'Module1_group': fields.one2many('test.module.group1', 's_no'),
-	   'Module2_group': fields.one2many('test.module.group2', 's_no'),
-	   'Module3_group': fields.one2many('test.module.group3', 's_no'),
-	   'Module4_group': fields.one2many('test.module.group4', 's_no'),
-	   'group_name1': fields.char('Group Name'),
-	   'group_name2': fields.char('Group Name'),
-	   'group_name3': fields.char('Group Name'),
-	   'group_name4': fields.char('Group Name'),
-	   'max_modules1': fields.integer('Max Modules'),
-	   'max_modules2': fields.integer('Max Modules'),
-	   'max_modules3': fields.integer('Max Modules'),
-	   'max_modules4': fields.integer('Max Modules'),
     }
     _defaults = { 
 	   'date1': fields.date.context_today,
 	   'date2': fields.date.context_today,
-	   'limit': 5,
 	   'module_duration': 0.00,
 	   'orientation': 'No',
 	   'room_arr': 'Default',
@@ -3429,13 +3407,15 @@ module_pathway()
 #Class Module Requirements
 ###############
 class requirments(osv.osv):
+
 	def _check_unique_req(self, cr, uid, ids, context=None):
-		if dupliacte_req_found == True:
-			return False
-		elif dupliacte_req_found_create == True:
-			return False
-		else :
-			return True
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.master_req == self_obj.master_req and x.master_req == self_obj.master_req:
+						return False
+		return True
 
 	def views(self,cr,uid,ids,context=None):
 		global globvar
@@ -3491,22 +3471,22 @@ class requirments(osv.osv):
 	'module_name': fields.related('mod_id','name',type="char",relation="cs.module",string="Module Name"),
 	'module_code': fields.related('mod_id','module_code',type="char",relation="cs.module",string="Module Code"),
 	}
-	_constraints = [(_check_unique_req, 'Error: Requirement Already Exists', ['Requirement'])]
+	#_constraints = [(_check_unique_req, 'Error: Requirement Already Exists', ['Requirement'])]
 requirments()
 
 #Class Module Master Requirements
 ###############
 class master_req(osv.osv):
+
 	def _check_unique_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.name == self_obj.name and x.name == self_obj.name:
+						return False
 		return True
+		
 	_name ='master.req'
 	_description ="People and Facilites Tab"
 	_columns = {
@@ -3610,7 +3590,7 @@ class peoplefac(osv.osv):
 	'equip_list':fields.many2one('master.equip', 'Equipment', ondelete='cascade', help='Equipments', select=True,required=True),
 	'mod_id': fields.many2one('cs.module', 'Module', ondelete='cascade', help='Module', select=True),
 	}
-	_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['Equipment'])]
+	#_constraints = [(_check_unique_equp, 'Error: Equipment Already Exists', ['Equipment'])]
 peoplefac()
 
 #Class Module Pre Test
