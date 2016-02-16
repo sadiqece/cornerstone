@@ -12,7 +12,7 @@
         'cornerstone_view.xml',
         'location_view.xml',
 		'security/cornerstone_security.xml',
-        'security/ir.model.access.csv',
+        #'security/ir.model.access.csv',
 		'report/cornerstone_report_view.xml',
 		'wizard/add_program_wizard.xml',
 		'test_view.xml',
@@ -27,6 +27,7 @@
 		'trainer_enrollment.xml',
 		'client_enrollment.xml',
 		'user_profile_view.xml',
+		'user_role_view.xml',
 		'reports_view.xml',
 		'payment_report.xml',
     ],
@@ -35,5 +36,8 @@
 		'static/src/js/accordian.js',
     ],
 "active": False,
-"installable": True
+'installable': True,
+'application': True,
+'auto_install': False,
+
 }

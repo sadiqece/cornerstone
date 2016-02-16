@@ -3330,7 +3330,7 @@ class cs_module(osv.osv):
 	   'module_pathway': fields.many2one('module.pathway', 'Pathway', size=25, help='Module Pathway'),
 	   'module_credit_value': fields.integer('Credits', size=4),
 	   'orientation': fields.selection((('Yes','Yes'),('No','No')),'Orientation'),
-	   'synopsis':fields.text('Synopsis', size=500),
+	   'synopsis':fields.text('Synopsis', size=500, readonly=1),
 	   'outline':fields.text('Outline'),
 	   'module_duration': fields.float('Duration in hours'),
 	   'module_fee': fields.float('Fee $',size=9),

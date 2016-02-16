@@ -168,6 +168,15 @@ class trainer_profile_info(osv.osv):
 				return_ids.append(x.id)
 		return dict([(id, return_ids ) for id in ids])
 		
+	def copy(self, cr, uid, id, default=None, context=None):
+		group_name = self.read(cr, uid, [id], ['name'])[0]['name']
+		group_name_one = self.read(cr, uid, [id], ['nric_name'])[0]['nric_name']
+		group_name_two = self.read(cr, uid, [id], ['nric_name'])[0]['nric_name']
+		default.update({'name': _('%s (copy)')%group_name})
+		default.update({'nric_name': _('%s (copy)')%group_name_one})
+		default.update({'nric': _('%s (copy)')%group_name_two})
+		return super(trainer_profile_info, self).copy(cr, uid, id, default, context)
+		
 #Table For Trianer Profile 'trainer_profile_info'			
 	_name = "trainer.profile.info"
 	_description = "This table is for keeping location data"

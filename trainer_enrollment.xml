@@ -307,7 +307,7 @@
       <field name="name">EM Admin Panel</field>
       <field name="model">panel.info</field>
       <field name="arch" type="xml">
-        <form string="panel_info" version="7.0" create="false" delete="false" edit="false" save="false">
+        <form string="panel_info" version="7.0" create="false" delete="false" edit="false" save="false" duplicate="false">
           <sheet>
 			<group col = '6'>
 				<field name="all_trainer" on_change="onchange_trainer_hist(all_trainer, class_sched )" options="{'create': False, 'create_edit': False}" style="width:200px"/>
@@ -376,7 +376,7 @@
       <field name="name">Settings</field>
       <field name="model">setting.line</field>
       <field name="arch" type="xml">
-        <form string="Setting" version="7.0" create="false" delete="false">
+        <form string="Setting" version="7.0" create="false" delete="false" duplicate="false">
           <sheet>
 			<h3>
 			  <label string="Settings" />
@@ -412,9 +412,8 @@
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">setting.line</field>
       <field name="view_type">form</field>
-      <field name="limit">10</field>
       <field name="view_mode">tree,form</field>
-	   <!--field name="view_id" ref="settings_tree" /-->
+	  <field name="context">{"search_default_today":1}</field>
       <field name="search_view_id" ref="view_settings_filter" />
 		<field name="help" type="html">
 		<p class="oe_view_nocontent_create">

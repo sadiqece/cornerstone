@@ -1,3 +1,4 @@
+import datetime
 from dateutil import relativedelta
 from openerp import addons
 
@@ -9,7 +10,6 @@ from lxml.builder import E
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import tools
-from datetime import datetime, timedelta, date
 import re
 
 import openerp
@@ -22,105 +22,9 @@ from openerp.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
-####################
-#User Management Page
-####################
-
-#Create User
-###############
-
-class create_users(osv.osv):
-
-#Role Status
-	def _role_status_display_1(self, cr, uid, ids, field_names, args,  context=None):
-		if not ids: return {}
-		res = {}
-
-		for line in self.browse(cr, uid, ids, context=context):
-			res[line.id] = line['status']
-		return res
-
-	def _role_status_display_2(self, cr, uid, ids, field_names, args,  context=None):
-		if not ids: return {}
-		res = {}
-
-		for line in self.browse(cr, uid, ids, context=context):
-			res[line.id] = line['status']
-		return res
-
-	def _role_status_display_3(self, cr, uid, ids, field_names, args,  context=None):
-		if not ids: return {}
-		res = {}
-
-		for line in self.browse(cr, uid, ids, context=context):
-			res[line.id] = line['status']
-		return res
-
-	def _role_status_display_4(self, cr, uid, ids, field_names, args,  context=None):
-		if not ids: return {}
-		res = {}
-
-		for line in self.browse(cr, uid, ids, context=context):
-			res[line.id] = line['status']
-		return res
-
-	_name = "manage.role"
-	_description = "Manage Roles"
-	_columns = {
-		'name': fields.char('Role', size=30, required=True),
-		'status': fields.selection((('Created','Created'),('Active','Active'),('Deactivated','Deactivated'),('Blocked','Blocked')),'Status', required=True),
-		'pages_actions_tab': fields.one2many('pages.actions', 'page_action_id', 'Pages & Actions'),
-		'notification_tab': fields.one2many('notifications', 'notification_id', 'Notifications'),
-		'documentation_tab': fields.one2many('documentations', 'documentation_id', 'Documentations'),
-		'role_status_display_1': fields.function(_role_status_display_1, readonly=1, type='char'),
-		'role_status_display_2': fields.function(_role_status_display_2, readonly=1, type='char'),
-		'role_status_display_3': fields.function(_role_status_display_3, readonly=1, type='char'),
-		'role_status_display_4': fields.function(_role_status_display_4, readonly=1, type='char'),
-	}
-create_users()
-
-#EOF Create User
-###############
-
-class pages_actions(osv.osv):
-	
-	_name ='pages.actions'
-	_description ="Pages & Actions"
-	_columns = {
-		'page_action_id' : fields.many2one('manage.role'),
-		'name':fields.char('Items'),
-		'view':fields.boolean('View'),
-		'create':fields.boolean('Create'),
-		'update':fields.boolean('Update'),
-	}
-pages_actions()
-
-class notification(osv.osv):
-	
-	_name ='notifications'
-	_description ="Notifications"
-	_columns = {
-		'notification_id' : fields.many2one('manage.role'),
-		'name':fields.char('Items'),
-		'active': fields.boolean('Active'),
-	}
-notification()
-
-class documentations(osv.osv):
-	
-	_name ='documentations'
-	_description ="Documentations"
-	_columns = {
-		'documentation_id' : fields.many2one('manage.role'),
-		'name':fields.char('Items'),
-		'generate': fields.boolean('Generate'),
-		'receive': fields.boolean('Receive'),
-	}
-documentations()
-
 class users_profile(osv.osv):
 
-	#Image
+#Image
 	def _get_image(self, cr, uid, ids, name, args, context=None):
 		result = dict.fromkeys(ids, False)
 		for obj in self.browse(cr, uid, ids, context=context):
@@ -129,7 +33,7 @@ class users_profile(osv.osv):
 
 	def _set_image(self, cr, uid, id, name, value, args, context=None):
 		#raise osv.except_osv(_('Warning!'),_('dddddd %s')%(123456))
-		return self.pool.get('user.profiles').write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
+		return self.pool.get('learner.info').write(cr, uid, [id], {'image': tools.image_resize_image_big(value)}, context=context)
 		'''obj_write = self.pool.get('learner.info')
 		for i in pay_recs:
 			vals = {
@@ -175,6 +79,13 @@ class users_profile(osv.osv):
 		for line in self.browse(cr, uid, ids, context=context):
 			res[line.id] = line['status']
 		return res
+
+#dob
+	def months_between(self, date1, date2):
+		date11 = datetime.datetime.strptime(date1, '%Y-%m-%d')
+		date12 = datetime.datetime.strptime(date2, '%Y-%m-%d')
+		r = relativedelta.relativedelta(date12, date11)
+		return r.days
 		
 	def onchange_dob(self, cr, uid, ids, dob, context=None):
 		if dob:
@@ -185,37 +96,39 @@ class users_profile(osv.osv):
 				res.update({'warning': {'title': _('Warning !'), 'message': _('Please enter correct date, future date not allowed.')}})
 				return res
 			return dob
+			
+	'''def create(self, cr, uid, vals, context=None):
+		user_obj = self.pool.get('res.users')
+		vals_user = {
+			'user_name': vals.get('name'),
+			'login': default_login,
+			#other required field 
+		}
+		user_obj.create(cr, uid, vals_user, context)
+		result = super(users_profile, self).create(cr, uid, vals, context=context)
+		return result'''
+		
+	def _check_unique_user_profile_name(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.user_profile_id == self_obj.user_profile_id and x.name == self_obj.name:
+						raise osv.except_osv(_('Error:'),_('"Name as in NRIC" already exist')%(self_obj))
+		return True
 		
 	_name ='user.profiles'
 	_description ="User Profile"
 	_columns = {
-		'user_profile_id' : fields.integer('User Profile ID'),
-		'name':fields.char('Title', size=30, required=True),
-		'sur_name':fields.char('Surname', size=20, required=True),
-		'given_name':fields.char('Given Name', size=20, required=True),
-		'name_nric':fields.char('Name as in NRIC', size=20, required=True),
+		'user_profile_id' : fields.integer('User Profile ID', size=200),
+		'name':fields.char('Name as in NRIC', size=30, required=True),
+		'sur_name':fields.char('Surname', size=20),
+		'given_name':fields.char('Title', size=20, required=True),
+		'name_nric':fields.char('Name', size=20, required=True),
 		'user_name':fields.char('User Name', size=20, required=True),
 		'password':fields.char('Password', size=20, required=True),
 		'status': fields.selection((('Created','Created'),('Active','Active'),('Deactivated','Deactivated'),('Blocked','Blocked')),'Status', required=True),
 		'role': fields.many2one('manage.role', 'Role', ondelete='cascade', help='Role', select=True),
-		'image': fields.binary("Photo",
-            help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
-        'image_medium': fields.function(_get_image, fnct_inv=_set_image,
-            string="Medium-sized photo", type="binary", multi="_get_image",
-            store = {
-                'user.profile': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Medium-sized photo of the employee. It is automatically "\
-                 "resized as a 128x128px image, with aspect ratio preserved. "\
-                 "Use this field in form views or some kanban views."),
-        'image_small': fields.function(_get_image, fnct_inv=_set_image,
-            string="Smal-sized photo", type="binary", multi="_get_image",
-            store = {
-                'user.profile': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
-            },
-            help="Small-sized photo of the employee. It is automatically "\
-                 "resized as a 64x64px image, with aspect ratio preserved. "\
-                 "Use this field anywhere a small image is required."),
 		'profile_pages_actions_tab': fields.one2many('profile.pages.actions', 'page_action_id', 'Pages & Actions'),
 		'profile_notification_tab': fields.one2many('profile.notifications', 'notification_id', 'Notifications'),
 		'profile_documentation_tab': fields.one2many('profile.documentations', 'documentation_id', 'Documentations'),
@@ -235,7 +148,26 @@ class users_profile(osv.osv):
 		'unit_no': fields.integer('Unit Number', size=9),
 		'mobile_no': fields.integer('Mobile Number', size=9),
 		'landline_no': fields.integer('Home/Office Number', size=9),
+				'image': fields.binary("Photo",
+            help="This field holds the image used as photo for the employee, limited to 1024x1024px."),
+        'image_medium': fields.function(_get_image, fnct_inv=_set_image,
+            string="Medium-sized photo", type="binary", multi="_get_image",
+            store = {
+                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+            },
+            help="Medium-sized photo of the employee. It is automatically "\
+                 "resized as a 128x128px image, with aspect ratio preserved. "\
+                 "Use this field in form views or some kanban views."),
+        'image_small': fields.function(_get_image, fnct_inv=_set_image,
+            string="Smal-sized photo", type="binary", multi="_get_image",
+            store = {
+                'learner.info': (lambda self, cr, uid, ids, c={}: ids, ['image'], 10),
+            },
+            help="Small-sized photo of the employee. It is automatically "\
+                 "resized as a 64x64px image, with aspect ratio preserved. "\
+                 "Use this field anywhere a small image is required."),
 	}
+	_constraints = [(_check_unique_user_profile_name, 'Error: Name as in NRIC already exist', ['NRIC'])]
 	_defaults = {
 		'nationality': 'Singapore',
 	}
@@ -265,44 +197,44 @@ class profile_pages_actions(osv.osv):
 	_name ='profile.pages.actions'
 	_description ="Pages & Actions"
 	_columns = {
-		'page_action_id' : fields.many2one('user.profiles'),
-		'name':fields.char('Items'),
+		'page_action_id' : fields.many2one('user.profiles', 'Page Action ID', ondelete='cascade', help='Learner', select=True),
+		'profile_items':fields.char('Items'),
 		'view':fields.boolean('View'),
 		'create':fields.boolean('Create'),
 		'update':fields.boolean('Update'),
 	}
-pages_actions()
+profile_pages_actions()
 
 class profile_notification(osv.osv):
 	
 	_name ='profile.notifications'
 	_description ="Notifications"
 	_columns = {
-		'notification_id' : fields.many2one('user.profiles'),
-		'name':fields.char('Items'),
+		'notification_id' : fields.many2one('user.profiles', 'Notifications ID', ondelete='cascade', help='Learner', select=True),
+		'notification_items':fields.char('Items'),
 		'active': fields.boolean('Active'),
 	}
-notification()
+profile_notification()
 
 class profile_documentations(osv.osv):
 	
 	_name ='profile.documentations'
 	_description ="Documentations"
 	_columns = {
-		'documentation_id' : fields.many2one('user.profiles'),
-		'name':fields.char('Items'),
+		'documentation_id' : fields.many2one('user.profiles', 'Documentations ID', ondelete='cascade', help='Learner', select=True),
+		'documentation_items':fields.char('Items'),
 		'generate': fields.boolean('Generate'),
 		'receive': fields.boolean('Receive'),
 	}
-documentations()
+profile_documentations()
 
 class profile_history(osv.osv):
 	
 	_name ='profile.history'
 	_description ="Personal History"
 	_columns = {
-		'history_id' : fields.many2one('user.profiles'),
-		'name':fields.char('Items'),
+		'history_id' : fields.many2one('user.profiles', 'History ID', ondelete='cascade', help='Learner', select=True),
+		'history_items':fields.char('Items'),
 	}
 profile_history()
 

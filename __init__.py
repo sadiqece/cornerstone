@@ -34,6 +34,7 @@ import class_status_dashboard
 import trainer_enrollment
 import client
 import user_profile
+import user_role
 import reports
 import wizard
 

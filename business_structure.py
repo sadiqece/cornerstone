@@ -76,6 +76,19 @@ class business(osv.osv):
 					else:
 						return False
 			return True
+			
+	'''def copy(self, cr, uid, id, default=None, context=None):
+		group_name = self.read(cr, uid, [id], ['name'])[0]['name']
+		group_name_one = self.read(cr, uid, [id], ['unit_line'])[0]['unit_line']
+		group_name_two = self.read(cr, uid, [id], ['business_code'])[0]['business_code']
+		default.update({'name': _('%s (copy)')%group_name})
+		default.update({'unit_line': _('%s (copy)')%group_name_one})
+		default.update({'business_code': _('%s (copy)')%group_name_two})
+		module_id =  super(business, self).copy(cr, uid, id, default, context)
+		return module_id'''
+		
+	def copy(self, cr, uid, id, default=None, context=None):
+		raise osv.except_osv(_('Forbbiden to duplicate'), _('Is not possible to duplicate the record, please create a new one.'))
 	
 		
 	_name = "business"
@@ -85,7 +98,8 @@ class business(osv.osv):
 		'business_id': fields.char('Id',size=20),
 		'name': fields.char('Business Unit Name', size=100,required=True, select=True),
 		'business_code': fields.char('Business Code', size=20),
-		'bussiness_id':fields.many2one('business', 'Parent', ondelete='cascade', help='Bussiness', select=True), 
+		'bussiness_id':fields.many2one('business', 'Parent', ondelete='cascade', help='Bussiness', select=True),
+		'segment_line_code': fields.selection((('CP (Corporate Public)','CP (Corporate Public)'),('CI (Corporate In-House)','CI (Corporate In-House)'),('RP (Retail Public)','RP (Retail Public)'),('HP (HE Public)','HP (HE Public)'),('HI  (HE In-House)','HI  (HE In-House)')),'Segment Code'),
 		'unit_line': fields.one2many('unit.line', 'unit_line_id', 'Unit Lines', select=True, required=True),
 		'people_line': fields.one2many('people.line', 'people_business_id', 'People Lines', select=True, required=True),
 		'people_count': fields.function(_calculate_total_mod, relation="business",readonly=1,string='People Count',type='integer'),
@@ -317,8 +331,39 @@ class business(osv.osv):
 	_constraints = [(_check_unique_name, 'Error: Name already exist', ['Business Unit Name']),(_check_unique_code, 'Error: Code already exist', ['Business Code']),(_make_mandatory_people, 'Error: Atleast One People should be added', ['People'])]
 business
 
+class segment_code(osv.osv):
+
+	def _check_segment_code(self, cr, uid, ids, context=None):
+		sr_ids = self.search(cr, 1 ,[], context=context)
+		lst = [
+				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
+				if x.name and x.id not in ids
+				]
+		for self_obj in self.browse(cr, uid, ids, context=context):
+			if self_obj.name and self_obj.name.lower() in  lst:
+				raise osv.except_osv(_('Error:'),_("Segment Code Already Exists")%(self_obj))
+		return True
+	
+	_name ='segment.code'
+	_description ="Business Segment Code"
+	_columns = {
+	'name':fields.selection((('CP (Corporate Public)','CP (Corporate Public)'),('CI (Corporate In-House)','CI (Corporate In-House)'),('RP (Retail Public)','RP (Retail Public)'),('HP (HE Public)','HP (HE Public)'),('HI  (HE In-House)','HI  (HE In-House)')),'Segment Code'),
+	}
+	_constraints = [(_check_segment_code, 'Error: Segment Code Already Exists', ['Segment Code'])]
+segment_code()
+
 
 class unit_line(osv.osv):
+	
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(unit_line, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
 	
 	def _check_unique_order_id(self, cr, uid, ids, context=None):
 		if dupliacte_order_priority_found == True:
@@ -346,6 +391,7 @@ class unit_line(osv.osv):
 	_name = "unit.line"
 	_description = "This table is for keeping location data"
 	_columns = {
+		's_no': fields.integer('S.No', size=100,readonly=1),
 		'order_priority': fields.integer('Order Of Priority', size=2,required=True, select=True),  
 		'unit': fields.char('Unit', size=30, required=True),
 		'unit_line_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
@@ -366,13 +412,11 @@ class people_line(osv.osv):
 
 	def _check_unique_order_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
-		lst = [
-				x.name.lower() for x in self.browse(cr, uid, sr_ids, context=context)
-				if x.name and x.id not in ids
-				]
-		for self_obj in self.browse(cr, uid, ids, context=context):
-			if self_obj.name and self_obj.name.lower() in  lst:
-				return False
+		for x in self.browse(cr, uid, sr_ids, context=context):
+			if x.id != ids[0]:
+				for self_obj in self.browse(cr, uid, ids, context=context):
+					if x.people_business_id == self_obj.people_business_id and x.name == self_obj.name:
+						return False
 		return True	
 		
 	_name = "people.line"
@@ -380,9 +424,15 @@ class people_line(osv.osv):
 	_columns = {
 		's_no': fields.integer('S.No', size=100,readonly=1),
 		'p_line_id': fields.char('Id',size=20),
-		'name': fields.char('Name', size=20,required=True, select=True),
-		'title': fields.char('Title', size=20),
 		'people_business_id': fields.many2one('business', 'Business', ondelete='cascade', help='Test', select=True),
+		'name': fields.many2one('user.profiles', 'Name as in NRIC', ondelete='cascade', help='Description', select=True),
+		'nric_name': fields.related('name','name_nric',type="char",relation="user.profiles",string="Name", readonly=1),
+		'unit': fields.related('name','status',type="char",relation="user.profiles",string="Status", readonly=1),
+		'title': fields.related('name','given_name',type="char",relation="user.profiles",string="Title", readonly=1),
+		'role': fields.related('name','role',type="many2one",relation="manage.role",string="Role", readonly=1),
 	}
 	_constraints = [(_check_unique_order_name, 'Error: People Name already exist', ['People'])]
 people_line
+
+
+

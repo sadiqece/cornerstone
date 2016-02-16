@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
   <data>
-  
-	<!-- ===================== Create User Role List View ============================= -->
-  
-	<record id="create_user_tree" model="ir.ui.view">
-      <field name="name">Users</field>
-      <field name="model">manage.role</field>
-      <field name="arch" type="xml">
-        <tree string="Users">
-          <field name="name" />
-		  <field name="status" />
-        </tree>
-      </field>
-    </record>
 	
 	<!-- ===================== Create User Profiles List View ============================= -->
   
@@ -30,122 +17,11 @@
         </tree>
       </field>
     </record>
-
-	<!-- ========================= Create Users Roles Form View ============================= -->
-	<record id="create_user_form" model="ir.ui.view">
-      <field name="name">Create Users</field>
-      <field name="model">manage.role</field>
-      <field name="arch" type="xml">
-        <form string="User" version="7.0" duplicate="false">
-          <sheet>
-			<!-- <field name="image_medium" widget="image"  /> -->
-              <group>
-				  <div class="oe_title">
-					<label for="name" class="oe_edit_only"/>
-					<h1 style="width:380px;">
-					  <field name="name" />
-					</h1>
-				  </div>
-			  </group>
-			  
-			  <group style="width:280px;">
-                  <div class="oe_title">
-					<label for="status"/>
-					<field name="status" style="width:220px;"/>
-				  </div>
-			  </group>
-			  
-				<div class="col-35" style="float:right !important;margin:-110px 0px 2px ">
-					<group col="4">
-					
-						<div attrs="{'invisible': [('role_status_display_1', 'in' , ('Active', 'Deactivated', 'Blocked', 'False'))]}">
-							<div id="div_status2" class="openerp oe_form_readonly role_status_box">
-								<div class="role_status_box_label">Status</div>
-								<div class="role_status_box_status">
-									<field name="role_status_display_1" readline="1" />
-								</div>
-							</div>
-						</div>
-
-						<div attrs="{'invisible': [('role_status_display_2', 'in' ,('Created', 'Deactivated', 'Blocked', 'False'))]}">
-							<div id="div_status1" class="openerp oe_form_readonly role_status_box_1">
-								<div class="role_status_box_label_1 ">Status</div>
-								<div class="role_status_box_status_1">
-									<field name="role_status_display_2" readline="1" />
-								</div>
-							</div>
-						</div>
-						
-						<div attrs="{'invisible': [('role_status_display_3', 'in' ,('Created', 'Active', 'Blocked', 'False'))]}">
-							<div id="div_status1" class="openerp oe_form_readonly role_status_box_2">
-								<div class="role_status_box_label_2 ">Status</div>
-								<div class="role_status_box_status_2">
-									<field name="role_status_display_3" readline="1" />
-								</div>
-							</div>
-						</div>
-
-						<div attrs="{'invisible': [('role_status_display_4', 'in' ,('Created', 'Active', 'Deactivated', 'False'))]}">
-							<div id="div_status1" class="openerp oe_form_readonly role_status_box_3">
-								<div class="role_status_box_label_3 ">Status</div>
-								<div class="role_status_box_status_3">
-									<field name="role_status_display_4" readline="1" />
-								</div>
-							</div>
-						</div>
-					</group>
-				</div>
-			  
-			<notebook colspan="5" col="10">
-				<page string="Pages and Actions">
-					<h3>
-					  <label string="Pages and Actions" readonly="context.get('ctx', False)" />
-					</h3>
-					<field name="pages_actions_tab" nolabel="1">
-					  <tree string="List" editable="bottom">
-						<field name="name" />
-						<field name="view" />
-						<field name="create" />
-						<field name="update" />
-					  </tree>
-					</field>
-				</page>
-				
-				<page string="Notifications">
-					<h3>
-					  <label string="Notifications" readonly="context.get('ctx', False)" />
-					</h3>
-					<field name="notification_tab" nolabel="1">
-					  <tree string="List" editable="bottom">
-						<field name="name" />
-						<field name="active" />
-					  </tree>
-					</field>
-				</page>
-				
-				<page string="Documentations">
-					<h3>
-					  <label string="Documentations" readonly="context.get('ctx', False)" />
-					</h3>
-					<field name="documentation_tab" nolabel="1">
-					  <tree string="List" editable="bottom">
-						<field name="name" />
-						<field name="generate" />
-						<field name="receive" />
-					  </tree>
-					</field>
-				</page>
-			
-			</notebook>
-		  </sheet>
-		</form>
-	  </field>
-	</record>
 	
 	<!-- ========================= Create Users Profile Form View ============================= -->
 	
 	<record id="users_pro" model="ir.ui.view">
-      <field name="name">User Profile</field>
+      <field name="name">Users</field>
       <field name="model">user.profiles</field>
       <field name="arch" type="xml">
         <form string="User Profile" version="7.0" duplicate="false">
@@ -153,14 +29,13 @@
 			<group class="col-10">
 				<label string="User Profile" class="oe_edit_only" style="font-size:20px;"/>
 			</group>
-			<div class="col-10">
+			<!--div class="col-10">
 				<field name="image_medium" widget="image" class="oe_left oe_avatar" />
-			</div>
-			  
+			</div-->
 			<div class="col-2">
 				<label for="name" class="oe_edit_only" />
 				<h1>
-				   <field name="name"/>
+				   <field name="name"/>   <!-- name ==> Name as in NRIC -->
 				</h1>
 			</div>
 			<div class="col-35">
@@ -205,16 +80,16 @@
 			</div>  
 			<div class="clear" />
 			<div class="col-3">
+			  <label for="name_nric" />
+			  <field name="name_nric" />  <!-- name_nric ==> Name -->
+			</div>
+			<div class="col-3">
 			  <label for="sur_name" />
-			  <field name="sur_name" />
+			  <field name="sur_name" />   <!-- sur_name ==> Sur Name -->
 			</div>
 			<div class="col-3">
 			  <label for="given_name" />
-			  <field name="given_name" />
-			</div>
-			<div class="col-3">
-			  <label for="name_nric" />
-			  <field name="name_nric" />
+			  <field name="given_name" />   <!-- given_name ==> Title -->
 			</div>
 			
 			<div class="clear" />
@@ -274,7 +149,7 @@
 					</h3>
 					<field name="profile_pages_actions_tab" nolabel="1">
 					  <tree string="List" editable="bottom">
-						<field name="name" />
+						<field name="profile_items" />
 						<field name="view" />
 						<field name="create" />
 						<field name="update" />
@@ -288,7 +163,7 @@
 					</h3>
 					<field name="profile_notification_tab" nolabel="1">
 					  <tree string="List" editable="bottom">
-						<field name="name" />
+						<field name="notification_items" />
 						<field name="active" />
 					  </tree>
 					</field>
@@ -300,7 +175,7 @@
 					</h3>
 					<field name="profile_documentation_tab" nolabel="1">
 					  <tree string="List" editable="bottom">
-						<field name="name" />
+						<field name="documentation_items" />
 						<field name="generate" />
 						<field name="receive" />
 					  </tree>
@@ -313,7 +188,7 @@
 					</h3>
 					<field name="profile_history_tab" nolabel="1">
 					  <tree string="List" editable="bottom">
-						<field name="name" />
+						<field name="history_items" />
 					  </tree>
 					</field>
 				</page>
@@ -326,22 +201,6 @@
 	</record>
   
 	<!-- ========================= Action Tabs ============================= -->
-	
-	<!-- Create Role -->
-	<record model="ir.actions.act_window" id="users_roles">
-      <field name="name">User Role</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">manage.role</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-	   <field name="view_id" ref="create_user_tree" />
-      <field name="search_view_id" ref="view_settings_filter" />
-		<field name="help" type="html">
-		<p class="oe_view_nocontent_create">
-			Click to create a user role.
-		</p>
-		</field>
-    </record>
 	
 	<!-- Create Users -->
 	<record model="ir.actions.act_window" id="profiles">
@@ -361,7 +220,6 @@
   
   
     <menuitem name="User Management" id="menu_user_management" parent="menu_lis_lab" />
-		<menuitem name="Role" id="user_role" parent="menu_user_management" action="users_roles" />
 		<menuitem name="User Profiles" id="user_profiles" parent="menu_user_management" action="profiles"/>
   </data>
 </openerp>

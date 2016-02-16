@@ -6,7 +6,7 @@
     <field name="name">business.form</field>
     <field name="model">business</field>
     <field name="arch" type="xml">
-        <form string="test" version="7.0">
+        <form string="test" version="7.0" duplicate="false">
             <sheet>
                 <group>
 						<div class="oe_title">
@@ -18,38 +18,45 @@
                             <h2 style="width:280px;">
                                 <field name = "business_code"/>
                             </h2>
-							<label for="bussiness_id" class="oe_edit_only"/>
-                            <h2 style="width:250px;">
-                                <field name = "bussiness_id" options="{'create': False, 'create_edit': False}"/>
-                            </h2>
+							<div class="col-2" >
+								<label for = "bussiness_id" />
+								<field name = "bussiness_id" />
+							</div>
+							<div class="col-2">
+								<label for = "segment_line_code" />
+								<field name = "segment_line_code" />
+							</div>
 						</div>
 		       </group>
 			   <group col="4">
-			   <div>
-				   <h2>
-						<label for="unit_line" string="Sub-Units"/>
-				   </h2>
-					<field name='unit_line' nolabel='1'>
-							<tree string='List' editable="bottom">
-								<!-- Zeya 7-1-15 -->
-								<field name='order_priority'  readonly="context.get('ctx', False)"/>
-								<!-- EOF -->
-								<field name='unit'/>
-							</tree>
-					</field>
-				</div>
-				<div>
-					<h2>
-						<label for="people_line" string="People"/>
-					</h2>
-					<field name='people_line' nolabel='1'>
-							<tree string='List' editable="bottom">
-								<field name = "s_no"/>
-								<field name='name'/>
-								<field name='title'/>
-							</tree>
-					</field>
-				</div>
+				   <div>
+					   <h2>
+							<label for="unit_line" string="Sub-Units"/>
+					   </h2>
+						<field name='unit_line' nolabel='1'>
+								<tree string='List' editable="bottom">
+									<field name = "s_no"/>
+									<field name='order_priority' readonly="context.get('ctx', False)"/>
+									<field name='unit'/>
+								</tree>
+						</field>
+					</div>
+					
+					<div>
+						<h2>
+							<label for="people_line" string="People"/>
+						</h2>
+						<field name='people_line' nolabel='1'>
+								<tree string='List' editable="bottom">
+									<field name = "s_no"/>
+									<field name='name' options="{'create': False, 'create_edit': False}"/>
+									<!--field name='nric_name'/-->
+									<field name='unit'/>
+									<field name='title' options="{'create': False, 'create_edit': False}"/>
+									<field name='role'/>
+								</tree>
+						</field>
+					</div>
 				</group>
 			</sheet>
         </form>
@@ -94,7 +101,6 @@
               </p>
             </field>
         </record>
-
 
 <menuitem name = "Business Structure" id = "business" parent = "menu_sub2" action = "action_business" />
 
