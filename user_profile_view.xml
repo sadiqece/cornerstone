@@ -13,7 +13,6 @@
 		  <field name="sur_name" />
 		  <field name="given_name" />
 		  <field name="name_nric" />
-		  <field name="user_name" />
         </tree>
       </field>
     </record>
@@ -94,8 +93,8 @@
 			
 			<div class="clear" />
 			<div class="col-2" style="width:300px;">
-				<label for="user_name" />
-				<field name="user_name" />
+				<label for="login" />
+				<field name="login" />
 				<label for="password" />
 				<field name="password" />
 			</div>
@@ -106,7 +105,8 @@
 				<label for="role" />
 				<field name="role" options="{'create': False, 'create_edit': False}"/>
 			</div>
-			
+				<label for="user_name" />
+				<field name="user_name" />
 			<notebook colspan="5" col="10">
 			
 				<page string="Personal Details">
@@ -187,9 +187,16 @@
 					  <label string="History" readonly="context.get('ctx', False)" />
 					</h3>
 					<field name="profile_history_tab" nolabel="1">
-					  <tree string="List" editable="bottom">
-						<field name="history_items" />
-					  </tree>
+					  <tree string="History Order Lines" create="false" delete="false">
+								<field name = "s_no"/>
+								<field name = "date_created"/>
+								<field name = "created_by"/>
+								<field name = "last_update"/>
+								<field name = "last_update_by"/>
+								<field name = "date_status_change"/>
+								<field name = "status_change_by"/>
+								<field name = "changes"/>
+							</tree>
 					</field>
 				</page>
 			

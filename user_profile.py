@@ -97,16 +97,16 @@ class users_profile(osv.osv):
 				return res
 			return dob
 			
-	'''def create(self, cr, uid, vals, context=None):
+	def create(self, cr, uid, vals, context=None):
 		user_obj = self.pool.get('res.users')
 		vals_user = {
-			'user_name': vals.get('name'),
-			'login': default_login,
-			#other required field 
+			'name': vals.get('name'),
+			'login': vals.get('login'),
+			'password': vals.get('password'),
 		}
 		user_obj.create(cr, uid, vals_user, context)
 		result = super(users_profile, self).create(cr, uid, vals, context=context)
-		return result'''
+		return result
 		
 	def _check_unique_user_profile_name(self, cr, uid, ids, context=None):
 		sr_ids = self.search(cr, 1 ,[], context=context)
@@ -125,14 +125,17 @@ class users_profile(osv.osv):
 		'sur_name':fields.char('Surname', size=20),
 		'given_name':fields.char('Title', size=20, required=True),
 		'name_nric':fields.char('Name', size=20, required=True),
-		'user_name':fields.char('User Name', size=20, required=True),
-		'password':fields.char('Password', size=20, required=True),
+		'user_name':fields.char('User Name', size=20, readonly=1),
+		'login': fields.char('Login', size=64, required=True,
+            help="Used to log into the system"),
+        'password': fields.char('Password', size=64,
+            help="Keep empty if you don't want the user to be able to connect on the system."),
 		'status': fields.selection((('Created','Created'),('Active','Active'),('Deactivated','Deactivated'),('Blocked','Blocked')),'Status', required=True),
 		'role': fields.many2one('manage.role', 'Role', ondelete='cascade', help='Role', select=True),
 		'profile_pages_actions_tab': fields.one2many('profile.pages.actions', 'page_action_id', 'Pages & Actions'),
 		'profile_notification_tab': fields.one2many('profile.notifications', 'notification_id', 'Notifications'),
 		'profile_documentation_tab': fields.one2many('profile.documentations', 'documentation_id', 'Documentations'),
-		'profile_history_tab': fields.one2many('profile.history', 'history_id', 'History'),
+		'profile_history_tab': fields.one2many('user.profile.history', 'history_id', 'History'),
 		'user_status_display_1': fields.function(_user_status_display_1, readonly=1, type='char'),
 		'user_status_display_2': fields.function(_user_status_display_2, readonly=1, type='char'),
 		'user_status_display_3': fields.function(_user_status_display_3, readonly=1, type='char'),
@@ -230,11 +233,29 @@ profile_documentations()
 
 class profile_history(osv.osv):
 	
-	_name ='profile.history'
-	_description ="Personal History"
+	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
+		
+		res = super(profile_history, self).read(cr, uid,ids, fields, context, load)
+		seq_number =0 
+		for r in res:
+			seq_number = seq_number+1
+			r['s_no'] = seq_number
+		
+		return res
+		
+	_name ='user.profile.history'
+	_description ="History Tab"
 	_columns = {
-		'history_id' : fields.many2one('user.profiles', 'History ID', ondelete='cascade', help='Learner', select=True),
-		'history_items':fields.char('Items'),
+	's_no' : fields.integer('S.No',size=20,readonly=1),
+	'history_id':fields.integer('Id',size=20),
+	'date_created':fields.char('Date Created',size=20),
+	'created_by':fields.char('Created By',size=20),
+	'last_update':fields.char('Last Update',size=20),
+	'last_update_by':fields.char('Last Update By',size=20),
+	'date_status_change':fields.char('Date Of Status Change',size=20),
+	'status_change_by':fields.char('Status Change By',size=20),
+	'changes':fields.char('Changes',size=200),
+	'test_id': fields.many2one('test', 'Test', ondelete='cascade', help='Test', select=True),
 	}
 profile_history()
 
